@@ -61,6 +61,7 @@ public class ServiceService {
 
     @Transactional
     public ServiceGetOneRes getOneService(ServiceGetOneReq p){
+
         log.info("p:{}",p);
         Long businessId = p.getBusinessId();
         // 13으로 찍힘
@@ -74,6 +75,7 @@ public class ServiceService {
 
         if(businessId==null && res.getUserId()!=userId) {
             throw new CustomException(ServiceErrorCode.USER_MISMATCH);
+            //이부분 어케할지 userId 없이도 볼수 있도록? 주소가 보여버리는데??
         }
         log.info("businessId:{}",businessId);
         if(businessId != null && !userId.equals(serviceMapper.findUserId(businessId))) {
