@@ -45,7 +45,7 @@
 
     <insert id="postOption">
         INSERT INTO option
-        SET detailTypeId=#{detailTypeId}
+        SET productId=#{productId}
         ,name=#{optionName}
     </insert>
     <select id="checkOption">
@@ -74,9 +74,9 @@
 
 
     <insert id="postProductOption">
-        INSERT INTO product_option
+        INSERT INTO option
         SET productId=#{productId}
-        ,optionId=#{optionId}
+        ,name=#{name}
     </insert>
     <select id="checkProductOption">
         SELECT optionId
@@ -97,7 +97,7 @@
 
     <insert id="postOptionDetail">
         INSERT INTO option_detail
-        SET productOptionId=#{productOptionId}
+        SET optionId=#{optionId}
         ,contents=#{contents}
         ,price=#{optionDetailPrice}
         ,name=#{optionDetailName}
@@ -160,7 +160,7 @@
     </resultMap>
 
     <resultMap id="selProductOptionDetailListResultMap" type="com.green.jobdone.product.model.ProductGetDtoDto">
-    <id property="optionDetailId" column="optionDetailId"/>
+    <id property="optionId" column="optionId"/>
     <result property="optionDetailName" column="optionDetailName"/>
     <result property="optionDetailPrice" column="optionDetailPrice"/>
     <result property="contents" column="contents"/>
@@ -171,20 +171,18 @@
         SELECT
             a.productId
             ,a.price as productPrice
-            ,b.productOptionId
-            ,d.name as optionName
+            ,b.optionId
+            ,b.name as optionName
             ,c.optionDetailId
             ,c.name as optionDetailName
             ,c.price as optionDetailPrice
             ,c.contents
             ,e.detailTypeName
         FROM product a
-        left JOIN product_option b
+        left JOIN option b
             ON a.productId=b.productId
         left JOIN option_detail c
             ON b.productOptionId=c.productOptionId
-        left JOIN option d
-            on b.optionId=d.optionId
         left JOIN detail_type e
             on a.detailTypeId=e.detailTypeId
         WHERE a.businessId=#{businessId}

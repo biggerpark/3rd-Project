@@ -67,7 +67,12 @@ public class ServiceService {
         // 13으로 찍힘
 
         ServiceGetOneRes res = serviceMapper.GetServiceOne(p);
-        Long userId = authenticationFacade.getSignedUserId();
+        Long userId = null;
+        try{
+            userId = authenticationFacade.getSignedUserId();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
         List<ServiceEtcDto> dto = serviceMapper.GetEtc(p.getServiceId());
         res.setEtc(dto);
         // 토큰의 userId
@@ -80,7 +85,7 @@ public class ServiceService {
             res.setUserName("");
             res.setUserPhone("");
             res.setAddress("");
-            throw new CustomException(ServiceErrorCode.USER_MISMATCH);
+           return res;
             //이부분 어케할지 userId 없이도 볼수 있도록? 주소가 보여버리는데??
         }
         log.info("businessId:{}",businessId);

@@ -58,7 +58,7 @@
 
 
     <resultMap id="serviceOption" type="com.green.jobdone.service.model.Dto.ServiceOptionDto">
-        <id property="productOptionId" column="productOptionId"/>
+        <id property="optionId" column="optionId"/>
         <result property="optionName" column="optionName"/>
         <result property="optionDetailId" column="optionDetailId"/>
         <result property="optionDetailName" column="optionDetailName"/>
@@ -81,7 +81,7 @@
         select a.serviceId, b.name as userName, b.phone as userPhone, d.businessName as businessName,
         e.detailTypeName as detailTypeName, a.price, a.completed, a.address, a.comment, a.addComment, a.createdAt, a.userId,
         k.startDate, k.endDate, k.mStartTime, k.mEndTime, d.businessNum, l.categoryName, d.tel as businessPhone,
-        g.productOptionId, n.name as optionName, i.name as optionDetailName, i.contents, i.optionDetailId,
+        g.optionId, n.name as optionName, i.name as optionDetailName, i.contents, i.optionDetailId,
         a.pyeong, d.address as businessAddress, a.updatedAt, a.userId,
         IFNULL(o.optionDetailPrice, i.price) AS optionDetailPrice, o.serviceOptionId, o.comment AS optionComment
         FROM service a
@@ -91,7 +91,7 @@
         LEFT JOIN detail_type e ON c.detailTypeId = e.detailTypeId
         LEFT JOIN service_option f ON a.serviceId = f.serviceId
         LEFT JOIN option_detail i ON f.optionDetailId = i.optionDetailId
-        LEFT JOIN product_option g ON i.productOptionId = g.productOptionId
+        LEFT JOIN `option` g ON i.optionId = g.optionId
         LEFT JOIN service_detail k ON a.serviceId = k.serviceId
         LEFT JOIN category l ON e.categoryId = l.categoryId
         LEFT JOIN option n ON n.optionId = g.optionId

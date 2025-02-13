@@ -2,7 +2,6 @@ package com.green.jobdone.product;
 
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.product.model.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -47,7 +46,7 @@ public class ProductService {
     public int postOption(ProductOptionPostReq p) {
 
 
-        List<String> list = mapper.checkOption(p.getDetailTypeId());
+        List<String> list = mapper.checkOption(p.getProductId());
 
         if (list == null || list.size() == 0) {
             int result = mapper.postOption(p);
@@ -94,7 +93,7 @@ public class ProductService {
         }
 
         for (Long s : list) {
-            if (s.equals(p.getOptionId())) {
+            if (s.equals(p.getName())) {
                 return 0;
             }
         }
@@ -111,7 +110,7 @@ public class ProductService {
 
         long userId=authenticationFacade.getSignedUserId();
 
-        Long checkUserId=mapper.checkUserOptionDetail(p.getProductOptionId());
+        Long checkUserId=mapper.checkUserOptionDetail(p.getOptionId());
 
         if(userId!=checkUserId){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
@@ -120,7 +119,7 @@ public class ProductService {
 
 
 
-        List<String> list = mapper.checkProductOptionDetail(p.getProductOptionId());
+        List<String> list = mapper.checkProductOptionDetail(p.getOptionId());
 
         if (list == null || list.size() == 0) {
             int result = mapper.postOptionDetail(p);
