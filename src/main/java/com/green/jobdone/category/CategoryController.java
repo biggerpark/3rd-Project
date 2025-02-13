@@ -8,7 +8,9 @@ import com.green.jobdone.category.model.CategoryGetRes;
 import com.green.jobdone.category.model.CategoryPostReq;
 import com.green.jobdone.common.model.ResultResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -56,7 +58,7 @@ public class CategoryController {
     }
 
     @GetMapping("/detail")
-    public ResultResponse<List<DetailTypeGetRes>> getAllDetailType(DetailTypeGetReq p){
+    public ResultResponse<List<DetailTypeGetRes>> getAllDetailType(@Valid @ParameterObject @ModelAttribute DetailTypeGetReq p){
         return ResultResponse.<List<DetailTypeGetRes>>builder().resultMessage("상세 서비스 조회 완료")
                 .resultData(categoryService.getDetailType(p)).build();
     }
