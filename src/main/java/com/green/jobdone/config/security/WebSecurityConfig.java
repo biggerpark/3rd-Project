@@ -47,6 +47,7 @@ public class WebSecurityConfig {
                                 .requestMatchers(HttpMethod.GET,"/api/review/**").permitAll() // 댓글 get 은 인증된 사용자가 아니어도 볼 수 있음
                                 .requestMatchers("/api/review/**").authenticated()
                                 //서비스쪽
+                                .requestMatchers(HttpMethod.GET,"/api/service/**").permitAll()
                                 .requestMatchers("/api/service/**").authenticated()
                                 //업체쪽
                                 .requestMatchers(HttpMethod.GET,"/api/business/**").permitAll() // 댓글 get 은 인증된 사용자가 아니어도 볼 수 있음

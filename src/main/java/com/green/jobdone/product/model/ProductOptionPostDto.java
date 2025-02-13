@@ -10,8 +10,8 @@ import lombok.Setter;
 public class ProductOptionPostDto {
     @Schema(title = "상품 PK", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     private long productId;
-    @Schema(title = "옵션 PK", example = "2", requiredMode = Schema.RequiredMode.REQUIRED)
-    private long optionId;
+    @Schema(title = "상품 이름", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String name;
     @JsonIgnore
     private long userId;
 }
