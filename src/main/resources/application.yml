@@ -5,6 +5,9 @@ const:
 file:
   directory: D:/2024-02/download/greengram_ver3
 
+domain:
+  path:
+    server: http://112.222.157.156:5224/
 
 mybatis:
   mapper-locations: mappers/**/*.xml

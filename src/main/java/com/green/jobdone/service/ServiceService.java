@@ -44,7 +44,7 @@ public class ServiceService {
 
         Long userId = authenticationFacade.getSignedUserId();
         p.setUserId(userId);
-        if(p.getStatus()>4 || p.getStatus()<0){
+        if(p.getStatus()>5 || p.getStatus()<0){
             throw new CustomException(ServiceErrorCode.INVALID_SERVICE_STATUS);
         }
         if(p.getBusinessId()!= null && !p.getUserId().equals(serviceMapper.findUserId(p.getBusinessId()))) {
@@ -66,14 +66,20 @@ public class ServiceService {
         Long businessId = p.getBusinessId();
         // 13으로 찍힘
 
+        ServiceGetOneRes res = serviceMapper.GetServiceOne(p);
+        Long userId = authenticationFacade.getSignedUserId();
+        List<ServiceEtcDto> dto = serviceMapper.GetEtc(p.getServiceId());
+        res.setEtc(dto);
+        // 토큰의 userId
+
         if(p.getServiceId()==0){
             return null;
         }
-        ServiceGetOneRes res = serviceMapper.GetServiceOne(p);
-        Long userId = authenticationFacade.getSignedUserId();
-        // 토큰의 userId
 
-        if(businessId==null && res.getUserId()!=userId) {
+        if(businessId==null && userId==null || res.getUserId()!=userId) {
+            res.setUserName("");
+            res.setUserPhone("");
+            res.setAddress("");
             throw new CustomException(ServiceErrorCode.USER_MISMATCH);
             //이부분 어케할지 userId 없이도 볼수 있도록? 주소가 보여버리는데??
         }
@@ -83,8 +89,6 @@ public class ServiceService {
             throw new CustomException(ServiceErrorCode.BUSINESS_OWNER_MISMATCH);
         }
 
-        List<ServiceEtcDto> dto = serviceMapper.GetEtc(p.getServiceId());
-        res.setEtc(dto);
         return res;
     }
 
