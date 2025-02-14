@@ -14,7 +14,8 @@
         address = #{address},
         detailTypeId = #{detailTypeId},
         busiCreatedAt = #{busiCreatedAt},
-        tel = #{tel}
+        tel = #{tel},
+        safeTel = #{safeTel}
     </insert>
 
     <select id="existBusinessNum" parameterType="String" resultType="int">
@@ -201,9 +202,8 @@
         b.contents,
         COUNT(distinct r.reviewId) AS reviewCount,
         TIMESTAMPDIFF(YEAR,b.busiCreatedAt, NOW()) AS years,
-        b.tel,
-        b.tel2,
-        b.tel3
+        b.safeTel
+
         FROM business b
         JOIN detail_type d ON d.detailTypeId = b.detailTypeId
         LEFT JOIN business_pic c ON c.businessId = b.businessId
@@ -218,7 +218,7 @@
     <select id="getBusinessPicList">
         select  p.businessId, p.businessPicId, p.pic
         from business_pic p
-        where p.businessId = #{businessId}
+        where p.businessId = #{businessId} and p.state in(1,2)
     </select>
 
     <delete id="delBusinessPic">

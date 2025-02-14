@@ -19,6 +19,8 @@ public class BusinessPostSignUpReq {
     private String logo;
     @JsonIgnore
     private long signedUserId;
+    @JsonIgnore
+    private String safeTel;
 
     @Schema(title = "사업자번호", example = "0000000", requiredMode = Schema.RequiredMode.REQUIRED)
     private String businessNum;

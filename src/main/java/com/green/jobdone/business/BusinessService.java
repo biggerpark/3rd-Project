@@ -24,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Service
 @Slf4j
@@ -33,14 +34,24 @@ public class BusinessService {
     private final BusinessMapper businessMapper;
     private final MyFileUtils myFileUtils;
     private final AuthenticationFacade authenticationFacade; //인증받은 유저가 이용 할 수 있게.
-
     //일단 사업등록하기 한번기입하면 수정불가하는 절대적정보
+
+    public static String generateSafeTel(){
+        Random random = new Random();
+
+        int n1 = random.nextInt(10000);
+        int n2 = random.nextInt(10000);
+        return String.format("050-%04d-%04d", n1, n2);
+    }
+
 
     @Transactional
     public long insBusiness(MultipartFile paper, MultipartFile logo, BusinessPostSignUpReq p) {
 
         long userId = authenticationFacade.getSignedUserId();
         p.setSignedUserId(userId);
+
+        String safeTel = generateSafeTel();
 
         // 사업자 등록번호 유효성 체크
         if (p.getBusinessNum() == null || p.getBusinessNum().isBlank()) {
@@ -79,7 +90,7 @@ public class BusinessService {
 
         }
 
-
+        p.setSafeTel(safeTel);
         p.setPaper(savedPicName);
         p.setLogo(logoPath);
 

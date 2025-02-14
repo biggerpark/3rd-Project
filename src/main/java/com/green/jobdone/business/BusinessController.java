@@ -43,7 +43,7 @@ public class BusinessController {
 
     @PutMapping("detail")
     @Operation(summary = "업체 상세정보 기입")
-    public ResultResponse<Integer> udtBusinessDetail(@RequestBody BusinessDetailPutReq p) {
+    public ResultResponse<Integer> udtBusinessDetail(@Valid @ParameterObject @ModelAttribute BusinessDetailPutReq p) {
         int result = businessService.udtBusiness(p);
         return ResultResponse.<Integer>builder()
                 .resultData(result)
