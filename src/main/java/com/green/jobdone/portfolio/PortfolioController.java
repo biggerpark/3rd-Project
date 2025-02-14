@@ -46,7 +46,7 @@ public class PortfolioController {
 
     @PutMapping("pic")
     @Operation(summary = "포폴 사진 유형 수정")
-    public ResultResponse<Integer> putPortfolioPic(PortfolioGetOneReq p) {
+    public ResultResponse<Integer> putPortfolioPic(@Valid @ParameterObject @ModelAttribute PortfolioGetOneReq p) {
         int res =portfolioService.udtPortfolioPics(p);
 
         return ResultResponse.<Integer>builder()
@@ -57,7 +57,7 @@ public class PortfolioController {
 
     @PutMapping("pic/thumbnail")
     @Operation(summary = "포폴 썸네일 설정")
-    public ResultResponse<Integer> setPortfolioThumbnail(PortfolioPicReq p){
+    public ResultResponse<Integer> setPortfolioThumbnail(@Valid @ParameterObject @ModelAttribute PortfolioPicReq p){
         int result = portfolioService.udtPortfolioThumbnail(p);
         return ResultResponse.<Integer>builder().resultData(result).resultMessage("댐").build();
     }
@@ -78,21 +78,21 @@ public class PortfolioController {
 
     @PutMapping
     @Operation(summary = "포폴 수정")
-    public ResultResponse<Integer> udtPortfolioPut(PortfolioPutReq p) {
+    public ResultResponse<Integer> udtPortfolioPut(@Valid @ParameterObject @ModelAttribute PortfolioPutReq p) {
         int res = portfolioService.udtPortfolio(p);
         return ResultResponse.<Integer>builder().resultData(res).resultMessage(res > 0? "포폴 수정 완료": "포폴 수정 빠꾸").build();
     }
 
     @GetMapping
     @Operation(summary = "여러 포폴조회")
-    public ResultResponse<List<PortfolioListGetRes>> getPortfolioList(PortfolioListGetReq p) {
+    public ResultResponse<List<PortfolioListGetRes>> getPortfolioList(@Valid @ParameterObject @ModelAttribute PortfolioListGetReq p) {
         List<PortfolioListGetRes> res = portfolioService.getPortfolioList(p);
         return ResultResponse.<List<PortfolioListGetRes>>builder().resultData(res).resultMessage("포폴 리스트 조회 완료").build();
     }
 
     @GetMapping("/{portfolioId}")
     @Operation(summary = "한 포폴 조회")
-    public ResultResponse<PortfolioGetOneRes> selPortfolio(PortfolioGetOneReq p) {
+    public ResultResponse<PortfolioGetOneRes> selPortfolio(@Valid @ParameterObject @ModelAttribute PortfolioGetOneReq p) {
         PortfolioGetOneReq req = new PortfolioGetOneReq(p.getPortfolioId());
         PortfolioGetOneRes res = portfolioService.getOnePortfolio(req);
 
@@ -101,7 +101,7 @@ public class PortfolioController {
 
     @GetMapping("pic/{portfolioId}")
     @Operation(summary = "한 포폴에서 사진 여러장 조회")
-    public ResultResponse<List<PortfolioPicGetRes>> getPortfolioPicList(PortfolioGetOneReq p){
+    public ResultResponse<List<PortfolioPicGetRes>> getPortfolioPicList(@Valid @ParameterObject @ModelAttribute PortfolioGetOneReq p){
         PortfolioPicGetReq req = new PortfolioPicGetReq(p.getPortfolioId());
         List<PortfolioPicGetRes> res = portfolioService.getPortfolioPicList(req);
 

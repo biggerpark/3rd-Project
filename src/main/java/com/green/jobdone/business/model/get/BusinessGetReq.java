@@ -19,9 +19,15 @@ public class BusinessGetReq {
     @JsonIgnore
     private long signedUserId;
 
-    @Schema(title = "정렬 기준", description = "latest(최신순), rating(별점순), order(주문순), price(가격순)")
+    @Schema(title = "정렬 기준", description = "latest(최신순), rating(별점순), order(주문순), price(가격순), distance(거리순)")
     private String sortType;
 
-    @Schema(title = "검색어", description = "청소")
+    @Schema(title = "검색어")
     private String searchTerm;
+
+    @Schema(title = "user_latitude")
+    private double userLat;
+
+    @Schema(title = "user_longitude")
+    private double userLng;
 }

@@ -43,7 +43,7 @@ public class BusinessController {
 
     @PutMapping("detail")
     @Operation(summary = "업체 상세정보 기입")
-    public ResultResponse<Integer> udtBusinessDetail(@RequestBody BusinessDetailPutReq p) {
+    public ResultResponse<Integer> udtBusinessDetail(@Valid @ParameterObject @ModelAttribute BusinessDetailPutReq p) {
         int result = businessService.udtBusiness(p);
         return ResultResponse.<Integer>builder()
                 .resultData(result)
@@ -53,7 +53,7 @@ public class BusinessController {
 
     @PatchMapping("logo")
     @Operation(summary = "업체 로고사진 변경")
-    public ResultResponse<Integer> patchProfilePic(@RequestPart BusinessLogoPatchReq p, @RequestPart(required = false) MultipartFile logo) {
+    public ResultResponse<Integer> patchProfilePic(@Valid @RequestPart BusinessLogoPatchReq p, @RequestPart(required = false) MultipartFile logo) {
         log.info("UserController > patchProfilePic > p: {}", p);
 
         int result = businessService.patchBusinessLogo(p, logo);
@@ -66,7 +66,7 @@ public class BusinessController {
 
     @PatchMapping("paper")
     @Operation(summary = "업체 사업자등록증 변경")
-    public ResultResponse<Integer> patchProfilePaper(@RequestPart BusinessPaperPatchReq p, @RequestPart(required = false) MultipartFile paper) {
+    public ResultResponse<Integer> patchProfilePaper(@Valid @RequestPart BusinessPaperPatchReq p, @RequestPart(required = false) MultipartFile paper) {
         log.info("UserController > patchProfilePic > p: {}", p);
 
         int result = businessService.patchBusinessPaper(p, paper);
@@ -82,7 +82,7 @@ public class BusinessController {
     @PostMapping("businessPic")
     @Operation(summary = "업체 사진 등록")
     public ResultResponse<BusinessPicPostRes> postBusinessPic(@RequestPart List<MultipartFile> pics,
-                                                              @RequestPart BusinessGetOneReq p) {
+                                                              @Valid @RequestPart BusinessGetOneReq p) {
 
         BusinessPicPostRes res = businessService.insBusinessPic(pics, p.getBusinessId());
         return ResultResponse.<BusinessPicPostRes>builder()
@@ -100,7 +100,7 @@ public class BusinessController {
 
     @PutMapping("pic")
     @Operation(summary = "사진 유형 수정")
-    public ResultResponse<Integer> putBusinessPic(BusinessGetOneReq p) {
+    public ResultResponse<Integer> putBusinessPic(@Valid @ParameterObject @ModelAttribute BusinessGetOneReq p) {
         int res = businessService.udtBusinessPics(p.getBusinessId());
 
         return ResultResponse.<Integer>builder()
@@ -111,14 +111,14 @@ public class BusinessController {
 
     @PutMapping("pic/thumbnail")
     @Operation(summary = "업체 사진 썸네일 설정")
-    public ResultResponse<Integer> setBusinessThumbnail(BusinessPicReq p){
+    public ResultResponse<Integer> setBusinessThumbnail(@Valid @ParameterObject @ModelAttribute BusinessPicReq p){
         int result = businessService.setBusinessThumbnail(p);
         return ResultResponse.<Integer>builder().resultData(result).resultMessage("댐").build();
     }
 
     @PutMapping("state")
     @Operation(summary = "업체 유형 수정")
-    public ResultResponse<Integer> putBusinessState(BusinessStatePutReq p) {
+    public ResultResponse<Integer> putBusinessState(@Valid @ParameterObject @ModelAttribute BusinessStatePutReq p) {
         int res = businessService.udtBusinessState(p);
 
         return ResultResponse.<Integer>builder()
@@ -129,7 +129,7 @@ public class BusinessController {
 
     @GetMapping("/{businessId}")
     @Operation(summary = "한 업체 조회")
-    public ResultResponse<BusinessGetOneRes> selBusiness( BusinessGetOneReq p) {
+    public ResultResponse<BusinessGetOneRes> selBusiness(@Valid @ParameterObject @ModelAttribute BusinessGetOneReq p) {
         BusinessGetOneReq req = new BusinessGetOneReq(p.getBusinessId());
         BusinessGetOneRes res = businessService.getBusinessOne(req);
 
@@ -139,7 +139,7 @@ public class BusinessController {
 
     @GetMapping
     @Operation(summary = "여러 업체 조회")
-    public ResultResponse<List<BusinessGetRes>> selBusinessList(BusinessGetReq p) {
+    public ResultResponse<List<BusinessGetRes>> selBusinessList(@Valid @ParameterObject @ModelAttribute BusinessGetReq p) {
         List<BusinessGetRes> res = businessService.getBusinessList(p);
         return ResultResponse.<List<BusinessGetRes>>builder()
                 .resultData(res).resultMessage("업체 리스트 조회 완료")
@@ -148,7 +148,7 @@ public class BusinessController {
 
     @GetMapping("pic/{businessId}")
     @Operation(summary = "한 업체의 사진 리스트")
-    public ResultResponse<List<BusinessOnePicsGetRes>> getBusinessPicList(BusinessGetOneReq p) {
+    public ResultResponse<List<BusinessOnePicsGetRes>> getBusinessPicList(@Valid @ParameterObject @ModelAttribute BusinessGetOneReq p) {
         BusinessOnePicsGetReq req = new BusinessOnePicsGetReq(p.getBusinessId());
         List<BusinessOnePicsGetRes> res = businessService.getBusinessOnePics(req);
 
