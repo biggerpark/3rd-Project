@@ -12,4 +12,5 @@ public interface ReviewPicMapper {
     int delReviewPic(long reviewId);
     void updReviewPicState(ReviewPicStatePutReq p);
     List<Long> selReviewPicId(long reviewId);
+    List<String> selReviewPicIdWithState1(long reviewId);
 }

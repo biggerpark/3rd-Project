@@ -136,7 +136,16 @@ public class ReviewService {
         int result = reviewMapper.updReview(p);
         List<String> picNameList = new ArrayList<>();
 //        String check = pics.get(0).getOriginalFilename();
-        int delPic = reviewPicMapper.delReviewPic(p.getReviewId());
+
+        long reviewId = p.getReviewId();
+        List<String> delPicNameList = reviewPicMapper.selReviewPicIdWithState1(reviewId);
+        for(String pic : delPicNameList) {
+            String middlePath = String.format("review/%d/%s", reviewId, pic);
+            myFileUtils.deleteFile(middlePath);
+        }
+
+        int delPics = reviewPicMapper.delReviewPic(reviewId);
+
         if(pics == null || pics.isEmpty()){
             return ReviewPutRes.builder()
                     .reviewId(p.getReviewId())
@@ -144,10 +153,9 @@ public class ReviewService {
                     .build();
         }
 
-        long reviewId = p.getReviewId();
 
         String middlePath = String.format("review/%d", reviewId);
-        myFileUtils.deleteFolder(middlePath, true);
+//        myFileUtils.deleteFolder(middlePath, true);
         myFileUtils.makeFolders(middlePath);
         for(MultipartFile pic : pics) {
             //각 파일 랜덤파일명 만들기
