@@ -22,9 +22,9 @@ public class BusinessGetOneRes {
     private int years;
     private String contents;
     private int reviewCount;
-    private String tel;
-    private String tel2;
-    private String tel3;
+    private String safeTel;
+
+
 
 
 }
