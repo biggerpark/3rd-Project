@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.math.BigDecimal;
+
 @Slf4j
 @Getter
 @Setter
@@ -24,6 +26,9 @@ public class BusinessGetRes {
     private long regionId;
     private String region;
     private int serviceCount;
+    private double lat;
+    private double lng;
+    private int distance;
 
 
 }

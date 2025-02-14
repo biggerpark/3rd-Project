@@ -15,7 +15,9 @@
         detailTypeId = #{detailTypeId},
         busiCreatedAt = #{busiCreatedAt},
         tel = #{tel},
-        safeTel = #{safeTel}
+        safeTel = #{safeTel},
+        latitude = #{latitude},
+        longitude = #{longitude}
     </insert>
 
     <select id="existBusinessNum" parameterType="String" resultType="int">
@@ -121,6 +123,8 @@
     , IFNULL(l.userId, 0) AS `like`
     , g.regionId, g.region
     , c.pic
+    , b.lat, b.lng
+    , ROUND(6371000  * ACOS(COS(RADIANS(#{userLat})) * COS(RADIANS(b.lat)) * COS(RADIANS(b.lng) - RADIANS(#{userLng})) + SIN(RADIANS(#{userLat})) * SIN(RADIANS(b.lat)))) AS distance
 
     FROM business b
     LEFT JOIN detail_type d
@@ -164,11 +168,14 @@
             <when test="sortType == '인기순'">
                 ORDER BY scoreAvg DESC, reviewCount DESC
             </when>
-            <when test="sortType == '주문량순'">
+            <when test="sortType == '주문순'">
                 ORDER BY serviceCount DESC
             </when>
-            <when test="sortType == '저가순'">
+            <when test="sortType == '가격순'">
                 ORDER BY p.price
+            </when>
+            <when test="sortType == '거리순'">
+                ORDER BY distance
             </when>
             <otherwise>
                 ORDER BY scoreAvg DESC, reviewCount DESC
