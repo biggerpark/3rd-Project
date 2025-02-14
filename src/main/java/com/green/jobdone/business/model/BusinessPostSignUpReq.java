@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @ToString
@@ -34,5 +36,7 @@ public class BusinessPostSignUpReq {
     private String busiCreatedAt;
     @Schema(title = "회사전번", example = "0533836669", requiredMode = Schema.RequiredMode.REQUIRED)
     private String tel;
+    //private BigDecimal latitude;
+    //private BigDecimal longitude;
 
 }
