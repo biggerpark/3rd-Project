@@ -8,7 +8,7 @@ import java.util.List;
 @Getter
 @Setter
 public class ProductGetDto {
-    private long productOptionId;
+    private long optionId;
     private String optionName;
     private List<ProductGetDtoDto> optionDetailList;
 

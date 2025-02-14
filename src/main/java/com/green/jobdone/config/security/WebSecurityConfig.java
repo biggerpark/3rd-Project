@@ -33,8 +33,8 @@ public class WebSecurityConfig {
     @Bean //스프링이 메소드 호출을 하고 리턴한 객체의 주소값을 관리한다. (빈 등록)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) //세션 필요할때만 사용
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //세션 사용안함
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) //세션 필요할때만 사용
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //세션 사용안함
                 .httpBasic(h -> h.disable()) // SSR을 사용하지 않기 때문에 HTTP Basic 인증 비활성화
                 .formLogin(form -> form.disable()) // SSR을 사용하지 않기 때문에 폼 로그인 비활성화
                 .csrf(csrf -> csrf.disable()) // SSR이 아니면 CSRF 보호 필요 없음
@@ -47,6 +47,7 @@ public class WebSecurityConfig {
                                 .requestMatchers(HttpMethod.GET,"/api/review/**").permitAll() // 댓글 get 은 인증된 사용자가 아니어도 볼 수 있음
                                 .requestMatchers("/api/review/**").authenticated()
                                 //서비스쪽
+                                .requestMatchers(HttpMethod.GET,"/api/service/**").permitAll()
                                 .requestMatchers("/api/service/**").authenticated()
                                 //업체쪽
                                 .requestMatchers(HttpMethod.GET,"/api/business/**").permitAll() // 댓글 get 은 인증된 사용자가 아니어도 볼 수 있음

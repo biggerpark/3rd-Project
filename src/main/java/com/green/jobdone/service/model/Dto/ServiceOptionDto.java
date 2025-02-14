@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 public class ServiceOptionDto {
     @JsonIgnore
-    private long productOptionId;
+    private long optionId;
     private String optionName;
     @JsonIgnore
     private long optionDetailId;

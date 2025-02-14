@@ -45,7 +45,7 @@
 
     <insert id="postOption">
         INSERT INTO option
-        SET detailTypeId=#{detailTypeId}
+        SET productId=#{productId}
         ,name=#{optionName}
     </insert>
     <select id="checkOption">
@@ -74,13 +74,13 @@
 
 
     <insert id="postProductOption">
-        INSERT INTO product_option
+        INSERT INTO option
         SET productId=#{productId}
-        ,optionId=#{optionId}
+        ,name=#{name}
     </insert>
     <select id="checkProductOption">
         SELECT optionId
-        FROM product_option
+        FROM option
         WHERE productId=#{productId}
     </select>
     <select id="checkUserProductOption">
@@ -97,7 +97,7 @@
 
     <insert id="postOptionDetail">
         INSERT INTO option_detail
-        SET productOptionId=#{productOptionId}
+        SET optionId=#{optionId}
         ,contents=#{contents}
         ,price=#{optionDetailPrice}
         ,name=#{optionDetailName}
@@ -105,7 +105,7 @@
     <select id="checkProductOptionDetail">
         SELECT name
         FROM option_detail
-        WHERE productOptionId=#{productOptionId}
+        WHERE optionId=#{optionId}
     </select>
     <update id="updOptionDetail">
         UPDATE option_detail
@@ -124,18 +124,18 @@
     </update>
     <select id="checkUserOptionDetail">
         SELECT c.userId
-        FROM product_option a
+        FROM option a
         LEFT JOIN product b
         on a. productId=b.productId
         LEFT JOIN business c
         on b.businessId=c.businessId
-        where a.productOptionId=#{productOptionId}
+        where a.optionId=#{optionId}
     </select>
     <select id="checkUserUpdOptionDetail">
         SELECT d.userId
         FROM option_detail a
-        LEFT JOIN product_option b
-            on a.productOptionId=b.productOptionId
+        LEFT JOIN option b
+            on a.optionId=b.optionId
         LEFT JOIN product c
             on  b.productId=c.productId
         LEFT JOIN business d
@@ -154,7 +154,7 @@
     </resultMap>
 
     <resultMap id="selProductOptionListResultMap" type="com.green.jobdone.product.model.ProductGetDto">
-        <id property="productOptionId" column="productOptionId"/>
+        <id property="optionId" column="optionId"/>
         <result property="optionName" column="optionName"/>
         <collection property="optionDetailList" resultMap="selProductOptionDetailListResultMap"/>
     </resultMap>
@@ -171,20 +171,18 @@
         SELECT
             a.productId
             ,a.price as productPrice
-            ,b.productOptionId
-            ,d.name as optionName
+            ,b.optionId
+            ,b.name as optionName
             ,c.optionDetailId
             ,c.name as optionDetailName
             ,c.price as optionDetailPrice
             ,c.contents
             ,e.detailTypeName
         FROM product a
-        left JOIN product_option b
+        left JOIN option b
             ON a.productId=b.productId
         left JOIN option_detail c
-            ON b.productOptionId=c.productOptionId
-        left JOIN option d
-            on b.optionId=d.optionId
+            ON b.optionId=c.optionId
         left JOIN detail_type e
             on a.detailTypeId=e.detailTypeId
         WHERE a.businessId=#{businessId}
