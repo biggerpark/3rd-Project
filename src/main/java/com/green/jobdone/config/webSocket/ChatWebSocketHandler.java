@@ -6,6 +6,7 @@ import com.green.jobdone.room.chat.ChatService;
 import com.green.jobdone.room.chat.model.ChatPicDto;
 import com.green.jobdone.room.chat.model.ChatPostReq;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
@@ -30,12 +31,11 @@ import java.util.Base64;
 import java.util.List;
 
 @Component
+@Slf4j
 public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Autowired
     private ChatService chatService;
 
-    @Autowired
-    private MyFileUtils myFileUtils;
 
     private static final Logger logger = LoggerFactory.getLogger(ChatWebSocketHandler.class);
     private final List<WebSocketSession> sessions = new ArrayList<>();
