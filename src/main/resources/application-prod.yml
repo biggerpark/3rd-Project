@@ -3,6 +3,6 @@ file:
 
 spring:
   datasource:
-    url: jdbc:log4jdbc:mariadb://112.222.157.156:5299/db_even_second_4
-    username: even_second_4
-    password: guppy
+    url: jdbc:log4jdbc:mariadb://192.168.0.144:5234/db_even_last_4
+    username: even_last_4
+    password: keystone

@@ -7,7 +7,7 @@ file:
 
 domain:
   path:
-    server: http://112.222.157.156:5224/
+    server: http://112.222.157.156:5234/
 
 mybatis:
   mapper-locations: mappers/**/*.xml
