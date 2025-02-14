@@ -160,7 +160,7 @@
     </resultMap>
 
     <resultMap id="selProductOptionDetailListResultMap" type="com.green.jobdone.product.model.ProductGetDtoDto">
-    <id property="optionId" column="optionId"/>
+    <id property="optionDetailId" column="optionDetailId"/>
     <result property="optionDetailName" column="optionDetailName"/>
     <result property="optionDetailPrice" column="optionDetailPrice"/>
     <result property="contents" column="contents"/>
