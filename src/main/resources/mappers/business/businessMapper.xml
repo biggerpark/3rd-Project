@@ -47,6 +47,9 @@
             <if test="openingTime != null and openingTime != ''">
                 ,openingTime = #{openingTime}
             </if>
+            <if test="tel != null and tel != ''">
+                ,tel = #{tel}
+            </if>
         </set>
         WHERE businessId = #{businessId} and userId = #{signedUserId}
     </update>
