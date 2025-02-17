@@ -15,6 +15,6 @@ public class Region extends UpdatedAt{
     private Long regionId;
 
     @Column(length = 10, nullable = false)
-    private String name;
+    private String region;
 
 }

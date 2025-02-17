@@ -12,7 +12,7 @@ import lombok.ToString;
 public class Etc extends UpdatedAt{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long etdId;
+    private Long etcId;
 
     @ManyToOne
     @JoinColumn(name = "serviceId", nullable = false)

@@ -19,9 +19,9 @@ public class Service extends UpdatedAt{
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
-//    @ManyToOne
-//    @JoinColumn(name = "productId", nullable = false)
-//    private Product product;
+    @ManyToOne
+    @JoinColumn(name = "productId", nullable = false)
+    private Product product;
 
     @Column(nullable = false) private int price;
     @Column(length = 6,nullable = false) private double lat;
