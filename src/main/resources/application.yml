@@ -50,6 +50,9 @@ spring:
     hibernate:
       #ddl-auto: create #entity를 서버 기동때마다 drop 후 create 한다.
       ddl-auto: update #entity가 없으면 create, 기존 존재하는 entity는 컬럼을 새롭게 추가하는 것만 반영
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
       hibernate:
         jdbc:
