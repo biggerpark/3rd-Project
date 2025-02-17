@@ -19,7 +19,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(chatWebSocketHandler, "/chat")
+        registry.addHandler(chatWebSocketHandler, "/chat/{roomId}")
                 .setAllowedOrigins(
                         "*"
 //                "http://192.168.0.195:5173",   // 개발용
