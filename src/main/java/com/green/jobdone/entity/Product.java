@@ -17,6 +17,7 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "businessId", nullable = false)
     private Business business;
+
     @ManyToOne
     @JoinColumn(name = "detailTypeId", nullable = false)
     private DetailType detailType;

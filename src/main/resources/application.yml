@@ -3,7 +3,7 @@ const:
   auth-code-length: 6
 
 file:
-  directory: D:/2024-02/download/greengram_ver3
+  directory: D:\pjh\3rd-Project\jobdone
 
 domain:
   path:
@@ -55,6 +55,7 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
       hibernate:
+        physical_naming_strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         jdbc:
           batch_size: 50
         format_sql: true
