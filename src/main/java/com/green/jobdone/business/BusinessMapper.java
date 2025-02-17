@@ -1,9 +1,7 @@
 package com.green.jobdone.business;
 
 import com.green.jobdone.business.model.*;
-import com.green.jobdone.business.model.get.BusinessGetOneRes;
-import com.green.jobdone.business.model.get.BusinessGetReq;
-import com.green.jobdone.business.model.get.BusinessGetRes;
+import com.green.jobdone.business.model.get.*;
 import com.green.jobdone.business.phone.BusinessPhonePostReq;
 import com.green.jobdone.business.pic.BusinessOnePicsGetReq;
 import com.green.jobdone.business.pic.BusinessOnePicsGetRes;
@@ -36,8 +34,9 @@ public interface BusinessMapper {
 
     //get 하 내일하자 --> 완
     List<BusinessGetRes> selAllBusiness(BusinessGetReq p);
-
     BusinessGetOneRes selOneBusiness(long businessId);
+
+    List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetMonthlyReq p);
 
 
 

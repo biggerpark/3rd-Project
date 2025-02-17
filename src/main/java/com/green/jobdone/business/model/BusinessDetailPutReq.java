@@ -25,4 +25,7 @@ public class BusinessDetailPutReq {
     private String title;
     @Schema(title = "업체 상세 설명", example = "겨울방학이라서 집벌레 많죠? 잡아드림.", requiredMode = Schema.RequiredMode.REQUIRED)
     private String contents;
+
+    @Schema(title = "전번" , example = "01055555555", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String tel;
 }
