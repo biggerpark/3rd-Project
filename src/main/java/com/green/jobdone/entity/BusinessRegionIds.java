@@ -1,9 +1,7 @@
 package com.green.jobdone.entity;
 
 import jakarta.persistence.Embeddable;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -11,6 +9,7 @@ import java.io.Serializable;
 @Setter
 @Embeddable
 @EqualsAndHashCode
+
 public class BusinessRegionIds implements Serializable {
     private Long businessId;
     private Long regionId;

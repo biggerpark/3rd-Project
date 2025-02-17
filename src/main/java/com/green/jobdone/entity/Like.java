@@ -7,6 +7,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
+@Table(name = "`Like`")
 public class Like {
     @EmbeddedId
     private LikeIds likeIds;

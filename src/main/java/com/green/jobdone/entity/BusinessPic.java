@@ -17,7 +17,6 @@ public class BusinessPic extends CreatedAt{
     private Long businessPicId;
 
     @ManyToOne
-    @MapsId("businessId")
     @JoinColumn(name = "businessId")
     @OnDelete(action = OnDeleteAction.CASCADE) //단방향 상태에서 on delete cascade(DDL) 설정
     private Business business;

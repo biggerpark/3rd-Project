@@ -10,7 +10,7 @@ import lombok.Setter;
 @Table(name = "business_region")
 public class BusinessRegion {
     @EmbeddedId
-    private LikeIds businessRegionIds;
+    private BusinessRegionIds businessRegionIds;
 
     @ManyToOne
     @JoinColumn(name = "businessId")
