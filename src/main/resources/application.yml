@@ -24,7 +24,7 @@ jwt-const:
   claim-key: signedUser
   token-name: JWT
   token-type: Bearer
-  access-token-expiry: 600_000_000 #10분(MS)
+  access-token-expiry: 600_000 #10분(MS)
   refresh-token-expiry: 1_296_000_000 #15일(MS)
   refresh-token-cookie-name: refresh-token
   refresh-token-cookie-expiry: 1_296_000 #15일 (S)
@@ -33,8 +33,6 @@ jwt-const:
 
 
 spring:
-
-
   application:
     name: Jobone
   datasource:
