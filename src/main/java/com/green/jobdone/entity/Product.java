@@ -13,8 +13,8 @@ import org.apache.ibatis.annotations.Many;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long productId;
-    @ManyToOne
+    private Long productId;
+//    @ManyToOne
 //    @JoinColumn(name = "", nullable = false)
 //    private Business business;
 //
