@@ -10,7 +10,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class User extends UpdatedAt {
+public class User extends CreatedAt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // auto_increment 속성이 들어감.
     private Long userId;

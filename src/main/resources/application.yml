@@ -3,7 +3,7 @@ const:
   auth-code-length: 6
 
 file:
-  directory: D:/2024-02/download/greengram_ver3
+  directory: D:\pjh\3rd-Project\jobdone
 
 domain:
   path:
@@ -52,6 +52,7 @@ spring:
       ddl-auto: update #entity가 없으면 create, 기존 존재하는 entity는 컬럼을 새롭게 추가하는 것만 반영
     properties:
       hibernate:
+        physical_naming_strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         jdbc:
           batch_size: 50
         format_sql: true

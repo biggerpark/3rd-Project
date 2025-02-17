@@ -18,7 +18,7 @@ public class Admin  extends UpdatedAt{
     private String aId;
 
     @Column(nullable = false,length = 100)
-    private String aPW;
+    private String aPw;
 
     @Column(length = 30, nullable = false)
     private String name;
