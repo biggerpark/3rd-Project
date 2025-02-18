@@ -1,5 +1,7 @@
 package com.green.jobdone.config.webSocket;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.room.chat.ChatMapper;
 import com.green.jobdone.room.chat.ChatService;
@@ -34,7 +36,7 @@ import java.util.List;
 @Component
 @Slf4j
 public class ChatWebSocketHandler extends TextWebSocketHandler {
-
+    private ObjectMapper objectMapper = new ObjectMapper();
     private final ChatService chatService;
     private static final Logger logger = LoggerFactory.getLogger(ChatWebSocketHandler.class);
     private final List<WebSocketSession> sessions = new ArrayList<>();
@@ -75,17 +77,16 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             List<MultipartFile> files = new ArrayList<>();
             try {
                 log.info("try문 잘 들어오나 확인용");
-                JSONObject jsonObject = new JSONObject(jsonString);
+                JsonNode jsonNode = objectMapper.readTree(jsonString);
 
-                // roomId, flag, message 추출
-                long roomId = jsonObject.getLong("roomId");
+                long roomId = jsonNode.get("roomId").asLong();
                 log.info("roomId: " + roomId);
-                int flag = jsonObject.getInt("flag");
+                int flag = jsonNode.get("flag").asInt();
                 log.info("flag: " + flag);
-                String contents = jsonObject.optString("message", "").trim();
-
-                // 추출된 값 로깅
+                String contents = jsonNode.has("message") ? jsonNode.get("message").asText().trim() : "";
+                // 필요한 데이터 처리
                 log.info("message: " + contents);
+
                 req.setRoomId(roomId);
                 req.setFlag(flag);
                 req.setContents(contents);
