@@ -47,6 +47,9 @@
             <if test="openingTime != null and openingTime != ''">
                 ,openingTime = #{openingTime}
             </if>
+            <if test="tel != null and tel != ''">
+                ,tel = #{tel}
+            </if>
         </set>
         WHERE businessId = #{businessId} and userId = #{signedUserId}
     </update>
@@ -238,6 +241,25 @@
         from business_pic b
         where businessPicId = #{businessPicId}
     </select>
+
+    <select id="getBusinessMonthly">
+
+        SELECT
+        b.businessName,
+        YEAR(s.createdAt) AS year,
+        MONTH(s.createdAt) AS month,
+        SUM(s.price) AS totalPrice
+        FROM service s
+        JOIN product p
+        ON s.productId = p.productId
+        JOIN business b
+        ON p.businessId = b.businessId
+        WHERE  b.businessId = #{businessId}
+        GROUP BY s.productId, YEAR(s.createdAt), MONTH(s.createdAt)
+        ORDER BY s.productId ,year DESC, month DESC;
+    </select>
+
+
 
 
 </mapper>

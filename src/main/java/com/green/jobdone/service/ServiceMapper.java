@@ -1,6 +1,7 @@
 package com.green.jobdone.service;
 
 import com.green.jobdone.service.model.*;
+import com.green.jobdone.service.model.Dto.CompletedDto;
 import com.green.jobdone.service.model.Dto.KakaoPayDto;
 import com.green.jobdone.service.model.Dto.ServiceEtcDto;
 import org.apache.ibatis.annotations.Mapper;
@@ -25,6 +26,6 @@ public interface ServiceMapper {
     int patchCompleted(ServicePatchReq p);
     int updServiceEtc(ServicePutReq p);
     KakaoPayDto serviceInfo(Long serviceId);
-    int payCompleted(long serviceId);
+    int payOrDoneCompleted(CompletedDto dto);
     void saveTid(Long serviceId, String tid);
 }

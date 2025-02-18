@@ -4,12 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.green.jobdone.common.KaKaoPay;
 import com.green.jobdone.common.model.Domain;
+import com.green.jobdone.service.model.Dto.CompletedDto;
 import com.green.jobdone.service.model.Dto.KakaoPayDto;
 import com.green.jobdone.service.model.KakaoPayRedayRes;
 import com.green.jobdone.service.model.KakaoPayRes;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -120,8 +118,10 @@ public class PayService {
         // 파라미터, 헤더
         HttpEntity<Map<String ,String>> requestEntity = new HttpEntity<>(params, getHeaders());
         log.info("requestEntity: {}", requestEntity);
+        CompletedDto dto = new CompletedDto();
+        dto.setServiceId(serviceId);
 
-        int res = serviceMapper.payCompleted(serviceId);
+        int res = serviceMapper.payOrDoneCompleted(dto);
         if(res==0){
             throw new RuntimeException();
         }

@@ -10,7 +10,6 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    @Autowired
     private final ChatWebSocketHandler chatWebSocketHandler;
 
     public WebSocketConfig(ChatWebSocketHandler chatWebSocketHandler) {
@@ -19,7 +18,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(chatWebSocketHandler, "/chat")
+        registry.addHandler(chatWebSocketHandler, "/chat/{roomId}")
                 .setAllowedOrigins(
                         "*"
 //                "http://192.168.0.195:5173",   // 개발용

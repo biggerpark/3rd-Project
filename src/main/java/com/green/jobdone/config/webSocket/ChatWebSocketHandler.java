@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
+
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Component;
@@ -33,12 +34,14 @@ import java.util.List;
 @Component
 @Slf4j
 public class ChatWebSocketHandler extends TextWebSocketHandler {
-    @Autowired
-    private ChatService chatService;
 
-
+    private final ChatService chatService;
     private static final Logger logger = LoggerFactory.getLogger(ChatWebSocketHandler.class);
     private final List<WebSocketSession> sessions = new ArrayList<>();
+
+    public ChatWebSocketHandler(ChatService chatService) {
+        this.chatService = chatService;
+    }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
@@ -46,20 +49,60 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         logger.info("WebSocket connection established: " + session.getId());
     }
 
+//    @Override
+//    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+//        logger.info("메세지전용: " + message.getPayload());
+//        long roomId = Long.parseLong(message.getPayload());
+//        for (WebSocketSession webSocketSession : sessions) {
+//            if (webSocketSession.isOpen()) {
+//                try {
+//                    webSocketSession.sendMessage(new TextMessage("새 메세지: " + message.getPayload()));
+//                } catch (IOException e) {
+//                    logger.error("웹소켓 메시지 전송 중 오류 발생", e);
+//                }
+//            }
+//        }
+//    }
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-        logger.info("Received message: " + message.getPayload());
+        logger.info("메세지전용: " + message.getPayload());
 
-        for (WebSocketSession webSocketSession : sessions) {
-            if (webSocketSession.isOpen()) {
-                try {
-                    webSocketSession.sendMessage(new TextMessage("새 메세지: " + message.getPayload()));
-                } catch (IOException e) {
-                    logger.error("웹소켓 메시지 전송 중 오류 발생", e);
+        // JSON 형식으로 파싱
+        String jsonString = message.getPayload();
+        ChatPostReq req = new ChatPostReq();
+        List<MultipartFile> files = new ArrayList<>();
+        try {
+            JSONObject jsonObject = new JSONObject(jsonString);
+
+            // roomId, flag, message 추출
+            long roomId = jsonObject.getLong("roomId");
+            int flag = jsonObject.getInt("flag");
+            String contents = jsonObject.optString("message", "").trim();
+
+            // 추출된 값 로깅
+            logger.info("roomId: " + roomId);
+            logger.info("flag: " + flag);
+            logger.info("message: " + contents);
+            req.setRoomId(roomId);
+            req.setFlag(flag);
+            req.setContents(contents);
+
+            // 웹소켓 세션에 메시지 전송
+            for (WebSocketSession webSocketSession : sessions) {
+                if (webSocketSession.isOpen()) {
+                    try {
+                        webSocketSession.sendMessage(new TextMessage("새 메세지: " + message.getPayload()));
+                    } catch (IOException e) {
+                        logger.error("웹소켓 메시지 전송 중 오류 발생", e);
+                    }
                 }
             }
+        } catch (Exception e) {
+            logger.error("JSON 파싱 오류", e);
         }
+        chatService.insChat(files,req);
     }
+
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
