@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
+
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Component;
@@ -35,13 +36,12 @@ import java.util.List;
 public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     private final ChatService chatService;
+    private static final Logger logger = LoggerFactory.getLogger(ChatWebSocketHandler.class);
+    private final List<WebSocketSession> sessions = new ArrayList<>();
+
     public ChatWebSocketHandler(ChatService chatService) {
         this.chatService = chatService;
     }
-
-
-    private static final Logger logger = LoggerFactory.getLogger(ChatWebSocketHandler.class);
-    private final List<WebSocketSession> sessions = new ArrayList<>();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
@@ -97,7 +97,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                     }
                 }
             }
-        } catch (JSONException e) {
+        } catch (Exception e) {
             logger.error("JSON 파싱 오류", e);
         }
         chatService.insChat(files,req);
