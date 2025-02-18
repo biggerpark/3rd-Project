@@ -110,9 +110,15 @@ public class ServiceService {
         for(ServiceEtcDto dto : etcDto){
             sum += dto.getEtcPrice();
         }
-        int realPrice = p.getTotalPrice();
-        realPrice += sum;
-        p.setTotalPrice(realPrice);
+
+        if(sum!=0){
+            int realPrice = p.getTotalPrice();
+            // totalPrice = price(수정하면 프론트 귀찮을까봐 냅둠)
+            // 처음 get때 받는 price에 해당하는 부분
+            realPrice += sum;
+            p.setTotalPrice(realPrice);
+            // realPrice = totalPrice
+        }
 
         int res1 = serviceMapper.updService(p);
         int res2 = serviceMapper.updServiceDetail(p);
