@@ -6,6 +6,8 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -32,4 +34,6 @@ public class Service extends UpdatedAt{
     @Column(length = 3000) private String addComment;
     @Column(nullable = false) @ColumnDefault("0")private int pyeong;
     @Column(length = 50) private String tid;
+    @Column private LocalDateTime paidAt;
+    @Column private LocalDateTime doneAt;
 }
