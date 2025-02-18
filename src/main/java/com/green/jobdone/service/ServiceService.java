@@ -2,20 +2,17 @@ package com.green.jobdone.service;
 
 import com.green.jobdone.common.exception.CustomException;
 import com.green.jobdone.common.exception.ServiceErrorCode;
-import com.green.jobdone.common.exception.UserErrorCode;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.service.model.*;
+import com.green.jobdone.service.model.Dto.CompletedDto;
 import com.green.jobdone.service.model.Dto.ServiceEtcDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -144,6 +141,13 @@ public class ServiceService {
             throw new CustomException(ServiceErrorCode.BUSINESS_OWNER_MISMATCH);
         }
         p.setUserId(0);
+
+        if(p.getCompleted()==7){
+            CompletedDto dto = new CompletedDto();
+            dto.setServiceId(p.getServiceId());
+            dto.setBusinessId(p.getBusinessId());
+            return serviceMapper.payOrDoneCompleted(dto);
+        }
 
 
             int res = serviceMapper.patchCompleted(p);
