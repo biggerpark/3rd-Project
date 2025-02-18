@@ -46,7 +46,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         sessions.add(session);
-        logger.info("WebSocket connection established: " + session.getId());
+        log.info("WebSocket connection established: " + session.getId());
     }
 
 //    @Override
@@ -65,7 +65,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 //    }
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-        logger.info("메세지전용: " + message.getPayload());
+        log.info("메세지전용: " + message.getPayload());
 
         // JSON 형식으로 파싱
         String jsonString = message.getPayload();
@@ -80,9 +80,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             String contents = jsonObject.optString("message", "").trim();
 
             // 추출된 값 로깅
-            logger.info("roomId: " + roomId);
-            logger.info("flag: " + flag);
-            logger.info("message: " + contents);
+            log.info("roomId: " + roomId);
+            log.info("flag: " + flag);
+            log.info("message: " + contents);
             req.setRoomId(roomId);
             req.setFlag(flag);
             req.setContents(contents);
@@ -100,6 +100,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         } catch (Exception e) {
             logger.error("JSON 파싱 오류", e);
         }
+        log.info("try문을 정상적으로 빠져 나왔나 확인");
+        log.info("file과 req확인: {} {}", files.size(), req);
         chatService.insChat(files,req);
     }
 
@@ -107,13 +109,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         sessions.remove(session);
-        logger.info("WebSocket connection closed: " + session.getId());
+        log.info("WebSocket connection closed: " + session.getId());
     }
 
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
-        logger.info("handleBinaryMessage called!");
-        logger.info("Received binary message, size: " + message.getPayload().array().length);
+        log.info("handleBinaryMessage called!");
+        log.info("Received binary message, size: " + message.getPayload().array().length);
         try {
             byte[] payload = message.getPayload().array();
             String jsonString = new String(payload, StandardCharsets.UTF_8);
@@ -143,7 +145,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                         byte[] fileData = Base64.getDecoder().decode(base64File);
                         pics.add(convertByteArrayToMultipartFile(fileData, "uploaded_file_" + i));
                     } else {
-                        logger.warn("Empty or invalid Base64 file data at index: " + i);
+                        log.warn("Empty or invalid Base64 file data at index: " + i);
                     }
                 }
             }
@@ -163,11 +165,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             session.sendMessage(new TextMessage("파일 업로드 및 메시지 저장 완료"));
 
         } catch (Exception e) {
-            logger.error("파일 업로드 및 메시지 처리 중 오류 발생", e);
+            log.error("파일 업로드 및 메시지 처리 중 오류 발생", e);
             try {
                 session.sendMessage(new TextMessage("파일 업로드 및 메시지 처리 실패: " + e.getMessage()));
             } catch (IOException ex) {
-                logger.error("웹소켓 응답 전송 중 오류 발생", ex);
+                log.error("웹소켓 응답 전송 중 오류 발생", ex);
             }
         }
     }
