@@ -321,6 +321,16 @@ public class BusinessService {
     }
 
     public List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetMonthlyReq p){
+
+
+            long userId = businessMapper.existBusinessId(p.getBusinessId());
+
+            long signedUserId = authenticationFacade.getSignedUserId();
+            p.setSignedUserId(signedUserId);
+            if (userId != signedUserId) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
+            }
+
         return businessMapper.getBusinessMonthly(p);
     }
 }
