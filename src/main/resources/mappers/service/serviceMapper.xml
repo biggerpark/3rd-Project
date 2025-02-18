@@ -46,6 +46,8 @@
         <result property="businessNum" column="businessNum"/>
         <result property="createdAt" column="createdAt"/>
         <result property="updatedAt" column="updatedAt"/>
+        <result property="paidAt" column="paidAt"/>
+        <result property="doneAt" column="doneAt"/>
         <result property="categoryName" column="categoryName"/>
         <collection property="options" resultMap="serviceOption"/>
         <collection property="etc" resultMap="serviceEtc"/>
@@ -79,10 +81,10 @@
 
     <select id="GetServiceOne" resultMap="serviceFlow">
         select a.serviceId, b.name as userName, b.phone as userPhone, d.businessName as businessName,
-        e.detailTypeName as detailTypeName, a.price, a.completed, a.address, a.comment, a.addComment, a.createdAt, a.userId,
+        e.detailTypeName as detailTypeName, if(a.totalprice=0, a.price, a.totalPrice) as price, a.completed, a.address, a.comment, a.addComment, a.createdAt, a.userId,
         k.startDate, k.endDate, k.mStartTime, k.mEndTime, d.businessNum, l.categoryName, d.tel as businessPhone,
         g.optionId, n.name as optionName, i.name as optionDetailName, i.contents, i.optionDetailId,
-        a.pyeong, d.address as businessAddress, a.updatedAt, a.userId,
+        a.pyeong, d.address as businessAddress, a.updatedAt, a.userId, a.paidAt, a.doneAt,
         IFNULL(o.optionDetailPrice, i.price) AS optionDetailPrice, o.serviceOptionId, o.comment AS optionComment
         FROM service a
         LEFT JOIN user b ON a.userId = b.userId
@@ -166,7 +168,7 @@
     <update id="updService">
         update service
         <set>
-            <if test="totalPrice != null">price = #{totalPrice},</if>
+            <if test="totalPrice != 0">totalPrice = #{totalPrice},</if>
             <if test="addComment != null">addComment = #{addComment},</if>
             <if test="pyeong != null">pyeong = #{pyeong},</if>
             completed = 2
@@ -258,9 +260,16 @@
         join detail_type c on b.detailTypeId = c.detailTypeId
         where serviceId = #{serviceId}
     </select>
-    <update id="payCompleted">
+    <update id="payOrDoneCompleted">
         update service
-        set completed = 6
+        <if test="businessId = null">
+            set completed = 6
+            ,paidAt = now()
+        </if>
+        <if test="businessId !=null">
+            set completed = 7
+            ,doneAt = now()
+        </if>
         where serviceId = #{serviceId}
     </update>
 </mapper>

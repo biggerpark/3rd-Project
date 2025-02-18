@@ -35,6 +35,8 @@ public class ServiceGetOneRes {
     private String createdAt;
     private String updatedAt;
     private String pyeong;
+    private String paidAt;
+    private String doneAt;
     private List<ServiceOptionDto> options;
     private List<ServiceEtcDto> etc;
 }
