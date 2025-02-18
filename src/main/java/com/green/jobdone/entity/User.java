@@ -1,21 +1,33 @@
 package com.green.jobdone.entity;
 
+import com.green.jobdone.config.security.SignInProviderType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
 @Setter
-@ToString
+@Table(
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        columnNames = {"email", "providerType"}
+                )
+        }
+)
 public class User extends UpdatedAt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // auto_increment 속성이 들어감.
+    @Column(name = "userId")
     private Long userId;
 
-    @Column(nullable = false,length = 40,unique = true) // not null, unique 속성 추가
+    @Column(nullable = false)
+    private SignInProviderType providerType;
+
+    @Column(nullable = false, length = 40,unique = true) // not null, unique 속성 추가
     private String email;
 
     @Column(nullable = false,length = 100)
@@ -27,12 +39,12 @@ public class User extends UpdatedAt {
     @Column(length = 250)
     private String pic;
 
-
-    @Column(length = 11,nullable = false)
+    @Column(length = 11, nullable = false)
     private String phone;
 
     @Column(nullable = false)
-    private int type=100; // 디폴트값으로 100으로 설정
+    @ColumnDefault("100")
+    private int type; // 디폴트값으로 100으로 설정
 
 
 
