@@ -46,11 +46,17 @@
         </set>
     </update>
 
+    <select id="selReviewPicIdWithState1">
+        SELECT pic
+          FROM review_pic
+         WHERE reviewId = #{reviewId} AND state = 1
+    </select>
+
 
     <delete id="delReviewPic">
         DELETE FROM review_pic
          WHERE reviewId = #{reviewId}
-           AND state = 1;
+           AND state = 1
     </delete>
 
 

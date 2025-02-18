@@ -1,10 +1,7 @@
 package com.green.jobdone.business;
 
 import com.green.jobdone.business.model.*;
-import com.green.jobdone.business.model.get.BusinessGetOneReq;
-import com.green.jobdone.business.model.get.BusinessGetOneRes;
-import com.green.jobdone.business.model.get.BusinessGetReq;
-import com.green.jobdone.business.model.get.BusinessGetRes;
+import com.green.jobdone.business.model.get.*;
 import com.green.jobdone.business.phone.BusinessPhonePostReq;
 import com.green.jobdone.business.pic.BusinessOnePicsGetReq;
 import com.green.jobdone.business.pic.BusinessOnePicsGetRes;
@@ -321,6 +318,10 @@ public class BusinessService {
             throw new IllegalArgumentException("이미 존재하는 전화번호입니다");
         }
         return businessMapper.insBusinessPhone(p);
+    }
+
+    public List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetMonthlyReq p){
+        return businessMapper.getBusinessMonthly(p);
     }
 }
 
