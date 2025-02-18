@@ -63,51 +63,53 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 //            }
 //        }
 //    }
-    @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-        try{
-        log.info("메세지전용: " + message.getPayload());
+        @Override
+        protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+            try{
+            log.info("메세지전용: " + message.getPayload());
 
-        // JSON 형식으로 파싱
-        String jsonString = message.getPayload();
-        ChatPostReq req = new ChatPostReq();
-        List<MultipartFile> files = new ArrayList<>();
-        try {
-            JSONObject jsonObject = new JSONObject(jsonString);
+            // JSON 형식으로 파싱
+            String jsonString = message.getPayload();
+            log.info("jsonString: " + jsonString);
+            ChatPostReq req = new ChatPostReq();
+            List<MultipartFile> files = new ArrayList<>();
+            try {
+                log.info("try문 잘 들어오나 확인용");
+                JSONObject jsonObject = new JSONObject(jsonString);
 
-            // roomId, flag, message 추출
-            long roomId = jsonObject.getLong("roomId");
-            int flag = jsonObject.getInt("flag");
-            String contents = jsonObject.optString("message", "").trim();
+                // roomId, flag, message 추출
+                long roomId = jsonObject.getLong("roomId");
+                log.info("roomId: " + roomId);
+                int flag = jsonObject.getInt("flag");
+                log.info("flag: " + flag);
+                String contents = jsonObject.optString("message", "").trim();
 
-            // 추출된 값 로깅
-            log.info("roomId: " + roomId);
-            log.info("flag: " + flag);
-            log.info("message: " + contents);
-            req.setRoomId(roomId);
-            req.setFlag(flag);
-            req.setContents(contents);
+                // 추출된 값 로깅
+                log.info("message: " + contents);
+                req.setRoomId(roomId);
+                req.setFlag(flag);
+                req.setContents(contents);
 
-            // 웹소켓 세션에 메시지 전송
-            for (WebSocketSession webSocketSession : sessions) {
-                if (webSocketSession.isOpen()) {
-                    try {
-                        webSocketSession.sendMessage(new TextMessage("새 메세지: " + message.getPayload()));
-                    } catch (IOException e) {
-                        logger.error("웹소켓 메시지 전송 중 오류 발생", e);
+                // 웹소켓 세션에 메시지 전송
+                for (WebSocketSession webSocketSession : sessions) {
+                    if (webSocketSession.isOpen()) {
+                        try {
+                            webSocketSession.sendMessage(new TextMessage("새 메세지: " + message.getPayload()));
+                        } catch (IOException e) {
+                            logger.error("웹소켓 메시지 전송 중 오류 발생", e);
+                        }
                     }
                 }
+            } catch (Exception e) {
+                logger.error("JSON 파싱 오류", e);
             }
-        } catch (Exception e) {
-            logger.error("JSON 파싱 오류", e);
+            log.info("try문을 정상적으로 빠져 나왔나 확인");
+            log.info("file과 req확인: {} {}", files.size(), req);
+            chatService.insChat(files,req);}
+            catch (Exception e) {
+                log.info("다른 이유로 안되는듯");
+            }
         }
-        log.info("try문을 정상적으로 빠져 나왔나 확인");
-        log.info("file과 req확인: {} {}", files.size(), req);
-        chatService.insChat(files,req);}
-        catch (Exception e) {
-            log.info("다른 이유로 안되는듯");
-        }
-    }
 
 
     @Override
