@@ -36,4 +36,5 @@ public class Service extends UpdatedAt{
     @Column(length = 50) private String tid;
     @Column private LocalDateTime paidAt;
     @Column private LocalDateTime doneAt;
+    @Column(nullable = false) @ColumnDefault("0") private int totalPrice;
 }
