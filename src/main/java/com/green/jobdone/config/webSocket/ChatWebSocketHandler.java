@@ -65,6 +65,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 //    }
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+        try{
         log.info("메세지전용: " + message.getPayload());
 
         // JSON 형식으로 파싱
@@ -102,7 +103,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         }
         log.info("try문을 정상적으로 빠져 나왔나 확인");
         log.info("file과 req확인: {} {}", files.size(), req);
-        chatService.insChat(files,req);
+        chatService.insChat(files,req);}
+        catch (Exception e) {
+            log.info("다른 이유로 안되는듯");
+        }
     }
 
 
