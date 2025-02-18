@@ -24,6 +24,10 @@ repositories {
 }
 
 dependencies {
+    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' //OAuth2를 위한 implementation
+
     implementation 'io.jsonwebtoken:jjwt:0.12.6'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'

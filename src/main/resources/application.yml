@@ -1,3 +1,16 @@
+global:
+  oauth2:
+    base-uri: /oauth2/authorization #FE 소셜로그인 요청할 때 사용할 주소값
+    # 플랫폼과 통신을 3번 정도 하는데 각 통신들이 하나의 작업을 위한 트랜잭션이라는 것을
+    # 연결시키기 위해 쿠키를 사용한다.
+    authorization-request-cookie-name: oauth2_auth_request
+    redirect-uri-param-cookie-name: redirect_uri
+    cookie-expiry-seconds: 180
+    authorized-redirect-uris:
+      - http://localhost:8080/fe/redirect
+      - http://192.168.0.144:8080/fe/redirect
+      - http://112.222.157.156:8080/fe/redirect
+
 const:
   default-page-size: 20
   auth-code-length: 6
@@ -19,7 +32,7 @@ kakaopay:
 
 jwt-const:
   issuer: green@green.kr
-  secret: DaeguGreenArtAcademyClass502RoomForJavaSpringBootFightingD23sdfsdf23
+  secret: ${JWT_SECRET_KEY}
   header-schema-name: Authorization
   claim-key: signedUser
   token-name: JWT
@@ -39,12 +52,67 @@ spring:
     name: Jobone
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:mariadb://localhost/job_done
-    username: root
-    password: green502
+    url: jdbc:log4jdbc:mariadb://${DEFAULT.DB_URL}
+    username: ${DEFAULT.USERNAME}
+    password: ${DEFAULT.PASSWORD}
   servlet:
     multipart:
       max-file-size: 15MB
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${SOCIAL.GOOGLE.CLIENT_ID}
+            client-secret: ${SOCIAL.GOOGLE.SECRET}
+            scope:
+              - email
+              - profile
+          kakao:
+            client-name: Kakao
+            client-id: ${SOCIAL.KAKAO.CLIENT_ID}
+            client-secret: ${SOCIAL.KAKAO.SECRET}
+            client-authentication-method: client_secret_post #client-id, client-secret 쿼리스트링으로 날아가야 한다.
+            authorization-grant-type: authorization_code #권한부여 유형(인가코드 > access-token 받는 방식 선택)
+            redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+              # baseUrl: 서버가 돌아가고 있는 host
+            # action: login
+            # registrationId: kakao
+            scope:
+              - profile_nickname
+              - profile_image
+              - account_email
+
+          naver:
+            client-name: Naver
+            client-id: ${SOCIAL.NAVER.CLIENT_ID}
+            client-secret: ${SOCIAL.NAVER.SECRET}
+            client-authentication-method: client_secret_post #client-id, client-secret 쿼리스트링으로 날아가야 한다.
+            authorization-grant-type: authorization_code #권한부여 유형(인가코드 > access-token 받는 방식 선택)
+            redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+            # baseUrl: 서버가 돌아가고 있는 host
+            # action: login
+            # registrationId: naver
+            scope:
+              - name
+              - image
+              - profile_image
+              - nickname
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize #kakao 인증처리 URL
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-info-authentication-method: header
+            #default값이 header AccessToken 어디에 담아서 보낼지 설정(header, form, querry)
+            user-name-attribute: id #유일값 속성명
+          naver:
+            authorization-uri: https://nid.naver.com/oauth2.0/authorize #naver 인증처리 URL
+            token-uri: https://nid.naver.com/oauth2.0/token
+            user-info-uri: https://openapi.naver.com/v1/nid/me
+            user-name-attribute: response #유일값 속성명
+
   jpa:
     database: mysql
     hibernate:

@@ -3,10 +3,15 @@ package com.green.jobdone.user;
 import com.green.jobdone.common.CookieUtils;
 import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.common.PicUrlMaker;
+import com.green.jobdone.common.exception.CustomException;
+import com.green.jobdone.common.exception.UserErrorCode;
 import com.green.jobdone.config.jwt.JwtConst;
 import com.green.jobdone.config.jwt.JwtUser;
 import com.green.jobdone.config.jwt.TokenProvider;
+import com.green.jobdone.config.jwt.UserRole;
 import com.green.jobdone.config.security.AuthenticationFacade;
+import com.green.jobdone.config.security.SignInProviderType;
+import com.green.jobdone.entity.User;
 import com.green.jobdone.mail.MailMapper;
 import com.green.jobdone.user.model.*;
 import jakarta.servlet.http.Cookie;
@@ -21,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -35,6 +41,7 @@ public class UserService {
     private final CookieUtils cookieUtils;
     private final AuthenticationFacade authenticationFacade;
     private final JwtConst jwtConst;
+    private final UserRepository userRepository;
 
 
     public int postUserSignUp(UserSignUpReq p, MultipartFile pic) {
@@ -49,14 +56,25 @@ public class UserService {
 
         String hashedPassword = passwordEncoder.encode(p.getUpw());
         log.info("hashedPassword: {}", hashedPassword);
-        p.setUpw(hashedPassword);
-        p.setPic(savedPicName);
 
-        int result = mapper.postUserSignUp(p);
+        User user = new User();
+        user.setProviderType(SignInProviderType.LOCAL);
+        user.setEmail(p.getEmail());
+        user.setUpw(hashedPassword);
+        user.setName(p.getName());
+        user.setPic(savedPicName);
+        user.setPhone(p.getPhone());
+
+        //int result = mapper.insUser(p);
+        userRepository.save(user);
+//        p.setUpw(hashedPassword);
+//        p.setPic(savedPicName);
+//
+//        int result = mapper.postUserSignUp(p);
 
         if (pic == null) {
             mailMapper.delAuthInfo(p.getEmail());
-            return result;
+            return 1;
         }
 
         // 저장 위치 만든다.
@@ -75,37 +93,28 @@ public class UserService {
 
         mailMapper.delAuthInfo(p.getEmail());
 
-        return result;
+        return 1;
 
     }
 
     public UserSignInRes postUserSignIn(UserSignInReq p, HttpServletResponse response) {
+
         UserSignInResDto res = mapper.postUserSignIn(p.getEmail()); // email 에 해당하는 유저 res 가져오기
-//        if(res==null||!passwordEncoder.matches(p.getUpw(), res.getUpw())) {
-//           return null;
-//        }
-
-        //예외처리를 하기 전에는 밑에 보이는 것처럼 처리했어야했다.
-        if (res == null) { //아이디 없음
-            return UserSignInRes.builder()
-                    .message("이메일을 확인해주세요")
-                    .build();
-
-        } else if (!passwordEncoder.matches(p.getUpw(), res.getUpw())) { //비밀번호가 다를시
-            //} else if( !BCrypt.checkpw(p.getUpw(), res.getUpw()) ) { //비밀번호가 다를시
-            return UserSignInRes.builder()
-                    .message("비밀번호를 확인해주세요")
-                    .build();
-        }
 
         if (res.getPic() != null) {
             res.setPic(PicUrlMaker.makePicUserUrl(res.getUserId(), res.getPic()));
         }
 
+        User user = userRepository.findByEmailAndProviderType(p.getEmail(), SignInProviderType.LOCAL);
+        if(user == null || !passwordEncoder.matches(p.getUpw(), user.getUpw())) {
+            throw new CustomException(UserErrorCode.INCORRECT_ID_PW);
+        }
+
         /*
         JWT 토큰 생성 2개? AccessToken(20분), RefreshToken(15일)
          */
-        JwtUser jwtUser = new JwtUser(res.getUserId(), res.getRoles());
+
+        JwtUser jwtUser = new JwtUser(user.getUserId(), res.getRoles());
 
 
         String accessToken = tokenProvider.generateAccessToken(jwtUser);
@@ -116,7 +125,7 @@ public class UserService {
 
         //refreshToken은 쿠키에 담는다.
 
-        cookieUtils.setCookie(response, "refreshToken", refreshToken, jwtConst.getRefreshTokenCookieExpiry());
+        cookieUtils.setCookie(response, "refreshToken", refreshToken, jwtConst.getRefreshTokenCookieExpiry(), "/api/user/access-token");
 
         return UserSignInRes
                 .builder()
