@@ -33,8 +33,11 @@ import java.util.List;
 @Component
 @Slf4j
 public class ChatWebSocketHandler extends TextWebSocketHandler {
-    @Autowired
-    private ChatService chatService;
+
+    private final ChatService chatService;
+    public ChatWebSocketHandler(ChatService chatService) {
+        this.chatService = chatService;
+    }
 
 
     private static final Logger logger = LoggerFactory.getLogger(ChatWebSocketHandler.class);
