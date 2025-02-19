@@ -212,7 +212,9 @@
         b.contents,
         COUNT(distinct r.reviewId) AS reviewCount,
         TIMESTAMPDIFF(YEAR,b.busiCreatedAt, NOW()) AS years,
-        b.safeTel
+        b.safeTel,
+        b.tel,
+        b.businessNum
 
         FROM business b
         JOIN detail_type d ON d.detailTypeId = b.detailTypeId
