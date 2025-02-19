@@ -52,6 +52,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
         // 마지막 부분이 roomId이므로, 이를 추출
         long roomId = Long.parseLong(uriParts[uriParts.length - 1]);
+        session.setBinaryMessageSizeLimit(10*1024*1024);
         roomSessions.computeIfAbsent(roomId, k -> new HashSet<>()).add(session);
 
         // 추출된 roomId를 사용하여 채팅방 설정 등 처리
@@ -149,22 +150,18 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
 
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
-        log.info("handleBinaryMessage called!");
-        log.info("Received binary message, size: " + message.getPayload().array().length);
-        try {
+        log.info("사진 보내는곳으로 정상접속");
+
             byte[] payload = message.getPayload().array();
             String jsonString = new String(payload, StandardCharsets.UTF_8);
             ObjectMapper objectMapper = new ObjectMapper();
+        try {
             JsonNode jsonNode = objectMapper.readTree(jsonString);
-
-
             if (!jsonNode.has("roomId") || !jsonNode.has("flag")) {
                 throw new RuntimeException("JSON 데이터에 roomId 또는 flag가 없습니다.");
             }
-
             long roomId = jsonNode.get("roomId").asLong();
             int flag = jsonNode.get("flag").asInt();
-
             String textMessage = jsonNode.has("message") ? jsonNode.get("message").asText().trim() : "";
 
             // 파일 처리
