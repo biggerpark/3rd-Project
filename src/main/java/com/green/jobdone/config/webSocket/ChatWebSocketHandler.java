@@ -165,7 +165,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             log.info("textMessage 확인: {}",textMessage);
 
             // 파일 처리
-            JsonNode fileNode = jsonNode.get("files"); // 배열이 아닌 하나의 객체
+            JsonNode fileNode = jsonNode.get("file"); // 배열이 아닌 하나의 객체
             log.info("fileNode: {}", fileNode);
             MultipartFile pic = null;
 
