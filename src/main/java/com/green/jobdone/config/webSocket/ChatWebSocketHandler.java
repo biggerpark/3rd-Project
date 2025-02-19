@@ -166,24 +166,21 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
 
             // 파일 처리
             JsonNode fileNode = jsonNode.get("files"); // 배열이 아닌 하나의 객체
+            log.info("fileNode: {}", fileNode);
             MultipartFile pic = null;
 
             if (fileNode != null) {
                 String base64File = fileNode.get("data").asText().trim(); // Base64 인코딩된 파일 데이터
                 log.info("base64File: " + base64File);
-
                 // Base64 디코딩 전에 파일이 비어있지 않은지 체크
-                if (!base64File.isEmpty()) {
-                    byte[] fileData = Base64.getDecoder().decode(base64File);
-                    log.info("파일 디코딩하러 들어왔나 확인용");
-                    pic = convertByteArrayToMultipartFile(fileData, fileNode.get("name").asText());
-                } else {
-                    log.warn("Empty or invalid Base64 file data.");
-                }
+                byte[] fileData = Base64.getDecoder().decode(base64File);
+                log.info("파일 디코딩하러 들어왔나 확인용");
+                pic = convertByteArrayToMultipartFile(fileData, fileNode.get("name").asText());
+
             }
             log.info("기존에 걸렸던곳 바로앞");
             log.info("textMessage: " + textMessage);
-            log.info("pics: " + pic);
+            log.info("pic: " + pic);
 
             if (textMessage.isEmpty() && pic==null) {
                 throw new RuntimeException("메시지와 파일이 모두 비어 있습니다.");
