@@ -116,11 +116,11 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             if (sessionSet != null) {
                 for (WebSocketSession webSocketSession : sessionSet) {
                     if (webSocketSession.isOpen()) {
-                        log.info("req확인: {}", req);
-                        chatService.insChat(files,req);
                         webSocketSession.sendMessage(new TextMessage("새 메시지: " + message.getPayload()));
                     }
                 }
+                        log.info("req확인: {}", req);
+                        chatService.insChat(files,req);
             }
         } catch (Exception e) {
             throw new CustomException(ChatErrorCode.FAIL_TO_REG);
