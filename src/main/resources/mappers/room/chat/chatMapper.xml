@@ -7,13 +7,11 @@
         values
         (#{roomId}, #{contents}, #{flag})
     </insert>
-    <insert id="insChatPic" parameterType="com.green.jobdone.room.chat.model.ChatPicDto">
+    <insert id="insChatPic">
         insert into chat_pic
         (chatId, pic)
         values
-        <foreach collection="pics" item="pic" separator=",">
         (#{chatId}, #{pic})
-        </foreach>
     </insert>
 
     <select id="checkUserId">

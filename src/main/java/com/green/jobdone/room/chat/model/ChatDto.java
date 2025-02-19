@@ -10,6 +10,6 @@ import java.util.List;
 @Setter
 
 public class ChatDto {
-    private List<MultipartFile> pics;
+    private MultipartFile pics;
     private ChatPostReq p;
 }
