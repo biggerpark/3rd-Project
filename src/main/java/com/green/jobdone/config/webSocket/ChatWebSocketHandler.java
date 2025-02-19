@@ -86,7 +86,6 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
         String jsonString = message.getPayload();
         log.info("jsonString: " + jsonString);
         ChatPostReq req = new ChatPostReq();
-        List<MultipartFile> files = new ArrayList<>();
         try {
             log.info("try문 잘 들어오나 확인용");
             JsonNode jsonNode = objectMapper.readTree(jsonString);
@@ -121,7 +120,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
                     }
                 }
                         log.info("req확인: {}", req);
-                        chatService.insChat(files,req);
+                        chatService.insChat(null,req);
             }
         } catch (Exception e) {
             throw new CustomException(ChatErrorCode.FAIL_TO_REG);
@@ -166,30 +165,27 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             log.info("textMessage 확인: {}",textMessage);
 
             // 파일 처리
-            JsonNode filesArrayNode = jsonNode.get("files");
-            List<MultipartFile> pics = new ArrayList<>();
+            JsonNode fileNode = jsonNode.get("files"); // 배열이 아닌 하나의 객체
+            MultipartFile pic = null;
 
-            if (filesArrayNode != null && filesArrayNode.isArray()) {
-                for (JsonNode fileNode : filesArrayNode) {
-                    log.info("정상적으로 jsonNode for문 진입?");
-                    String base64File = fileNode.asText().trim();
-                    log.info("base64File: " + base64File);
+            if (fileNode != null) {
+                String base64File = fileNode.get("data").asText().trim(); // Base64 인코딩된 파일 데이터
+                log.info("base64File: " + base64File);
 
-                    // Base64 디코딩 전에 파일이 비어있지 않은지 체크
-                    if (!base64File.isEmpty()) {
-                        byte[] fileData = Base64.getDecoder().decode(base64File);
-                        log.info("파일 디코딩하러 들어왔나 확인용");
-                        pics.add(convertByteArrayToMultipartFile(fileData, "uploaded_file_" + pics.size()));
-                    } else {
-                        log.warn("Empty or invalid Base64 file data.");
-                    }
+                // Base64 디코딩 전에 파일이 비어있지 않은지 체크
+                if (!base64File.isEmpty()) {
+                    byte[] fileData = Base64.getDecoder().decode(base64File);
+                    log.info("파일 디코딩하러 들어왔나 확인용");
+                    pic = convertByteArrayToMultipartFile(fileData, fileNode.get("name").asText());
+                } else {
+                    log.warn("Empty or invalid Base64 file data.");
                 }
             }
             log.info("기존에 걸렸던곳 바로앞");
             log.info("textMessage: " + textMessage);
-            log.info("pics: " + pics);
+            log.info("pics: " + pic);
 
-            if (textMessage.isEmpty() && pics.isEmpty()) {
+            if (textMessage.isEmpty() && pic==null) {
                 throw new RuntimeException("메시지와 파일이 모두 비어 있습니다.");
             }
 
@@ -199,7 +195,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             chatPostReq.setContents(textMessage.isEmpty() ? null : textMessage);
             chatPostReq.setFlag(flag);
 
-            chatService.insChat(pics, chatPostReq);
+            chatService.insChat(pic, chatPostReq);
 
             session.sendMessage(new TextMessage("파일 업로드 및 메시지 저장 완료"));
 
