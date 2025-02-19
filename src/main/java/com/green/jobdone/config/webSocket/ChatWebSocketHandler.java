@@ -161,32 +161,41 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
                 throw new RuntimeException("JSON 데이터에 roomId 또는 flag가 없습니다.");
             }
             long roomId = jsonNode.get("roomId").asLong();
+            log.info("roomId 확인: {}",roomId);
             int flag = jsonNode.get("flag").asInt();
+            log.info("FLag 확인: {}",flag);
             String textMessage = jsonNode.has("message") ? jsonNode.get("message").asText().trim() : "";
+            log.info("textMessage 확인: {}",textMessage);
 
             // 파일 처리
             JsonNode filesArrayNode = jsonNode.get("files");
             List<MultipartFile> pics = new ArrayList<>();
 
             if (filesArrayNode != null && filesArrayNode.isArray()) {
+                log.info("정상적으로 진입?");
                 for (JsonNode fileNode : filesArrayNode) {
+                    log.info("정상적으로 jsonNode for문 진입?");
                     String base64File = fileNode.asText().trim();
 
                     // Base64 디코딩 전에 파일이 비어있지 않은지 체크
-                    if (base64File != null && !base64File.isEmpty()) {
+                    if (!base64File.isEmpty()) {
                         byte[] fileData = Base64.getDecoder().decode(base64File);
+                        log.info("파일 디코딩하러 들어왔나 확인용");
                         pics.add(convertByteArrayToMultipartFile(fileData, "uploaded_file_" + pics.size()));
                     } else {
                         log.warn("Empty or invalid Base64 file data.");
                     }
                 }
             }
+            log.info("기존에 걸렸던곳 바로앞");
+            log.info("textMessage: " + textMessage);
+            log.info("pics: " + pics);
 
             if (textMessage.isEmpty() && pics.isEmpty()) {
                 throw new RuntimeException("메시지와 파일이 모두 비어 있습니다.");
             }
 
-
+            log.info("if문 잘 넘어갔나?");
             ChatPostReq chatPostReq = new ChatPostReq();
             chatPostReq.setRoomId(roomId);
             chatPostReq.setContents(textMessage.isEmpty() ? null : textMessage);
