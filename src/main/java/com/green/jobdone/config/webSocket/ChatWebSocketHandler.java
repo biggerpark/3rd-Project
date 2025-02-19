@@ -111,7 +111,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             // 해당 roomId의 모든 세션에 메시지 전송
             Set<WebSocketSession> sessionSet = roomSessions.get(roomId);
             log.info("sessionSet: " + sessionSet);
-            if (sessionSet != null && roomId!=roomId2) {
+            if (sessionSet != null && roomId==roomId2) {
                 for (WebSocketSession webSocketSession : sessionSet) {
                     if (webSocketSession.isOpen()) {
                         webSocketSession.sendMessage(new TextMessage("새 메시지: " + message.getPayload()));
