@@ -68,7 +68,7 @@ public class ServiceService {
         try{
             userId = authenticationFacade.getSignedUserId();
         } catch (Exception e){
-            e.printStackTrace();
+            throw new CustomException(ServiceErrorCode.USER_MISMATCH);
         }
         List<ServiceEtcDto> dto = serviceMapper.GetEtc(p.getServiceId());
         res.setEtc(dto);
