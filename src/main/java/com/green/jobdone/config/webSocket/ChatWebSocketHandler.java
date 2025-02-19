@@ -161,9 +161,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
                 throw new RuntimeException("JSON 데이터에 roomId 또는 flag가 없습니다.");
             }
             long roomId = jsonNode.get("roomId").asLong();
-            log.info("roomId 확인: {}",roomId);
             int flag = jsonNode.get("flag").asInt();
-            log.info("FLag 확인: {}",flag);
             String textMessage = jsonNode.has("message") ? jsonNode.get("message").asText().trim() : "";
             log.info("textMessage 확인: {}",textMessage);
 
@@ -172,10 +170,10 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             List<MultipartFile> pics = new ArrayList<>();
 
             if (filesArrayNode != null && filesArrayNode.isArray()) {
-                log.info("정상적으로 진입?");
                 for (JsonNode fileNode : filesArrayNode) {
                     log.info("정상적으로 jsonNode for문 진입?");
                     String base64File = fileNode.asText().trim();
+                    log.info("base64File: " + base64File);
 
                     // Base64 디코딩 전에 파일이 비어있지 않은지 체크
                     if (!base64File.isEmpty()) {
@@ -200,7 +198,6 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             chatPostReq.setRoomId(roomId);
             chatPostReq.setContents(textMessage.isEmpty() ? null : textMessage);
             chatPostReq.setFlag(flag);
-//            logger.info("ChatPostReq: " + chatPostReq);
 
             chatService.insChat(pics, chatPostReq);
 
