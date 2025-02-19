@@ -25,8 +25,8 @@ public class ChatController {
 
     @Operation(summary = " 소켓사용시 미사용")
     @PostMapping
-    public ResultResponse<Integer> inChat2(@RequestPart(required = false) List<MultipartFile> pics, @RequestPart ChatPostReq p){
-        int res = chatService.insChat(pics, p);
+    public ResultResponse<Integer> inChat2(@RequestPart(required = false) MultipartFile pic, @RequestPart ChatPostReq p){
+        int res = chatService.insChat(pic, p);
 
         return ResultResponse.<Integer>builder()
                 .resultMessage("송신 완료")
@@ -36,9 +36,9 @@ public class ChatController {
     @Operation(summary = "채팅 보내기  소켓사용시 미사용")
     @PostMapping("form-data")
     public ResultResponse<Integer> insChat(@RequestBody ChatDto p){
-        List<MultipartFile> pics = p.getPics();
+        MultipartFile pic = p.getPics();
         ChatPostReq req = new ChatPostReq();
-        int res = chatService.insChat(pics, req);
+        int res = chatService.insChat(pic, req);
 
         return ResultResponse.<Integer>builder()
                 .resultMessage("송신 완료")
