@@ -16,6 +16,6 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public class UpdatedAt extends CreatedAt {
     @LastModifiedDate //insert, update 되었을 때 현재일시값을 넣는다.
-    @Column(nullable = false) //이 애노테이션은 자동으로 작성이 되는데 설정을 좀 더 해주고 싶다면 이 애노테이션을 붙여야 한다.
+    @Column(nullable = false, columnDefinition = "DATETIME(0)") //이 애노테이션은 자동으로 작성이 되는데 설정을 좀 더 해주고 싶다면 이 애노테이션을 붙여야 한다.
     private LocalDateTime updatedAt;
 }

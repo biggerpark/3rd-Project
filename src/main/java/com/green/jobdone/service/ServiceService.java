@@ -64,11 +64,17 @@ public class ServiceService {
         // 13으로 찍힘
 
         ServiceGetOneRes res = serviceMapper.GetServiceOne(p);
+        if(res.getTotalPrice()==0){
+            res.setTotalPrice(res.getPrice());
+            res.setAddPrice(0);
+        } else{
+            res.setAddPrice(res.getTotalPrice()-res.getPrice());
+        }
         Long userId = null;
         try{
             userId = authenticationFacade.getSignedUserId();
         } catch (Exception e){
-            throw new CustomException(ServiceErrorCode.USER_MISMATCH);
+            e.printStackTrace();
         }
         List<ServiceEtcDto> dto = serviceMapper.GetEtc(p.getServiceId());
         res.setEtc(dto);

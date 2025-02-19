@@ -1,5 +1,6 @@
 package com.green.jobdone.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -16,5 +17,6 @@ import java.time.LocalDateTime;
 public class UserAuthIds implements Serializable {
     private String email;
     @CreatedDate
-    private LocalDateTime created;
+    @Column(columnDefinition = "DATETIME(0)")
+    private LocalDateTime createdAt;
 }
