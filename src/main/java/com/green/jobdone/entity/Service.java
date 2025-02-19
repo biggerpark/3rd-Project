@@ -34,7 +34,7 @@ public class Service extends UpdatedAt{
     @Column(length = 3000) private String addComment;
     @Column(nullable = false) @ColumnDefault("0")private int pyeong;
     @Column(length = 50) private String tid;
-    @Column private LocalDateTime paidAt;
-    @Column private LocalDateTime doneAt;
+    @Column(columnDefinition = "DATETIME(0)") private LocalDateTime paidAt;
+    @Column(columnDefinition = "DATETIME(0)") private LocalDateTime doneAt;
     @Column(nullable = false) @ColumnDefault("0") private int totalPrice;
 }
