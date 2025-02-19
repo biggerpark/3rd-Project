@@ -23,6 +23,9 @@ public class BusinessGetOneRes {
     private String contents;
     private int reviewCount;
     private String safeTel;
+    private String tel;
+    private String businessNum;
+
 
 
 
