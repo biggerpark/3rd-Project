@@ -80,9 +80,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 //    }
 @Override
 protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-    try{
         log.info("메세지전용: " + message.getPayload());
-
         // JSON 형식으로 파싱
         String jsonString = message.getPayload();
         log.info("jsonString: " + jsonString);
@@ -108,27 +106,25 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             String[] uriParts = uri.split("/");
             long roomId2 = Long.parseLong(uriParts[uriParts.length - 1]);
 
+            if(roomId != roomId2) {
+                throw new CustomException(ChatErrorCode.FAIL_TO_REG);
+            }
+
             // 해당 roomId의 모든 세션에 메시지 전송
             Set<WebSocketSession> sessionSet = roomSessions.get(roomId);
             log.info("sessionSet: " + sessionSet);
-            if (sessionSet != null && roomId==roomId2) {
+            if (sessionSet != null) {
                 for (WebSocketSession webSocketSession : sessionSet) {
                     if (webSocketSession.isOpen()) {
+                        log.info("req확인: {}", req);
+                        chatService.insChat(files,req);
                         webSocketSession.sendMessage(new TextMessage("새 메시지: " + message.getPayload()));
                     }
                 }
             }
-            log.info("req확인: {}", req);
-            chatService.insChat(files,req);
         } catch (Exception e) {
-            logger.error("JSON 파싱 오류", e);
+            throw new CustomException(ChatErrorCode.FAIL_TO_REG);
         }
-        log.info("try문을 정상적으로 빠져 나왔나 확인");}
-
-    catch (Exception e) {
-        log.info("다른 이유로 안되는듯");
-    }
-
 }
 
 
