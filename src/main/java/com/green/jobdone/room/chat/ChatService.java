@@ -26,6 +26,11 @@ public class ChatService {
 
     @Transactional
     public int insChat(List<MultipartFile> pics, ChatPostReq p){
+//        long userId = authenticationFacade.getSignedUserId();
+//        UserIdRoom userIdRoom = chatMapper.checkUserId(p.getRoomId());
+//        if(userId!=userIdRoom.getUserId()||userId!=userIdRoom.getBuid()){
+//            throw new CustomException(ChatErrorCode.FAIL_TO_REG);
+//        } // 채팅 인증 처리가 필요할때 사용용도
         int res = chatMapper.insChat(p);
         if(pics.size()==0){
             return res;
