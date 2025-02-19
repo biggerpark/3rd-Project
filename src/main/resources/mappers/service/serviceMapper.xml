@@ -35,6 +35,7 @@
         <result property="businessAddress" column="businessAddress"/>
         <result property="businessPhone" column="businessPhone"/>
         <result property="price" column="price"/>
+        <result property="totalPrice" column="totalPrice"/>
         <result property="completed" column="completed"/>
         <result property="comment" column="comment"/>
         <result property="addComment" column="addComment"/>
@@ -81,10 +82,10 @@
 
     <select id="GetServiceOne" resultMap="serviceFlow">
         select a.serviceId, b.name as userName, b.phone as userPhone, d.businessName as businessName,
-        e.detailTypeName as detailTypeName, if(a.totalprice=0, a.price, a.totalPrice) as price, a.completed, a.address, a.comment, a.addComment, a.createdAt, a.userId,
+        e.detailTypeName as detailTypeName, a.price, a.completed, a.address, a.comment, a.addComment, a.createdAt, a.userId,
         k.startDate, k.endDate, k.mStartTime, k.mEndTime, d.businessNum, l.categoryName, d.tel as businessPhone,
         g.optionId, n.name as optionName, i.name as optionDetailName, i.contents, i.optionDetailId,
-        a.pyeong, d.address as businessAddress, a.updatedAt, a.userId, a.paidAt, a.doneAt,
+        a.pyeong, d.address as businessAddress, a.updatedAt, a.userId, a.paidAt, a.doneAt, a.totalPrice,
         IFNULL(o.optionDetailPrice, i.price) AS optionDetailPrice, o.serviceOptionId, o.comment AS optionComment
         FROM service a
         LEFT JOIN user b ON a.userId = b.userId

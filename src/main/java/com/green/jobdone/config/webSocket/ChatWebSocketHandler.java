@@ -78,55 +78,58 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 //            }
 //        }
 //    }
-        @Override
-        protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-            try{
-            log.info("메세지전용: " + message.getPayload());
+@Override
+protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+    try{
+        log.info("메세지전용: " + message.getPayload());
 
-            // JSON 형식으로 파싱
-            String jsonString = message.getPayload();
-            log.info("jsonString: " + jsonString);
-            ChatPostReq req = new ChatPostReq();
-            List<MultipartFile> files = new ArrayList<>();
-            try {
-                log.info("try문 잘 들어오나 확인용");
-                JsonNode jsonNode = objectMapper.readTree(jsonString);
+        // JSON 형식으로 파싱
+        String jsonString = message.getPayload();
+        log.info("jsonString: " + jsonString);
+        ChatPostReq req = new ChatPostReq();
+        List<MultipartFile> files = new ArrayList<>();
+        try {
+            log.info("try문 잘 들어오나 확인용");
+            JsonNode jsonNode = objectMapper.readTree(jsonString);
 
-                long roomId = jsonNode.get("roomId").asLong();
-                log.info("roomId: " + roomId);
-                int flag = jsonNode.get("flag").asInt();
-                log.info("flag: " + flag);
-                String contents = jsonNode.has("message") ? jsonNode.get("message").asText().trim() : "";
-                // 필요한 데이터 처리
-                log.info("message: " + contents);
+            long roomId = jsonNode.get("roomId").asLong();
+            log.info("roomId: " + roomId);
+            int flag = jsonNode.get("flag").asInt();
+            log.info("flag: " + flag);
+            String contents = jsonNode.has("message") ? jsonNode.get("message").asText().trim() : "";
+            // 필요한 데이터 처리
+            log.info("message: " + contents);
 
-                req.setRoomId(roomId);
-                req.setFlag(flag);
-                req.setContents(contents);
+            req.setRoomId(roomId);
+            req.setFlag(flag);
+            req.setContents(contents);
 
-                String uri = session.getUri().toString();
-                String[] uriParts = uri.split("/");
-                long roomId2 = Long.parseLong(uriParts[uriParts.length - 1]);
+            String uri = session.getUri().toString();
+            String[] uriParts = uri.split("/");
+            long roomId2 = Long.parseLong(uriParts[uriParts.length - 1]);
 
-                // 해당 roomId의 모든 세션에 메시지 전송
-                Set<WebSocketSession> sessionSet = roomSessions.get(roomId);
-                if (sessionSet != null && roomId!=roomId2) {
-                    for (WebSocketSession webSocketSession : sessionSet) {
-                        if (webSocketSession.isOpen()) {
-                            webSocketSession.sendMessage(new TextMessage("새 메시지: " + message.getPayload()));
-                            log.info("file과 req확인: {} {}", files.size(), req);
-                            chatService.insChat(files,req);
-                        }
+            // 해당 roomId의 모든 세션에 메시지 전송
+            Set<WebSocketSession> sessionSet = roomSessions.get(roomId);
+            log.info("sessionSet: " + sessionSet);
+            if (sessionSet != null && roomId==roomId2) {
+                for (WebSocketSession webSocketSession : sessionSet) {
+                    if (webSocketSession.isOpen()) {
+                        webSocketSession.sendMessage(new TextMessage("새 메시지: " + message.getPayload()));
                     }
                 }
-            } catch (Exception e) {
-                logger.error("JSON 파싱 오류", e);
             }
-            log.info("try문을 정상적으로 빠져 나왔나 확인");}
-            catch (Exception e) {
-                log.info("다른 이유로 안되는듯");
-            }
+            log.info("req확인: {}", req);
+            chatService.insChat(files,req);
+        } catch (Exception e) {
+            logger.error("JSON 파싱 오류", e);
         }
+        log.info("try문을 정상적으로 빠져 나왔나 확인");}
+
+    catch (Exception e) {
+        log.info("다른 이유로 안되는듯");
+    }
+
+}
 
 
     @Override
