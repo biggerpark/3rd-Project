@@ -187,6 +187,15 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             }
 
             log.info("if문 잘 넘어갔나?");
+            Set<WebSocketSession> sessionSet = roomSessions.get(roomId);
+            log.info("sessionSet: " + sessionSet);
+            if (sessionSet != null) {
+                for (WebSocketSession webSocketSession : sessionSet) {
+                    if (webSocketSession.isOpen()) {
+                        webSocketSession.sendMessage(new TextMessage("새 메시지: " + message.getPayload()));
+                    }
+                }
+            }
             ChatPostReq chatPostReq = new ChatPostReq();
             chatPostReq.setRoomId(roomId);
             chatPostReq.setContents(textMessage.isEmpty() ? null : textMessage);
