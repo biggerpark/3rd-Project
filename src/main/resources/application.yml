@@ -20,14 +20,15 @@ file:
 
 domain:
   path:
-    server: http://112.222.157.156:5234/
+    server: http://192.168.0.144:5234
+#    server: http://112.222.157.157:5234/
 
 mybatis:
   mapper-locations: mappers/**/*.xml
 
 
 kakaopay:
-  secretKey:
+  secretKey: ${KAKAO.PAY.SECRET}
   cid: TC0ONETIME
 
 jwt-const:
@@ -37,7 +38,7 @@ jwt-const:
   claim-key: signedUser
   token-name: JWT
   token-type: Bearer
-  access-token-expiry: 60000 #1분(MS)
+  access-token-expiry: 600_000 #10분(MS)
   refresh-token-expiry: 1_296_000_000 #15일(MS)
   refresh-token-cookie-name: refresh-token
   refresh-token-cookie-expiry: 1_296_000 #15일 (S)
