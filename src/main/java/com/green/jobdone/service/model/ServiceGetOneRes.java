@@ -21,6 +21,8 @@ public class ServiceGetOneRes {
     private String detailTypeName;
     private String businessPhone;
     private int price;
+    private int addPrice;
+    private int totalPrice;
     private int completed;
     private String comment;
     private String addComment;

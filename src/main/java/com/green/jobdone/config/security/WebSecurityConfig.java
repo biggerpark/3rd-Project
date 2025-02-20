@@ -1,10 +1,12 @@
 package com.green.jobdone.config.security;
 
 //Spring Security 세팅
+import com.green.jobdone.common.GlobalOauth2;
 import com.green.jobdone.config.handler.CustomAccessDeniedHandler;
 import com.green.jobdone.config.jwt.JwtAuthenticationEntryPoint;
 import com.green.jobdone.config.jwt.TokenAuthenticationFilter;
 import com.green.jobdone.config.jwt.UserRole;
+import com.green.jobdone.config.security.oauth.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +15,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -21,6 +24,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+    private final Oauth2AuthenticationCheckRedirectUriFilter oauth2AuthenticationCheckRedirectUriFilter;
+    private final Oauth2AuthenticationRequestBasedOnCookieRepository repository;
+    private final Oauth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler;
+    private final Oauth2AuthenticationFailureHandler oauth2AuthenticationFailureHandler;
+    private final MyOauth2UserService myOauth2UserService;
+    private final GlobalOauth2 globalOauth2;
 
     //스프링 시큐리티 기능 비활성화 (스프링 시큐리티가 관여하지 않았으면 하는 부분)
 //    @Bean
@@ -97,6 +107,13 @@ public class WebSecurityConfig {
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)// 인증 실패 시 jwtAuthenticationEntryPoint 처리, 401 Unauthorized 처리(토큰이 필요하다는 에러)
                         .accessDeniedHandler(new CustomAccessDeniedHandler()))  // 403 Forbidden 처리(접근 가능한 role 이 아니다 라는 에러)
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 인증 필터 추가
+                .oauth2Login( oauth2 -> oauth2.authorizationEndpoint( auth -> auth.baseUri( globalOauth2.getBaseUri() )
+                                .authorizationRequestRepository(repository) )
+                        .redirectionEndpoint( redirection -> redirection.baseUri("/*/oauth2/code/*") ) //BE가 사용하는 redirectUri이다. 플랫폼마다 설정을 할 예정
+                        .userInfoEndpoint( userInfo -> userInfo.userService(myOauth2UserService) )
+                        .successHandler(oauth2AuthenticationSuccessHandler)
+                        .failureHandler(oauth2AuthenticationFailureHandler) )
+                .addFilterBefore(oauth2AuthenticationCheckRedirectUriFilter, OAuth2AuthorizationRequestRedirectFilter.class)
                 .build();
     }
 
