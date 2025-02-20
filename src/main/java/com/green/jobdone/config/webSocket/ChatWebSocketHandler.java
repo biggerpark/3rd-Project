@@ -202,7 +202,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
                 for (WebSocketSession webSocketSession : sessionSet) {
                     if (webSocketSession.isOpen()) {
                         webSocketSession.sendMessage(new TextMessage(jsonData));
-                        webSocketSession.sendMessage(new TextMessage("새 메시지: " + message.getPayload()));
+//                        webSocketSession.sendMessage(new TextMessage("새 메시지: " + textMessage));
                     }
                 }
             }
