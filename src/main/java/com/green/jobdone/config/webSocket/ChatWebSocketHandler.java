@@ -196,6 +196,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             chatPostReq.setFlag(flag);
 
             String jsonData = chatService.insChat(pic, chatPostReq);
+            log.info("jsonData 어케 나옴: "+jsonData);
             // string 으로넘어옴
 
             if (sessionSet != null) {

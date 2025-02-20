@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.green.jobdone.room.RoomMapper">
-    <insert id="insRoom">
+    <insert id="insRoom" keyProperty="roomId" useGeneratedKeys="true">
         insert into room
         set
         businessId = #{businessId},
@@ -11,10 +11,11 @@
         </if>
     </insert>
 
+
     <select id="selRoom">
-        SELECT a.roomId, a.createdAt AS roomCreatedAt,
+        SELECT a.roomId, a.createdAt AS roomCreatedAt, a.businessId, a.userId,
         b.title, b.businessName, c.chatId, a.serviceId,
-        IF(d.pic IS NOT NULL, '사진', c.contents) AS recentlyChat
+        IF(d.pic IS NOT NULL, '사진', c.contents) AS recentlyChat, b.logo, e.pic
         FROM room a
         LEFT JOIN business b ON a.businessId = b.businessId
         LEFT JOIN service s ON a.serviceId = s.serviceId
@@ -24,6 +25,7 @@
         FROM chat
         WHERE roomId = a.roomId
         )
+        left join user e on a.userId = e.userId
         LEFT JOIN chat_pic d ON c.chatId = d.chatId
         WHERE
         <if test="userId != null">
@@ -32,7 +34,7 @@
         <if test="businessId != null">
             a.businessId = #{businessId}
         </if>
-        order by c.chatId desc;
+        order by c.chatId desc, a.roomId desc;
     </select>
 
 </mapper>
