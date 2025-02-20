@@ -119,7 +119,7 @@
     <select id="GetServiceFlow">
         select a.serviceId, a.createdAt, a.price, a.completed, b.name as userName,
         c.startDate, e.detailTypeName as detailTypeName, f.businessName as businessName,
-        a.address
+        a.address, ifnull(a.totalPrice,0) as totalPrice
         from service A
         left join user B on a.userId = b.userId
         left join service_detail C on a.serviceId = c.serviceId

@@ -53,6 +53,12 @@ public class ServiceService {
 //        } // 위 주석을 풀면(JWT 인증처리하면) 주석처리하기
 
         List<ServiceGetRes> res = serviceMapper.GetServiceFlow(p);
+        for(ServiceGetRes rs : res){
+            if(rs.getTotalPrice()==0){
+                rs.setTotalPrice(rs.getPrice());
+            }
+            rs.setAddPrice(rs.getTotalPrice()-rs.getPrice());
+        }
         return res;
     }
 
