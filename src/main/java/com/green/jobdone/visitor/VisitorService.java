@@ -26,14 +26,31 @@ class VisitorService {
 
     private String getClientIp(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
-
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr(); // 기본값 (프록시 없는 경우)
-        } else {
-            // X-Forwarded-For에 여러 개의 IP가 있을 경우, 첫 번째 것이 실제 IP
-            ip = ip.split(",")[0].trim();
+        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
+            return ip.split(",")[0].trim();  // 첫 번째 IP가 실제 클라이언트 IP
         }
-        return ip;
+
+        ip = request.getHeader("Proxy-Client-IP");
+        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
+            return ip;
+        }
+
+        ip = request.getHeader("WL-Proxy-Client-IP");
+        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
+            return ip;
+        }
+
+        ip = request.getHeader("HTTP_CLIENT_IP");
+        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
+            return ip;
+        }
+
+        ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
+            return ip;
+        }
+
+        return request.getRemoteAddr();  // 마지막으로 기본 요청 IP 사용
     }
     /*
     private String getClientIp() {
