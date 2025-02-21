@@ -49,7 +49,6 @@ jwt-const:
 
 
 
-
 spring:
   application:
     name: Jobone
@@ -162,3 +161,6 @@ mail:
         timeout: 5000
         writetimeout: 5000
   auth-code-expiration-millis: 1800000
+
+server:
+  forward-headers-strategy: native

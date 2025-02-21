@@ -31,7 +31,7 @@ public class OCRWebClientController {
     private final ObjectMapper objectMapper = new ObjectMapper(); // JSON 파싱을 위한 ObjectMapper
 
     @PostMapping("/upload")
-    public Mono<OCRWebClientDto> uploadOCR(@RequestPart("file") MultipartFile file) {
+    public Mono<OCRWebClientDto> uploadOCR(@RequestPart("paper") MultipartFile file) {
         return Mono.fromCallable(() -> {
                     MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
                     bodyBuilder.part("document", file.getResource());
