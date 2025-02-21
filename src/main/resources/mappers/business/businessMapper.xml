@@ -47,6 +47,9 @@
             <if test="openingTime != null and openingTime != ''">
                 ,openingTime = #{openingTime}
             </if>
+            <if test="tel != null and tel != ''">
+                ,tel = #{tel}
+            </if>
         </set>
         WHERE businessId = #{businessId} and userId = #{signedUserId}
     </update>
@@ -209,7 +212,9 @@
         b.contents,
         COUNT(distinct r.reviewId) AS reviewCount,
         TIMESTAMPDIFF(YEAR,b.busiCreatedAt, NOW()) AS years,
-        b.safeTel
+        b.safeTel,
+        b.tel,
+        b.businessNum
 
         FROM business b
         JOIN detail_type d ON d.detailTypeId = b.detailTypeId
@@ -238,6 +243,25 @@
         from business_pic b
         where businessPicId = #{businessPicId}
     </select>
+
+    <select id="getBusinessMonthly">
+
+        SELECT
+        b.businessName,
+        YEAR(s.paidAt) AS year,
+        MONTH(s.paidAt) AS month,
+        SUM(s.price) AS totalPrice
+        FROM service s
+        JOIN product p
+        ON s.productId = p.productId
+        JOIN business b
+        ON p.businessId = b.businessId
+        WHERE  b.businessId = #{businessId}
+        GROUP BY s.productId, YEAR(s.paidAt), MONTH(s.paidAt)
+        ORDER BY s.productId ,year DESC, month DESC;
+    </select>
+
+
 
 
 </mapper>

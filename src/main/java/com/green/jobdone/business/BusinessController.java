@@ -1,10 +1,7 @@
 package com.green.jobdone.business;
 
 import com.green.jobdone.business.model.*;
-import com.green.jobdone.business.model.get.BusinessGetOneReq;
-import com.green.jobdone.business.model.get.BusinessGetOneRes;
-import com.green.jobdone.business.model.get.BusinessGetReq;
-import com.green.jobdone.business.model.get.BusinessGetRes;
+import com.green.jobdone.business.model.get.*;
 import com.green.jobdone.business.phone.BusinessPhonePostReq;
 import com.green.jobdone.business.pic.BusinessOnePicsGetReq;
 import com.green.jobdone.business.pic.BusinessOnePicsGetRes;
@@ -156,6 +153,16 @@ public class BusinessController {
                 .resultData(res)
                 .resultMessage(res != null?"업체 사진 리스트 조회완":"업체 사진 리스트 조회 실패")
                 .build();
+    }
+
+    @GetMapping("monthly/{businessId}")
+    @Operation(summary = "업체의 월매출 조회하기")
+    public ResultResponse<List<BusinessGetMonthlyRes>> getBusinessMonthly(@Valid @ParameterObject @ModelAttribute BusinessGetOneReq p) {
+        BusinessGetMonthlyReq req = new BusinessGetMonthlyReq(p.getBusinessId());
+        List<BusinessGetMonthlyRes> res = (List<BusinessGetMonthlyRes>) businessService.getBusinessMonthly(req);
+        return ResultResponse.<List<BusinessGetMonthlyRes>>builder()
+                .resultData(res)
+                .resultMessage(res != null? "업체의 월매출 조회완료":"꽝 다음기회에").build();
     }
 
 
