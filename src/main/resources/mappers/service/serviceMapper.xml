@@ -4,9 +4,9 @@
 <mapper namespace="com.green.jobdone.service.ServiceMapper">
     <insert id="insService" keyProperty="serviceId" useGeneratedKeys="true">
         insert into service
-        (userId , productId, price, lat, lng, address, comment, phone, name, pyeong)
+        (userId , productId, price, lat, lng, address, comment, pyeong)
         values
-        (#{userId} , #{productId}, #{totalPrice}, #{lat}, #{lng}, #{address}, #{comment}, #{phone}, #{name}, #{pyeong})
+        (#{userId} , #{productId}, #{totalPrice}, #{lat}, #{lng}, #{address}, #{comment}, #{pyeong})
     </insert>
 
     <insert id="insServiceDetail">
