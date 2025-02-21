@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "visitor_log", uniqueConstraints = @UniqueConstraint(columnNames = {"ip_address", "visit_date"}))
+@Table(name = "visitor_log", uniqueConstraints = @UniqueConstraint(columnNames = {"ipAddress", "visitDate"}))
 public class VisitorLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
