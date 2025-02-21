@@ -9,11 +9,13 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 
 @Getter
 @Setter
+@ToString
 //이거 어디감
 public class ServicePostReq {
     @Schema(title = "서비스 받을 유저 pk", example = "2")

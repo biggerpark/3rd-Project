@@ -3,14 +3,24 @@ package com.green.jobdone.service;
 import com.green.jobdone.common.exception.CustomException;
 import com.green.jobdone.common.exception.ServiceErrorCode;
 import com.green.jobdone.config.security.AuthenticationFacade;
+import com.green.jobdone.entity.*;
+import com.green.jobdone.product.OptionDetailRepository;
+import com.green.jobdone.product.ProductRepository;
+import com.green.jobdone.service.model.Dto.PostOptionDto;
+import com.green.jobdone.user.UserRepository;
+import org.springframework.stereotype.Service;
 import com.green.jobdone.service.model.*;
 import com.green.jobdone.service.model.Dto.CompletedDto;
 import com.green.jobdone.service.model.Dto.ServiceEtcDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+
+
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import java.util.List;
@@ -21,6 +31,12 @@ import java.util.List;
 public class ServiceService {
     private final ServiceMapper serviceMapper;
     private final AuthenticationFacade authenticationFacade;
+    private final ServiceRepository serviceRepository;
+    private final ServiceOptionRepository serviceOptionRepository;
+    private final ServiceDetailRepository serviceDetailRepository;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
+    private final OptionDetailRepository optionDetailRepository;
 
 
     @Transactional
@@ -31,6 +47,39 @@ public class ServiceService {
         Long userId = authenticationFacade.getSignedUserId();
         p.setUserId(userId);
 
+//        com.green.jobdone.entity.Service service = new com.green.jobdone.entity.Service();
+//
+//        User user = userRepository.findById(userId).orElse(null);
+//        Product product = productRepository.findById(p.getProductId()).orElse(null);
+//
+//        service.setUser(user);
+//        service.setProduct(product);
+//        service.setAddress(p.getAddress());
+//        service.setPrice(p.getTotalPrice());
+//        service.setComment(p.getComment());
+//        service.setPyeong(p.getPyeong());
+//        serviceRepository.save(service);
+//        Long serviceId = service.getServiceId();
+//        ServiceDetail serviceDetail = new ServiceDetail();
+//        serviceDetail.setService(service);
+//
+//        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+//        LocalDate startDate = LocalDate.parse(p.getStartDate(), dateFormatter);
+//
+//        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+//        LocalTime mStartTime = LocalTime.parse(p.getMStartTime(), timeFormatter);
+//        // req 받을때는 string이였던지라 이걸 jpa로 넣기 위해 localtime/date 로 변환 하는것
+//        serviceDetail.setStartDate(startDate);
+//        serviceDetail.setMStartTime(mStartTime);
+//        serviceDetailRepository.save(serviceDetail);
+//        for(PostOptionDto dto : p.getOptions()) {
+//            ServiceOption serviceOption = new ServiceOption();
+//            serviceOption.setService(service);
+//            OptionDetail optionDetail = optionDetailRepository.findBy(dto.getOptionDetailId()).orElse(null);
+//            serviceOption.setOptionDetail();
+//        }
+//        p.setServiceId(serviceId);
+//        log.info("p: {}",p);
         int res1 = serviceMapper.insService(p);
         int res2 = serviceMapper.insServiceDetail(p);
         int res = serviceMapper.insServiceOption(p);
@@ -53,6 +102,12 @@ public class ServiceService {
 //        } // 위 주석을 풀면(JWT 인증처리하면) 주석처리하기
 
         List<ServiceGetRes> res = serviceMapper.GetServiceFlow(p);
+        for(ServiceGetRes rs : res){
+            if(rs.getTotalPrice()==0){
+                rs.setTotalPrice(rs.getPrice());
+            }
+            rs.setAddPrice(rs.getTotalPrice()-rs.getPrice());
+        }
         return res;
     }
 

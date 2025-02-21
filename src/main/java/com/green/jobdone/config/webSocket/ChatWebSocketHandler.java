@@ -196,13 +196,14 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             chatPostReq.setFlag(flag);
 
             String jsonData = chatService.insChat(pic, chatPostReq);
+            log.info("jsonData 어케 나옴: "+jsonData);
             // string 으로넘어옴
 
             if (sessionSet != null) {
                 for (WebSocketSession webSocketSession : sessionSet) {
                     if (webSocketSession.isOpen()) {
                         webSocketSession.sendMessage(new TextMessage(jsonData));
-                        webSocketSession.sendMessage(new TextMessage("새 메시지: " + message.getPayload()));
+//                        webSocketSession.sendMessage(new TextMessage("새 메시지: " + textMessage));
                     }
                 }
             }
