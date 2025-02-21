@@ -46,44 +46,45 @@ public class ServiceService {
 
         Long userId = authenticationFacade.getSignedUserId();
         p.setUserId(userId);
+        log.info("p: {}",p);
+        com.green.jobdone.entity.Service service = new com.green.jobdone.entity.Service();
 
-//        com.green.jobdone.entity.Service service = new com.green.jobdone.entity.Service();
-//
-//        User user = userRepository.findById(userId).orElse(null);
-//        Product product = productRepository.findById(p.getProductId()).orElse(null);
-//
-//        service.setUser(user);
-//        service.setProduct(product);
-//        service.setAddress(p.getAddress());
-//        service.setPrice(p.getTotalPrice());
-//        service.setComment(p.getComment());
-//        service.setPyeong(p.getPyeong());
-//        serviceRepository.save(service);
-//        Long serviceId = service.getServiceId();
-//        ServiceDetail serviceDetail = new ServiceDetail();
-//        serviceDetail.setService(service);
-//
-//        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-//        LocalDate startDate = LocalDate.parse(p.getStartDate(), dateFormatter);
-//
-//        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-//        LocalTime mStartTime = LocalTime.parse(p.getMStartTime(), timeFormatter);
-//        // req 받을때는 string이였던지라 이걸 jpa로 넣기 위해 localtime/date 로 변환 하는것
-//        serviceDetail.setStartDate(startDate);
-//        serviceDetail.setMStartTime(mStartTime);
-//        serviceDetailRepository.save(serviceDetail);
+        User user = userRepository.findById(userId).orElse(null);
+        Product product = productRepository.findById(p.getProductId()).orElse(null);
+
+        service.setUser(user);
+        service.setProduct(product);
+        service.setAddress(p.getAddress());
+        service.setPrice(p.getTotalPrice());
+        service.setComment(p.getComment());
+        service.setPyeong(p.getPyeong());
+        serviceRepository.save(service);
+        Long serviceId = service.getServiceId();
+        ServiceDetail serviceDetail = new ServiceDetail();
+        serviceDetail.setService(service);
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        LocalDate startDate = LocalDate.parse(p.getStartDate(), dateFormatter);
+
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        LocalTime mStartTime = LocalTime.parse(p.getMStartTime(), timeFormatter);
+        // req 받을때는 string이였던지라 이걸 jpa로 넣기 위해 localtime/date 로 변환 하는것
+        serviceDetail.setStartDate(startDate);
+        serviceDetail.setMStartTime(mStartTime);
+        serviceDetailRepository.save(serviceDetail);
 //        for(PostOptionDto dto : p.getOptions()) {
 //            ServiceOption serviceOption = new ServiceOption();
 //            serviceOption.setService(service);
 //            OptionDetail optionDetail = optionDetailRepository.findBy(dto.getOptionDetailId()).orElse(null);
 //            serviceOption.setOptionDetail();
 //        }
-//        p.setServiceId(serviceId);
-//        log.info("p: {}",p);
-        int res1 = serviceMapper.insService(p);
-        int res2 = serviceMapper.insServiceDetail(p);
+        p.setServiceId(serviceId);
+        log.info("p: {}",p);
+//        int res1 = serviceMapper.insService(p);
+//        int res2 = serviceMapper.insServiceDetail(p);
         int res = serviceMapper.insServiceOption(p);
         return res;
+
     }
 
     public List<ServiceGetRes> getService(ServiceGetReq p){

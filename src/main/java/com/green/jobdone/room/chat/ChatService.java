@@ -7,6 +7,11 @@ import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.common.exception.ChatErrorCode;
 import com.green.jobdone.common.exception.CustomException;
 import com.green.jobdone.config.security.AuthenticationFacade;
+import com.green.jobdone.entity.Chat;
+import com.green.jobdone.entity.ChatPic;
+import com.green.jobdone.entity.Room;
+import com.green.jobdone.room.RoomRepository;
+import com.green.jobdone.room.RoomService;
 import com.green.jobdone.room.chat.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +31,9 @@ public class ChatService {
     private final ChatMapper chatMapper;
     private final MyFileUtils myFileUtils;
     private final AuthenticationFacade authenticationFacade;
+    private final ChatRepository chatRepository;
+    private final RoomRepository roomRepository;
+    private final ChatPicRepository chatPicRepository;
 
     @Transactional
     public String insChat(MultipartFile pic, ChatPostReq p){
@@ -34,12 +42,18 @@ public class ChatService {
 //        if(userId!=userIdRoom.getUserId()||userId!=userIdRoom.getBuid()){
 //            throw new CustomException(ChatErrorCode.FAIL_TO_REG);
 //        } // 채팅 인증 처리가 필요할때 사용용도
-        int res = chatMapper.insChat(p);
+        Room room = roomRepository.findById(p.getRoomId()).orElse(null);
+        Chat chat = new Chat();
+        chat.setRoom(room);
+        chat.setFlag(p.getFlag());
+        chat.setContents(p.getContents());
+        chatRepository.save(chat);
+//        int res = chatMapper.insChat(p);
         if(pic==null){
             return null;
         }
 
-        long chatId = p.getChatId();
+        Long chatId = chat.getChatId();
         String filePath = String.format("room/%d/chat/%d",p.getRoomId(),chatId);
         myFileUtils.makeFolders(filePath);
 
@@ -50,10 +64,16 @@ public class ChatService {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        ChatPicDto chatPicDto = new ChatPicDto();
-        chatPicDto.setChatId(chatId);
-        chatPicDto.setPic(fileName);
-        int res2 = chatMapper.insChatPic(chatPicDto);
+
+        ChatPic chatPic = new ChatPic();
+        chatPic.setChat(chat);
+        chatPic.setPic(fileName);
+        chatPicRepository.save(chatPic);
+
+//        ChatPicDto chatPicDto = new ChatPicDto();
+//        chatPicDto.setChatId(chatId);
+//        chatPicDto.setPic(fileName);
+//        int res2 = chatMapper.insChatPic(chatPicDto);
         String picUrl = String.format("/pic/%s",folderPath);
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String ,Object> resJson = new HashMap<>();
