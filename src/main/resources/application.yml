@@ -11,6 +11,10 @@ global:
       - http://192.168.0.144:8080/fe/redirect
       - http://112.222.157.156:8080/fe/redirect
 
+upstage:
+  api:
+    key: ${UPSTAGE.API_KEY}
+
 const:
   default-page-size: 20
   auth-code-length: 6
