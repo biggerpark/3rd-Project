@@ -1,5 +1,7 @@
 package com.green.jobdone.room.chat;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.common.exception.ChatErrorCode;
@@ -13,8 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -25,32 +28,44 @@ public class ChatService {
     private final AuthenticationFacade authenticationFacade;
 
     @Transactional
-    public int insChat(List<MultipartFile> pics, ChatPostReq p){
+    public String insChat(MultipartFile pic, ChatPostReq p){
+//        long userId = authenticationFacade.getSignedUserId();
+//        UserIdRoom userIdRoom = chatMapper.checkUserId(p.getRoomId());
+//        if(userId!=userIdRoom.getUserId()||userId!=userIdRoom.getBuid()){
+//            throw new CustomException(ChatErrorCode.FAIL_TO_REG);
+//        } // 채팅 인증 처리가 필요할때 사용용도
         int res = chatMapper.insChat(p);
-        if(pics.size()==0){
-            return res;
+        if(pic==null){
+            return null;
         }
 
         long chatId = p.getChatId();
         String filePath = String.format("room/%d/chat/%d",p.getRoomId(),chatId);
         myFileUtils.makeFolders(filePath);
-        List<String> picName = new ArrayList<>(pics.size());
-        for(MultipartFile pic : pics){
-            String fileName = myFileUtils.makeRandomFileName(pic.getOriginalFilename());
-            picName.add(fileName);
-            String folderPath = String.format("%s/%s", filePath,fileName);
-            try {
-                myFileUtils.transferTo(pic, folderPath);
+
+        String fileName = myFileUtils.makeRandomFileName(pic.getOriginalFilename());
+        String folderPath = String.format("%s/%s", filePath,fileName);
+        try {
+            myFileUtils.transferTo(pic, folderPath);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
         ChatPicDto chatPicDto = new ChatPicDto();
         chatPicDto.setChatId(chatId);
-        chatPicDto.setPics(picName);
+        chatPicDto.setPic(fileName);
         int res2 = chatMapper.insChatPic(chatPicDto);
+        String picUrl = String.format("/pic/%s",folderPath);
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String ,Object> resJson = new HashMap<>();
+        resJson.put("flag",p.getFlag());
+        resJson.put("pic",picUrl);
+        resJson.put("message",p.getContents());
+        try {
+            return objectMapper.writeValueAsString(resJson);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
-        return res2;
     }
 
     public Long insertChat(ChatPostReq p){

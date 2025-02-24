@@ -212,7 +212,9 @@
         b.contents,
         COUNT(distinct r.reviewId) AS reviewCount,
         TIMESTAMPDIFF(YEAR,b.busiCreatedAt, NOW()) AS years,
-        b.safeTel
+        b.safeTel,
+        b.tel,
+        b.businessNum
 
         FROM business b
         JOIN detail_type d ON d.detailTypeId = b.detailTypeId
@@ -246,8 +248,8 @@
 
         SELECT
         b.businessName,
-        YEAR(s.createdAt) AS year,
-        MONTH(s.createdAt) AS month,
+        YEAR(s.paidAt) AS year,
+        MONTH(s.paidAt) AS month,
         SUM(s.price) AS totalPrice
         FROM service s
         JOIN product p
@@ -255,7 +257,7 @@
         JOIN business b
         ON p.businessId = b.businessId
         WHERE  b.businessId = #{businessId}
-        GROUP BY s.productId, YEAR(s.createdAt), MONTH(s.createdAt)
+        GROUP BY s.productId, YEAR(s.paidAt), MONTH(s.paidAt)
         ORDER BY s.productId ,year DESC, month DESC;
     </select>
 

@@ -6,6 +6,8 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -19,9 +21,9 @@ public class Service extends UpdatedAt{
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
-//    @ManyToOne
-//    @JoinColumn(name = "productId", nullable = false)
-//    private Product product;
+    @ManyToOne
+    @JoinColumn(name = "productId", nullable = false)
+    private Product product;
 
     @Column(nullable = false) private int price;
     @Column(length = 6,nullable = false) private double lat;
@@ -32,4 +34,7 @@ public class Service extends UpdatedAt{
     @Column(length = 3000) private String addComment;
     @Column(nullable = false) @ColumnDefault("0")private int pyeong;
     @Column(length = 50) private String tid;
+    @Column(columnDefinition = "DATETIME(0)") private LocalDateTime paidAt;
+    @Column(columnDefinition = "DATETIME(0)") private LocalDateTime doneAt;
+    @Column(nullable = false) @ColumnDefault("0") private int totalPrice;
 }

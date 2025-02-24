@@ -1,5 +1,6 @@
 package com.green.jobdone.room;
 
+import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.room.chat.model.ChatPostReq;
 import com.green.jobdone.room.model.RoomGetReq;
@@ -23,13 +24,21 @@ public class RoomService {
             p.setUserId(authenticationFacade.getSignedUserId());
         }
         List<RoomGetRes> res = roomMapper.selRoom(p);
+        for(RoomGetRes r : res){
+
+            r.setPic(PicUrlMaker.makePicUserUrl(r.getUserId(),r.getPic()));
+            r.setLogo(PicUrlMaker.makePicUrlLogo(r.getBusinessId(),r.getLogo()));
+        }
         return res;
     }
 
-    public int insRoom(RoomPostReq p) {
+    public Long insRoom(RoomPostReq p) {
         p.setUserId(authenticationFacade.getSignedUserId());
+        if(p.getServiceId()==0){
+            p.setServiceId(null);
+        }
         int res = roomMapper.insRoom(p);
 
-        return res;
+        return p.getRoomId();
     }
 }

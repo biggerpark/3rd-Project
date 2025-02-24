@@ -31,7 +31,7 @@ public class Business {
     @Column(length = 20, name = "businessName")
     private String businessName;
 
-    @Column(length = 30)
+    @Column(length = 80)
     private String title;
 
     @Column(length = 3000)

@@ -4,9 +4,9 @@
 <mapper namespace="com.green.jobdone.service.ServiceMapper">
     <insert id="insService" keyProperty="serviceId" useGeneratedKeys="true">
         insert into service
-        (userId , productId, price, lat, lng, address, comment, phone, name, pyeong)
+        (userId , productId, price, lat, lng, address, comment, pyeong)
         values
-        (#{userId} , #{productId}, #{totalPrice}, #{lat}, #{lng}, #{address}, #{comment}, #{phone}, #{name}, #{pyeong})
+        (#{userId} , #{productId}, #{totalPrice}, #{lat}, #{lng}, #{address}, #{comment}, #{pyeong})
     </insert>
 
     <insert id="insServiceDetail">
@@ -35,6 +35,7 @@
         <result property="businessAddress" column="businessAddress"/>
         <result property="businessPhone" column="businessPhone"/>
         <result property="price" column="price"/>
+        <result property="totalPrice" column="totalPrice"/>
         <result property="completed" column="completed"/>
         <result property="comment" column="comment"/>
         <result property="addComment" column="addComment"/>
@@ -46,6 +47,8 @@
         <result property="businessNum" column="businessNum"/>
         <result property="createdAt" column="createdAt"/>
         <result property="updatedAt" column="updatedAt"/>
+        <result property="paidAt" column="paidAt"/>
+        <result property="doneAt" column="doneAt"/>
         <result property="categoryName" column="categoryName"/>
         <collection property="options" resultMap="serviceOption"/>
         <collection property="etc" resultMap="serviceEtc"/>
@@ -82,7 +85,7 @@
         e.detailTypeName as detailTypeName, a.price, a.completed, a.address, a.comment, a.addComment, a.createdAt, a.userId,
         k.startDate, k.endDate, k.mStartTime, k.mEndTime, d.businessNum, l.categoryName, d.tel as businessPhone,
         g.optionId, n.name as optionName, i.name as optionDetailName, i.contents, i.optionDetailId,
-        a.pyeong, d.address as businessAddress, a.updatedAt, a.userId,
+        a.pyeong, d.address as businessAddress, a.updatedAt, a.userId, a.paidAt, a.doneAt, a.totalPrice,
         IFNULL(o.optionDetailPrice, i.price) AS optionDetailPrice, o.serviceOptionId, o.comment AS optionComment
         FROM service a
         LEFT JOIN user b ON a.userId = b.userId
@@ -116,7 +119,7 @@
     <select id="GetServiceFlow">
         select a.serviceId, a.createdAt, a.price, a.completed, b.name as userName,
         c.startDate, e.detailTypeName as detailTypeName, f.businessName as businessName,
-        a.address
+        a.address, ifnull(a.totalPrice,0) as totalPrice
         from service A
         left join user B on a.userId = b.userId
         left join service_detail C on a.serviceId = c.serviceId
@@ -166,7 +169,7 @@
     <update id="updService">
         update service
         <set>
-            <if test="totalPrice != null">price = #{totalPrice},</if>
+            <if test="totalPrice != 0">totalPrice = #{totalPrice},</if>
             <if test="addComment != null">addComment = #{addComment},</if>
             <if test="pyeong != null">pyeong = #{pyeong},</if>
             completed = 2
@@ -258,9 +261,16 @@
         join detail_type c on b.detailTypeId = c.detailTypeId
         where serviceId = #{serviceId}
     </select>
-    <update id="payCompleted">
+    <update id="payOrDoneCompleted">
         update service
-        set completed = 6
+        <if test="businessId = null">
+            set completed = 6
+            ,paidAt = now()
+        </if>
+        <if test="businessId !=null">
+            set completed = 7
+            ,doneAt = now()
+        </if>
         where serviceId = #{serviceId}
     </update>
 </mapper>

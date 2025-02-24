@@ -21,6 +21,8 @@ public class ServiceGetOneRes {
     private String detailTypeName;
     private String businessPhone;
     private int price;
+    private int addPrice;
+    private int totalPrice;
     private int completed;
     private String comment;
     private String addComment;
@@ -35,6 +37,8 @@ public class ServiceGetOneRes {
     private String createdAt;
     private String updatedAt;
     private String pyeong;
+    private String paidAt;
+    private String doneAt;
     private List<ServiceOptionDto> options;
     private List<ServiceEtcDto> etc;
 }
