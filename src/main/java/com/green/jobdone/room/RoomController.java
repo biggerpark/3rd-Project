@@ -30,9 +30,9 @@ public class RoomController {
     }
     @Operation(summary = "채팅방 생성")
     @PostMapping
-    public ResultResponse<Integer> insRoom(@RequestBody RoomPostReq p) {
-        int res = roomService.insRoom(p);
-        return ResultResponse.<Integer>builder()
+    public ResultResponse<Long> insRoom(@RequestBody RoomPostReq p) {
+        Long res = roomService.insRoom(p);
+        return ResultResponse.<Long>builder()
                 .resultData(res)
                 .resultMessage("생성 완료")
                 .build();

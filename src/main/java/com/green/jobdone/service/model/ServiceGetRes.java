@@ -15,6 +15,8 @@ public class ServiceGetRes {
     private String businessName;
     private String detailTypeName;
     private int price;
+    private int addPrice;
+    private int totalPrice;
     private int completed;
     private String startDate;
     private String createdAt;
