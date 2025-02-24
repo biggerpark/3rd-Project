@@ -10,6 +10,8 @@ import com.green.jobdone.business.pic.BusinessPicPostRes;
 import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.config.security.AuthenticationFacade;
+import com.green.jobdone.entity.Business;
+import com.green.jobdone.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -322,7 +324,11 @@ public class BusinessService {
     }
 
 
-    public BusinessContentsPostRes getBusinessContents(BusinessContentsPostReq p) {
+    public BusinessContentsPostRes postBusinessContents(BusinessContentsPostReq p) {
+
+        User user = new User();
+        user.setUserId(authenticationFacade.getSignedUserId());
+
 
         long userId = businessMapper.existBusinessId(p.getBusinessId());
 
@@ -332,8 +338,14 @@ public class BusinessService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
         }
 
-        return null;
+        Business business = new Business();
+        business.setTitle(p.getTitle());
+        business.setContents(p.getContents());
 
+        businessRepository.save(business);
+
+
+        return new BusinessContentsPostRes(business.getTitle(),business.getContents());
     }
 
     public List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetMonthlyReq p){
