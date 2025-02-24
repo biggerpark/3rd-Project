@@ -20,4 +20,8 @@ public class CreatedAt {
     @Column(nullable = false, columnDefinition = "DATETIME(0)") //이 애노테이션은 자동으로 작성이 되는데 설정을 좀 더 해주고 싶다면 이 애노테이션을 붙여야 한다.
     @ColumnDefault("current_timestamp()")
     private LocalDateTime createdAt;
+//    @PrePersist
+//    public void setCreatedAt() {
+//        this.createdAt = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).toLocalDateTime();
+//    }
 }

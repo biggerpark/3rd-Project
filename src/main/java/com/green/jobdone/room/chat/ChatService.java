@@ -112,10 +112,13 @@ public class ChatService {
 
     public List<ChatGetRes> selRoomChat(ChatGetReq p){
         List<ChatGetRes> res = chatMapper.selRoomChat(p);
+        String logo = res.get(0).getLogo();
         long roomId = p.getRoomId();
         for (ChatGetRes chat : res) {
             long chatId = chat.getChatId();
+            long businessId = chat.getBusinessId();
             List<GetPicDto> a = chat.getPics();
+            chat.setLogo(PicUrlMaker.makePicUrlLogo(businessId , logo));
 
             if (a == null) {continue;}
 

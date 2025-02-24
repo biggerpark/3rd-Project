@@ -33,6 +33,7 @@
         <result property="userName" column="userName"/>
         <result property="logo" column="logo"/>
         <result property="businessName" column="businessName"/>
+        <result property="businessId" column="businessId"/>
         <collection property="pics" resultMap="chatPic"/>
     </resultMap>
     <resultMap id="chatPic" type="com.green.jobdone.room.chat.model.GetPicDto">
@@ -41,13 +42,13 @@
     </resultMap>
     <select id="selRoomChat" resultMap="selChat">
         select distinct a.chatId, a.contents, a.flag, a.createdAt, c.name as userName, d.logo, d.businessName
-        , e.pic, e.chatPicId
+        , e.pic, e.chatPicId, d.businessId
         from chat a
         left join room b on a.roomId = b.roomId
         left join user c on b.userId = c.userId
         left join business d on b.businessId = d.businessId
         left join chat_pic e on a.chatId = e.chatId
         where a.roomId = #{roomId}
-        order by a.chatId desc, e.chatPicId
+        order by a.chatId, e.chatPicId
     </select>
 </mapper>
