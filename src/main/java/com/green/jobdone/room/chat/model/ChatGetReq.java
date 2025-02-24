@@ -3,16 +3,19 @@ package com.green.jobdone.room.chat.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-import lombok.Setter;
-import org.springframework.web.bind.annotation.BindParam;
+
+
+import java.beans.ConstructorProperties;
 
 @Getter
-@Setter
-public class ChatGetReq {
-    @Schema(name = "room_Id")
-    private long roomId;
 
-    public ChatGetReq(@BindParam("room_id") long roomId) {
+
+public class ChatGetReq {
+    @Schema(name = "room_id")
+    private Long roomId;
+
+    @ConstructorProperties({"room_id"})
+    ChatGetReq(Long roomId) {
         this.roomId = roomId;
     }
 }
