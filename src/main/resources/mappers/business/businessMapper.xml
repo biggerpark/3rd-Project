@@ -16,8 +16,8 @@
         busiCreatedAt = #{busiCreatedAt},
         tel = #{tel},
         safeTel = #{safeTel},
-        latitude = #{latitude},
-        longitude = #{longitude}
+        lat = #{lat},
+        lng = #{lng}
     </insert>
 
     <select id="existBusinessNum" parameterType="String" resultType="int">
