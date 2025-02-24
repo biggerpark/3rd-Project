@@ -20,8 +20,7 @@ file:
 
 domain:
   path:
-    server: http://192.168.0.144:5234
-#    server: http://112.222.157.157:5234/
+    server: ${DOMAIN.SERVER.PATH}
 
 mybatis:
   mapper-locations: mappers/**/*.xml
