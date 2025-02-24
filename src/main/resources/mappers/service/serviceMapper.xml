@@ -176,6 +176,7 @@
         </set>
         where serviceId = #{serviceId}
     </update>
+
     <update id="updServiceDetail">
         update service_detail
         <set>
