@@ -37,6 +37,7 @@ public class ServiceService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final OptionDetailRepository optionDetailRepository;
+    private final EtcRepository etcRepository;
 
 
     @Transactional
@@ -169,8 +170,23 @@ public class ServiceService {
         p.setMEndTime(et);
         List<ServiceEtcDto> etcDto = p.getEtc();
         int sum = 0;
+        int i=0;
+        com.green.jobdone.entity.Service service = new com.green.jobdone.entity.Service();
+        service.setCompleted(2);
+        service.setServiceId(p.getServiceId());
+        service.setAddComment(p.getAddComment());
+        service.setPyeong(p.getPyeong());
+        // update시 set으로 null 지정시 기존값을 변경하지 않음
+        List<Etc> etcList = new ArrayList<>();
         for(ServiceEtcDto dto : etcDto){
             sum += dto.getEtcPrice();
+            Etc etc = Etc.builder()
+                    .service(service)
+                    .etcId(p.getEtc().get(i++).getEtcId())
+                    .price(dto.getEtcPrice())
+                    .comment(dto.getEtcComment())
+                    .build();
+            etcList.add(etc);
         }
 
         if(sum!=0){
@@ -179,30 +195,52 @@ public class ServiceService {
             // 처음 get때 받는 price에 해당하는 부분
             realPrice += sum;
             p.setTotalPrice(realPrice);
+            service.setTotalPrice(realPrice);
             // realPrice = totalPrice
         }
 
-        int res1 = serviceMapper.updService(p);
-        int res2 = serviceMapper.updServiceDetail(p);
-        int res4 = serviceMapper.updServiceEtc(p);
-//        int res3 = serviceMapper.updServiceOption(p);
-        return res4;
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        LocalDate startDate = LocalDate.parse(p.getStartDate(), dateFormatter);
+        LocalDate endDate = LocalDate.parse(p.getEndDate(), dateFormatter);
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        LocalTime mStartTime = LocalTime.parse(p.getMStartTime(), timeFormatter);
+        LocalTime mEndTime = LocalTime.parse(p.getMEndTime(), timeFormatter);
+        ServiceDetail serviceDetail = new ServiceDetail();
+        serviceDetail.setService(service);
+        serviceDetail.setStartDate(startDate);
+        serviceDetail.setEndDate(endDate);
+        serviceDetail.setMStartTime(mStartTime);
+        serviceDetail.setMEndTime(mEndTime);
+
+        serviceRepository.save(service);
+        serviceDetailRepository.save(serviceDetail);
+        etcRepository.saveAll(etcList);
+
+//        int res1 = serviceMapper.updService(p);
+//        int res2 = serviceMapper.updServiceDetail(p);
+//        int res4 = serviceMapper.updServiceEtc(p);
+//        int res3 = serviceMapper.updServiceOption(p); 없
+        return 1;
     }
 
     @Transactional
     public int completedService(ServicePatchReq p){
         p.setUserId(authenticationFacade.getSignedUserId());
-        int com = serviceMapper.getCompleted(p.getServiceId());
+//        int com = serviceMapper.getCompleted(p.getServiceId());
+        int com = serviceRepository.completedByServiceId(p.getServiceId());
         if(!transitionAllowed(com,p.getCompleted(),p.getBusinessId())) {
             throw new CustomException(ServiceErrorCode.INVALID_SERVICE_STATUS);
         }
         if(p.getBusinessId()==null){
-            int res = serviceMapper.patchCompleted(p);
+//            int res = serviceMapper.patchCompleted(p);
+            serviceRepository.updCompleted(p.getServiceId(), p.getCompleted());
             // xml에서 userId가 해당되는 경우에만 가능하도록 해놨음
-            return res;
+            return 1;
         }
 
-        Long findUserId = serviceMapper.findUserId(p.getBusinessId());
+//        Long findUserId = serviceMapper.findUserId(p.getBusinessId());
+        Long findUserId = serviceRepository.userIdByServiceId(p.getServiceId());
 
 
         if(!findUserId.equals(p.getUserId())){
@@ -211,15 +249,17 @@ public class ServiceService {
         p.setUserId(0);
 
         if(p.getCompleted()==7){
-            CompletedDto dto = new CompletedDto();
-            dto.setServiceId(p.getServiceId());
-            dto.setBusinessId(p.getBusinessId());
-            return serviceMapper.payOrDoneCompleted(dto);
+//            CompletedDto dto = new CompletedDto();
+//            dto.setServiceId(p.getServiceId());
+//            dto.setBusinessId(p.getBusinessId());
+//            return serviceMapper.payOrDoneCompleted(dto);
+            serviceRepository.doneCompleted(p.getServiceId());
         }
 
 
-            int res = serviceMapper.patchCompleted(p);
-            return res;
+//            int res = serviceMapper.patchCompleted(p);
+            serviceRepository.updCompleted(p.getServiceId(), p.getCompleted());
+            return 1;
 
     }
 
