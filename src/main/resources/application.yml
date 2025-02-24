@@ -54,7 +54,7 @@ spring:
     name: Jobone
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:mariadb://${DEFAULT.DB_URL}/yourdb?serverTimezone=Asia/Seoul
+    url: jdbc:log4jdbc:mariadb://${DEFAULT.DB_URL}?serverTimezone=Asia/Seoul
     username: ${DEFAULT.USERNAME}
     password: ${DEFAULT.PASSWORD}
   servlet:
