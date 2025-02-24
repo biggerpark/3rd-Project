@@ -5,12 +5,14 @@ import com.green.jobdone.entity.VisitorHistory;
 import com.green.jobdone.entity.VisitorLog;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 
 import java.time.LocalDate;
 
+@Slf4j
 @Service
 @Transactional
 class VisitorService {
@@ -25,31 +27,37 @@ class VisitorService {
     }
 
     private String getClientIp(HttpServletRequest request) {
+        log.info("getClientIp - getRemoteAddr: {}", request.getRemoteAddr());
         String ip = request.getHeader("X-Forwarded-For");
         if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
+            log.info("getClientIp - 1");
             return ip.split(",")[0].trim();  // 첫 번째 IP가 실제 클라이언트 IP
         }
 
         ip = request.getHeader("Proxy-Client-IP");
         if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
+            log.info("getClientIp - 2");
             return ip;
         }
 
         ip = request.getHeader("WL-Proxy-Client-IP");
         if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
+            log.info("getClientIp - 3");
             return ip;
         }
 
         ip = request.getHeader("HTTP_CLIENT_IP");
         if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
+            log.info("getClientIp - 4");
             return ip;
         }
 
         ip = request.getHeader("HTTP_X_FORWARDED_FOR");
         if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
+            log.info("getClientIp - 5");
             return ip;
         }
-
+        log.info("getClientIp - 6");
         return request.getRemoteAddr();  // 마지막으로 기본 요청 IP 사용
     }
     /*
