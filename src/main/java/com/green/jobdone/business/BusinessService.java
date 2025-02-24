@@ -32,6 +32,7 @@ public class BusinessService {
     private final MyFileUtils myFileUtils;
     private final AuthenticationFacade authenticationFacade; //인증받은 유저가 이용 할 수 있게.
     //일단 사업등록하기 한번기입하면 수정불가하는 절대적정보
+    public final BusinessRepository businessRepository;
 
     public static String generateSafeTel(){
         Random random = new Random();
@@ -318,6 +319,21 @@ public class BusinessService {
             throw new IllegalArgumentException("이미 존재하는 전화번호입니다");
         }
         return businessMapper.insBusinessPhone(p);
+    }
+
+
+    public BusinessContentsPostRes getBusinessContents(BusinessContentsPostReq p) {
+
+        long userId = businessMapper.existBusinessId(p.getBusinessId());
+
+        long signedUserId = authenticationFacade.getSignedUserId();
+        p.setSignedUserId(signedUserId);
+        if (userId != signedUserId) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
+        }
+
+        return null;
+
     }
 
     public List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetMonthlyReq p){

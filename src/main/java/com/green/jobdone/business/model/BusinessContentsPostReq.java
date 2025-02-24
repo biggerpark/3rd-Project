@@ -12,6 +12,9 @@ import lombok.Setter;
 @EqualsAndHashCode
 public class BusinessContentsPostReq {
     @JsonIgnore
+    private long signedUserId;
+
+    @Schema(title = "업체 pk")
     private long businessId;
 
     @Schema(title = "타이틀")
