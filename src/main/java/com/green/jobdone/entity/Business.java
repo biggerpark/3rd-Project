@@ -7,6 +7,7 @@ import lombok.ToString;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -69,12 +70,6 @@ public class Business {
 
     @Column
     private double lng;
-
-    @Column
-    private String tel2;
-
-    @Column
-    private String tel3;
 
 
 
