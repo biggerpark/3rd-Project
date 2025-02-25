@@ -16,8 +16,8 @@
         busiCreatedAt = #{busiCreatedAt},
         tel = #{tel},
         safeTel = #{safeTel},
-        latitude = #{latitude},
-        longitude = #{longitude}
+        lat = #{lat},
+        lng = #{lng}
     </insert>
 
     <select id="existBusinessNum" parameterType="String" resultType="int">
@@ -35,12 +35,7 @@
     <update id="udtBusiness">
         UPDATE business
         <set>
-            <if test=" title != null and title != ''">
-                title = #{title}
-            </if>
-            <if test=" title != null and title != ''">
-                ,contents = #{contents}
-            </if>
+
             <if test="closingTime != null and closingTime != ''">
                 ,closingTime = #{closingTime}
             </if>

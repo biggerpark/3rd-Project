@@ -10,6 +10,8 @@ import com.green.jobdone.business.pic.BusinessPicPostRes;
 import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.config.security.AuthenticationFacade;
+import com.green.jobdone.entity.Business;
+import com.green.jobdone.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -32,6 +35,7 @@ public class BusinessService {
     private final MyFileUtils myFileUtils;
     private final AuthenticationFacade authenticationFacade; //인증받은 유저가 이용 할 수 있게.
     //일단 사업등록하기 한번기입하면 수정불가하는 절대적정보
+    public final BusinessRepository businessRepository;
 
     public static String generateSafeTel(){
         Random random = new Random();
@@ -318,6 +322,26 @@ public class BusinessService {
             throw new IllegalArgumentException("이미 존재하는 전화번호입니다");
         }
         return businessMapper.insBusinessPhone(p);
+    }
+
+
+    public BusinessContentsPostRes postBusinessContents(BusinessContentsPostReq p) {
+
+        long signedUserId = authenticationFacade.getSignedUserId();
+
+        Business business = businessRepository.findById(p.getBusinessId())
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"너 누구냐"));
+
+        if (business.getUser().getUserId() != signedUserId) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다, 근데 너 누구냐");
+        }
+
+        business.setTitle(p.getTitle());
+        business.setContents(p.getContents());
+
+        businessRepository.save(business);
+
+        return new BusinessContentsPostRes(business.getTitle(),business.getContents());
     }
 
     public List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetMonthlyReq p){
