@@ -31,8 +31,8 @@ public class Qa extends CreatedAt {
     private String contents;
 
     @Column(length = 10, nullable = false)
-    @ColumnDefault("00101") // 00101:미답변,00102:검토중,00103:답변완료
-    private String qaState;
+    // 00101:미답변,00102:검토중,00103:답변완료
+    private String qaState="00101";
 
     @Column
     private Long qaTargetId;
