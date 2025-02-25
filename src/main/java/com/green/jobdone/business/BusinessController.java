@@ -165,7 +165,7 @@ public class BusinessController {
                 .resultMessage(res != null? "업체의 월매출 조회완료":"꽝 다음기회에").build();
     }
 
-    @PatchMapping("contents")
+    @PostMapping("contents")
     @Operation(summary = "상품 타이틀 및 내용 수정")
     public ResultResponse<BusinessContentsPostRes> postBusinessContents( @RequestBody BusinessContentsPostReq p){
 
