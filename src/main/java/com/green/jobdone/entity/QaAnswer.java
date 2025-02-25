@@ -6,12 +6,15 @@ import lombok.*;
 import org.aspectj.weaver.patterns.TypePatternQuestions;
 import org.hibernate.annotations.ColumnDefault;
 
+
 @Entity
 @Getter
 @Builder
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "qa_answer")
+
 public class QaAnswer extends CreatedAt{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +30,5 @@ public class QaAnswer extends CreatedAt{
 
     @Column(length = 3000, nullable = false)
     private String answer;
-
-
 
 }

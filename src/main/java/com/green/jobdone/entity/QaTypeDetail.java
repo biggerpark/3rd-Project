@@ -9,6 +9,8 @@ import lombok.*;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "qa_type_detail")
+
 public class QaTypeDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,4 +23,5 @@ public class QaTypeDetail {
     @Column(nullable = false, length = 50) // 이유는 윤석이 피그마에 잘 정리해둠.
     private String reason;
 
+  
 }
