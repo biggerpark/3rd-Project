@@ -8,5 +8,5 @@ import java.util.List;
 
 @Mapper
 public interface AdminMapper {
-    List<BusinessApplicationGetRes> getBusinessApplication(int page);
+    List<BusinessApplicationGetRes> getBusinessApplication(int offset);
 }

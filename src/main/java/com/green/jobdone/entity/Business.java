@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-public class Business {
+public class Business extends UpdatedAt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) //auto_increment
     private Long businessId;
