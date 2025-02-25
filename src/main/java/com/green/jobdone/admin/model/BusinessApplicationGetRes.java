@@ -8,11 +8,12 @@ import lombok.ToString;
 @Setter
 @ToString
 public class BusinessApplicationGetRes {
-    private String businessCreatedAt;
+    private String applicationCreatedAt;
     private String paper;
     private String detailTypeName;
     private String userName;
     private String businessName;
     private int state;
+    private long businessId;
 
 }

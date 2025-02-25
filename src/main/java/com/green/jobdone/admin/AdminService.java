@@ -17,7 +17,9 @@ public class AdminService {
 
     public List<BusinessApplicationGetRes> getBusinessApplication(int page) {
 
-        return adminMapper.getBusinessApplication(page);
+        int offset = (page - 1) * 10;
+
+        return adminMapper.getBusinessApplication(offset);
 
 
     }
