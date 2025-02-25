@@ -23,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -326,24 +327,19 @@ public class BusinessService {
 
     public BusinessContentsPostRes postBusinessContents(BusinessContentsPostReq p) {
 
-        User user = new User();
-        user.setUserId(authenticationFacade.getSignedUserId());
-
-
-        long userId = businessMapper.existBusinessId(p.getBusinessId());
-
         long signedUserId = authenticationFacade.getSignedUserId();
-        p.setSignedUserId(signedUserId);
-        if (userId != signedUserId) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
+
+        Business business = businessRepository.findById(p.getBusinessId())
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"너 누구냐"));
+
+        if (business.getUser().getUserId() != signedUserId) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다, 근데 너 누구냐");
         }
 
-        Business business = new Business();
         business.setTitle(p.getTitle());
         business.setContents(p.getContents());
 
         businessRepository.save(business);
-
 
         return new BusinessContentsPostRes(business.getTitle(),business.getContents());
     }

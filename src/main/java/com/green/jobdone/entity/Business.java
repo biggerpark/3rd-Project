@@ -66,10 +66,10 @@ public class Business {
     private String safeTel;
 
     @Column
-    private double lat;
+    private Double lat;
 
     @Column
-    private double lng;
+    private Double lng;
 
 
 
