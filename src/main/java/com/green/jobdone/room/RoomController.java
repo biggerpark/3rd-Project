@@ -1,6 +1,7 @@
 package com.green.jobdone.room;
 
 import com.green.jobdone.common.model.ResultResponse;
+import com.green.jobdone.room.model.RoomDelReq;
 import com.green.jobdone.room.model.RoomGetReq;
 import com.green.jobdone.room.model.RoomGetRes;
 import com.green.jobdone.room.model.RoomPostReq;
@@ -35,6 +36,15 @@ public class RoomController {
         return ResultResponse.<Long>builder()
                 .resultData(res)
                 .resultMessage("생성 완료")
+                .build();
+    }
+    @Operation(summary = "방 나가기")
+    @DeleteMapping
+    public ResultResponse<Integer> delRoom(@RequestBody RoomDelReq p) {
+        int res = roomService.delRoom(p);
+        return ResultResponse.<Integer>builder()
+                .resultData(res)
+                .resultMessage("완료")
                 .build();
     }
 }
