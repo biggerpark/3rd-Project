@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.green.jobdone.admin.AdminMapper">
+
+    <select id="getBusinessApplication">
+        SELECT a.createdAt as businessCreatedAt,a.paper,b.detailTypeName,c.name as userName,a.businessName,a.state
+        FROM business a
+        LEFT JOIN detail_type b
+        on a.detailTypeId=b.detailTypeId
+        LEFT JOIN user c
+        on a.userId=c.userId
+        ORDER BY a.createdAt
+        LIMIT #{page}, 10
+    </select>
+
+</mapper>

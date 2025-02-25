@@ -2,16 +2,16 @@ package com.green.jobdone.entity;
 
 import com.green.jobdone.config.converter.ReportReasonConverter;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.aspectj.weaver.patterns.TypePatternQuestions;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
-@Setter
+@Builder
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class QaAnswer extends CreatedAt{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

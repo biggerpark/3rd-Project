@@ -1,14 +1,14 @@
 package com.green.jobdone.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Getter
-@Setter
+@Builder
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class QaType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

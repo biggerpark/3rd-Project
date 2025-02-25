@@ -2,15 +2,16 @@ package com.green.jobdone.entity;
 
 import com.green.jobdone.config.converter.ReportReasonConverter;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
-@Setter
+@Builder
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class Qa extends CreatedAt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,9 +28,9 @@ public class Qa extends CreatedAt {
     @Column(length = 3000, nullable = false)
     private String contents;
 
-    @Column(nullable = false)
-    @ColumnDefault("101") // 101:미답변,102:검토중,103:답변완료
-    private int qaState;
+    @Column(length = 10, nullable = false)
+    @ColumnDefault("00101") // 00101:미답변,00102:검토중,00103:답변완료
+    private String qaState;
 
     @Column
     private Long qaTargetId;
@@ -38,7 +39,5 @@ public class Qa extends CreatedAt {
     @Convert(converter = ReportReasonConverter.class)  // ENUM 을 DB에 저장할 때 코드(code) 로 변환
     @Column(name = "reportReasonId")
     private ReportReason reportReason;
-
-
 
 }
