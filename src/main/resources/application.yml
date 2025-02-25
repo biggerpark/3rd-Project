@@ -27,7 +27,8 @@ file:
 
 domain:
   path:
-    server: ${DOMAIN.SERVER.PATH}
+    #server: ${DOMAIN.SERVER.PATH}
+  server: 192.168.0.144:5234
 
 mybatis:
   mapper-locations: mappers/**/*.xml
