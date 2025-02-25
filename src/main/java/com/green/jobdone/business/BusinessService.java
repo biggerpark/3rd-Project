@@ -46,7 +46,7 @@ public class BusinessService {
 
         int n1 = random.nextInt(10000);
         int n2 = random.nextInt(10000);
-        return String.format("050-%04d-%04d", n1, n2);
+        return String.format("050%04d%04d", n1, n2);
     }
 
 
