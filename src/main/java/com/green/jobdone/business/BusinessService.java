@@ -14,6 +14,7 @@ import com.green.jobdone.entity.Business;
 import com.green.jobdone.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.internal.constraintvalidators.bv.AssertTrueValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,8 @@ public class BusinessService {
     private final AuthenticationFacade authenticationFacade; //인증받은 유저가 이용 할 수 있게.
     //일단 사업등록하기 한번기입하면 수정불가하는 절대적정보
     public final BusinessRepository businessRepository;
+    public final BusinessPicRepository businessPicRepository;
+    private final AssertTrueValidator assertTrueValidator;
 
     public static String generateSafeTel(){
         Random random = new Random();
@@ -64,9 +67,9 @@ public class BusinessService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 등록된 사업자 번호입니다");
         }
 
-//        if (userId == 0){
-//            throw new IllegalArgumentException("인증되지 않은 유저입니다.");
-//        }
+//       if (userId == 0){
+//           throw new IllegalArgumentException("인증되지 않은 유저입니다.");
+//       }
 
 
         if (paper == null || logo == null) {
@@ -237,6 +240,72 @@ public class BusinessService {
 
         return BusinessPicPostRes.builder().businessId(businessId).pics(businessPicList).build();
     }
+
+    @Transactional
+    public BusinessPicPostRes businessPicTemp(List<MultipartFile> pics, long businessId) {
+        long signedUserId = authenticationFacade.getSignedUserId();
+
+        Business business = businessRepository.findById(businessId)
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"너 누구냐"));
+
+        if (business.getUser().getUserId() != signedUserId) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다, 근데 너 누구냐");
+        } //일단 보안먼저 챙겨주고
+
+
+        String tempPath = String.format("business/%d/temp", businessId);
+        myFileUtils.makeFolders(tempPath);
+
+        List<String> tempPicUrls = new ArrayList<>(pics.size());
+        List<String> businessPicList = new ArrayList<>(pics.size());
+        for (MultipartFile pic : pics) {
+            String savedPicName = myFileUtils.makeRandomFileName(pic);
+            String filePath = String.format("%s/%s", tempPath, savedPicName);
+
+            String tempPicUrl = String.format("http://112.222.157.157:5234/%s",filePath);
+
+            try{
+                myFileUtils.transferTo(pic,filePath);
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            businessPicList.add(savedPicName);
+            tempPicUrls.add(tempPicUrl);
+        }
+        BusinessPicDto businessPicDto = new BusinessPicDto();
+        businessPicDto.setBusinessId(businessId);
+        businessPicDto.setPics(businessPicList);
+        int resultPics = businessMapper.insBusinessPic(businessPicDto);
+
+        return  BusinessPicPostRes.builder().businessId(businessId).pics(tempPicUrls).build();
+    }
+
+    @Transactional
+    public BusinessPicPostRes businessPicConfirm(List<MultipartFile> pics, long businessId) {
+        long signedUserId = authenticationFacade.getSignedUserId();
+
+        Business business = businessRepository.findById(businessId)
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"너 누구냐"));
+
+        if (business.getUser().getUserId() != signedUserId) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다, 근데 너 누구냐");
+        }
+
+        String realPath = String.format("business/%d/temp", businessId);
+        myFileUtils.makeFolders(realPath);
+        List<String> businessPicList = new ArrayList<>(pics.size());
+        for (MultipartFile pic : pics) {
+            String savedPicName = myFileUtils.makeRandomFileName(pic);
+            String filePath = String.format("%s/%s", realPath, savedPicName);
+
+        }
+
+        return null;
+    }
+
+
+
 
     public int udtBusinessPics(long businessPicId) {
         return businessMapper.putBusinessPic(businessPicId);
