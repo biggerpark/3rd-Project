@@ -70,12 +70,5 @@ public class Business {
     @Column
     private Double lng;
 
-    @Column
-    private String tel2;
-
-    @Column
-    private String tel3;
-
-
 
 }
