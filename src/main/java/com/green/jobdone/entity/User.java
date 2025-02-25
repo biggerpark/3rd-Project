@@ -48,7 +48,7 @@ public class User extends UpdatedAt {
 //    @ColumnDefault("100")
 //    private int type; // 디폴트값으로 100으로 설정
 
-    @Convert(converter = UserRoleConverter.class) // 이거에 의해
+    @Convert(converter = UserRoleConverter.class)
     @ColumnDefault("100")  // DB 기본값 100 (USER)
     @Column(name="type",nullable = false)
     private UserRole role;
