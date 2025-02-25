@@ -46,7 +46,7 @@ public class BusinessService {
 
         int n1 = random.nextInt(10000);
         int n2 = random.nextInt(10000);
-        return String.format("050%04d%04d", n1, n2);
+        return String.format("050-%04d-%04d", n1, n2);
     }
 
 
@@ -56,7 +56,13 @@ public class BusinessService {
         long userId = authenticationFacade.getSignedUserId();
         p.setSignedUserId(userId);
 
-        String safeTel = generateSafeTel();
+
+        Random random = new Random();
+
+        int n1 = random.nextInt(10000);
+        int n2 = random.nextInt(10000);
+        String safeTel = String.format("050%04d%04d", n1, n2);
+
 
         // 사업자 등록번호 유효성 체크
         if (p.getBusinessNum() == null || p.getBusinessNum().isBlank()) {
@@ -94,10 +100,13 @@ public class BusinessService {
 
 
         }
+        log.debug("Generated safeTel: {}", safeTel);
 
         p.setSafeTel(safeTel);
         p.setPaper(savedPicName);
         p.setLogo(logoPath);
+        log.debug("Generated safeTel: {}", safeTel);
+        log.debug("BusinessPostSignUpReq: {}", p.toString());
 
         return businessMapper.insBusiness(p);
 
@@ -241,6 +250,7 @@ public class BusinessService {
 
         return BusinessPicPostRes.builder().businessId(businessId).pics(businessPicList).build();
     }
+
     @Transactional
     public BusinessContentsPostRes postBusinessContents(BusinessContentsPostReq p) {
 
@@ -260,6 +270,7 @@ public class BusinessService {
 
         return new BusinessContentsPostRes(business.getTitle(),business.getContents());
     }
+
     @Transactional
     public BusinessPicPostRes businessPicTemp(List<MultipartFile> pics, long businessId) {
         long signedUserId = authenticationFacade.getSignedUserId();
@@ -301,7 +312,7 @@ public class BusinessService {
     }
 
     @Transactional
-    public BusinessPicPostRes businessPicConfirm(List<MultipartFile> pics, long businessId) {
+    public boolean businessPicConfirm( long businessId) {
         long signedUserId = authenticationFacade.getSignedUserId();
 
         Business business = businessRepository.findById(businessId)
@@ -314,24 +325,10 @@ public class BusinessService {
         String tempPath = String.format("business/%d/temp", businessId);
         String middlePath = String.format("business/%d/pics", businessId);
         myFileUtils.makeFolders(middlePath);
-        List<String> businessPicList = new ArrayList<>(pics.size());
-        for (MultipartFile pic : pics) {
-            String savedPicName = myFileUtils.makeRandomFileName(pic);
-            businessPicList.add(savedPicName);
-            String filePath = String.format("%s/%s", middlePath, savedPicName);
-            try {
-                myFileUtils.transferTo(pic,filePath);
-                myFileUtils.deleteFile(tempPath);
-            }catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        BusinessPicDto businessPicDto = new BusinessPicDto();
-        businessPicDto.setBusinessId(businessId);
-        businessPicDto.setPics(businessPicList);
-        int resultPics = businessMapper.insBusinessPic(businessPicDto);
 
-        return BusinessPicPostRes.builder().businessId(businessId).pics(businessPicList).build();
+        boolean moveSuccess = myFileUtils.moveFolder(tempPath,middlePath);
+
+        return moveSuccess;
     }
 
 
