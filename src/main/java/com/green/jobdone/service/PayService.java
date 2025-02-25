@@ -29,6 +29,7 @@ import java.util.Map;
 @Slf4j
 public class PayService {
     private final KaKaoPay kaKaoPay;
+    private final ServiceRepository serviceRepository;
     private RestTemplate restTemplate = new RestTemplate();
     private final ServiceMapper serviceMapper;
     private KakaoPayRedayRes kakaoPayRedayRes;
@@ -90,7 +91,8 @@ public class PayService {
     }
 
     public void saveTid(Long serviceId, String tid){
-        serviceMapper.saveTid(serviceId,tid);
+//        serviceMapper.saveTid(serviceId,tid);
+        serviceRepository.saveTid(serviceId,tid);
     }
 
     @Transactional
@@ -121,10 +123,11 @@ public class PayService {
         CompletedDto dto = new CompletedDto();
         dto.setServiceId(serviceId);
 
-        int res = serviceMapper.payOrDoneCompleted(dto);
-        if(res==0){
-            throw new RuntimeException();
-        }
+//        int res = serviceMapper.payOrDoneCompleted(dto);
+//        if(res==0){
+//            throw new RuntimeException();
+//        }
+        serviceRepository.paidCompleted(serviceId);
 
         // 카톡 메세지 보냄
         RestTemplate restTemplate = new RestTemplate();

@@ -23,6 +23,7 @@ public class ServiceController {
     @Operation(summary = "예약하기 세차같은경우 평수에 0기입")
     @PostMapping
     public ResultResponse<ServicePostRes> postService(@Valid @RequestBody ServicePostReq p ){
+        log.info("p: {}", p);
         int res = serviceService.postService(p);
         ServicePostRes res1 = new ServicePostRes();
         res1.setServiceId(p.getServiceId());

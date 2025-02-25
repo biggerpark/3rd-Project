@@ -1,13 +1,13 @@
 package com.green.jobdone.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Getter
-@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class Etc extends UpdatedAt{
     @Id

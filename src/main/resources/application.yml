@@ -54,7 +54,7 @@ spring:
     name: Jobone
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:mariadb://${DEFAULT.DB_URL}
+    url: jdbc:log4jdbc:mariadb://${DEFAULT.DB_URL}?serverTimezone=Asia/Seoul
     username: ${DEFAULT.USERNAME}
     password: ${DEFAULT.PASSWORD}
   servlet:
@@ -130,6 +130,7 @@ spring:
           batch_size: 50
         format_sql: true
         order_updates: true
+        time_zone: Asia/Seoul
     show-sql: true
 
 
