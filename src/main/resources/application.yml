@@ -8,8 +8,15 @@ global:
     cookie-expiry-seconds: 180
     authorized-redirect-uris:
       - http://localhost:8080/fe/redirect
-      - http://192.168.0.144:8080/fe/redirect
-      - http://112.222.157.156:8080/fe/redirect
+      - http://192.168.0.144:5234/fe/redirect
+      - http://192.168.0.144:52340/fe/redirect
+      - http://112.222.157.157:5234/fe/redirect
+      - http://112.222.157.157:52340/fe/redirect
+      - http://localhost:5173/fe/redirect
+
+upstage:
+  api:
+    key: ${UPSTAGE.API_KEY}
 
 const:
   default-page-size: 20
@@ -20,7 +27,8 @@ file:
 
 domain:
   path:
-    server: ${DOMAIN.SERVER.PATH}
+    #server: ${DOMAIN.SERVER.PATH}
+    server: 192.168.0.144:5234
 
 mybatis:
   mapper-locations: mappers/**/*.xml
@@ -44,13 +52,12 @@ jwt-const:
 
 
 
-
 spring:
   application:
     name: Jobone
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:mariadb://${DEFAULT.DB_URL}/yourdb?serverTimezone=Asia/Seoul
+    url: jdbc:log4jdbc:mariadb://${DEFAULT.DB_URL}?serverTimezone=Asia/Seoul
     username: ${DEFAULT.USERNAME}
     password: ${DEFAULT.PASSWORD}
   servlet:
@@ -158,3 +165,6 @@ mail:
         timeout: 5000
         writetimeout: 5000
   auth-code-expiration-millis: 1800000
+
+server:
+  forward-headers-strategy: native

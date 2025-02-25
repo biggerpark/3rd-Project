@@ -7,7 +7,9 @@ import lombok.Setter;
 @Setter
 public class BusinessGetOneRes {
     private String logo;
+
     private long detailTypeId;
+    private long categoryId;
     private String detailTypeName;
     private long businessId;
     private String businessName;
