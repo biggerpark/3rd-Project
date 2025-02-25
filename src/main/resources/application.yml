@@ -8,8 +8,11 @@ global:
     cookie-expiry-seconds: 180
     authorized-redirect-uris:
       - http://localhost:8080/fe/redirect
-      - http://192.168.0.144:8080/fe/redirect
-      - http://112.222.157.156:8080/fe/redirect
+      - http://192.168.0.144:5234/fe/redirect
+      - http://192.168.0.144:52340/fe/redirect
+      - http://112.222.157.157:5234/fe/redirect
+      - http://112.222.157.157:52340/fe/redirect
+      - http://localhost:5173/fe/redirect
 
 upstage:
   api:
@@ -54,7 +57,7 @@ spring:
     name: Jobone
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:mariadb://${DEFAULT.DB_URL}
+    url: jdbc:log4jdbc:mariadb://${DEFAULT.DB_URL}?serverTimezone=Asia/Seoul
     username: ${DEFAULT.USERNAME}
     password: ${DEFAULT.PASSWORD}
   servlet:
@@ -130,6 +133,7 @@ spring:
           batch_size: 50
         format_sql: true
         order_updates: true
+        time_zone: Asia/Seoul
     show-sql: true
 
 
