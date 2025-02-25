@@ -4,7 +4,7 @@
 <mapper namespace="com.green.jobdone.admin.AdminMapper">
 
     <select id="getBusinessApplication">
-        SELECT a.createdAt as businessCreatedAt,a.paper,b.detailTypeName,c.name as userName,a.businessName,a.state
+        SELECT a.busiCreatedAt as businessCreatedAt,a.paper,b.detailTypeName,c.name as userName,a.businessName,a.state
         FROM business a
         LEFT JOIN detail_type b
         on a.detailTypeId=b.detailTypeId
