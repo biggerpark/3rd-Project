@@ -6,19 +6,22 @@ import lombok.*;
 @Entity
 @Getter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "qa_type_detail")
+
 public class QaTypeDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long qaTypeDetailId;
 
     @ManyToOne
-    @JoinColumn(name = "qaTypeId")
+    @JoinColumn(name = "qaTypeId", nullable = false)
     private QaType qaType;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 50) // 이유는 윤석이 피그마에 잘 정리해둠.
     private String reason;
+
+  
 }

@@ -64,6 +64,7 @@ public class UserService {
         user.setName(p.getName());
         user.setPic(savedPicName);
         user.setPhone(p.getPhone());
+        user.setRole(UserRole.USER);
 
         //int result = mapper.insUser(p);
         userRepository.save(user);

@@ -1,9 +1,12 @@
 package com.green.jobdone.entity;
 
+import com.green.jobdone.config.converter.UserRoleConverter;
+import com.green.jobdone.config.jwt.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -27,7 +30,12 @@ public class Admin  extends UpdatedAt{
     @Column(length = 11,nullable = false)
     private String phone;
 
-//    @Column(nullable = false)
-//    private int type=100;
+
+
+    @Convert(converter = UserRoleConverter.class)
+    @ColumnDefault("101")  // DB 기본값 101 (Admin)
+    @Column(name="type",nullable = false)
+    private UserRole role;
+
 
 }

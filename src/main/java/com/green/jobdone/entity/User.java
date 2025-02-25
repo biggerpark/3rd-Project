@@ -1,5 +1,7 @@
 package com.green.jobdone.entity;
 
+import com.green.jobdone.config.converter.UserRoleConverter;
+import com.green.jobdone.config.jwt.UserRole;
 import com.green.jobdone.config.security.SignInProviderType;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -42,9 +44,14 @@ public class User extends UpdatedAt {
     @Column(length = 11, nullable = false)
     private String phone;
 
-    @Column(nullable = false)
-    @ColumnDefault("100")
-    private int type; // 디폴트값으로 100으로 설정
+//    @Column(nullable = false)
+//    @ColumnDefault("100")
+//    private int type; // 디폴트값으로 100으로 설정
+
+    @Convert(converter = UserRoleConverter.class)
+    @ColumnDefault("100")  // DB 기본값 100 (USER)
+    @Column(name="type",nullable = false)
+    private UserRole role;
 
 
 
