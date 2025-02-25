@@ -14,7 +14,6 @@ import com.green.jobdone.entity.Business;
 import com.green.jobdone.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.internal.constraintvalidators.bv.AssertTrueValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +37,6 @@ public class BusinessService {
     //일단 사업등록하기 한번기입하면 수정불가하는 절대적정보
     public final BusinessRepository businessRepository;
     public final BusinessPicRepository businessPicRepository;
-    private final AssertTrueValidator assertTrueValidator;
 
     public static String generateSafeTel(){
         Random random = new Random();
@@ -241,7 +239,7 @@ public class BusinessService {
         return BusinessPicPostRes.builder().businessId(businessId).pics(businessPicList).build();
     }
 
-    @Transactional
+
     public BusinessPicPostRes businessPicTemp(List<MultipartFile> pics, long businessId) {
         long signedUserId = authenticationFacade.getSignedUserId();
 
@@ -281,7 +279,7 @@ public class BusinessService {
         return  BusinessPicPostRes.builder().businessId(businessId).pics(tempPicUrls).build();
     }
 
-    @Transactional
+
     public BusinessPicPostRes businessPicConfirm(List<MultipartFile> pics, long businessId) {
         long signedUserId = authenticationFacade.getSignedUserId();
 
