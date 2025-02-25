@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Table(name = "qa_type")
 public class QaType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

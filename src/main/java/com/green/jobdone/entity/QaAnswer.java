@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Table(name = "qa_answer")
 public class QaAnswer extends CreatedAt{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
