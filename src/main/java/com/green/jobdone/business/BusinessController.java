@@ -88,6 +88,18 @@ public class BusinessController {
                 .build();
     }
 
+    @PostMapping("businessPicTemp")
+    @Operation(summary = "업체 사진 임시 등록")
+    public ResultResponse<BusinessPicPostRes> postBusinessPicTemp(@RequestPart List<MultipartFile> pics,
+                                                              @Valid @RequestPart BusinessGetOneReq p) {
+
+        BusinessPicPostRes res = businessService.businessPicTemp(pics, p.getBusinessId());
+        return ResultResponse.<BusinessPicPostRes>builder()
+                .resultMessage("업체사진등록 완료")
+                .resultData(res)
+                .build();
+    }
+
     @DeleteMapping("businessPic")
     @Operation(summary = "업체 사진 삭제")
     public ResultResponse<Integer> delBusinessPic(@Valid @ParameterObject @ModelAttribute BusinessPicReq p ) {
