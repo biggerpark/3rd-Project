@@ -11,4 +11,5 @@ public class OCRWebClientDto {
     private String businessName;
     private String address;
     private String busiCreatedAt;
+    private String businessNum;
 }

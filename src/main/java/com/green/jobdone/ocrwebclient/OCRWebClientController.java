@@ -3,7 +3,13 @@ package com.green.jobdone.ocrwebclient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.green.jobdone.common.exception.CustomException;
+import com.green.jobdone.common.exception.ReviewErrorCode;
+import com.green.jobdone.common.exception.UserErrorCode;
+import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.ocrwebclient.model.OCRWebClientDto;
+import com.green.jobdone.user.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +22,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/ocr")
 public class OCRWebClientController {
+    private final UserRepository userRepository;
+    private final AuthenticationFacade authenticationFacade;
 
     @Value("${upstage.api.key}")
     private String apiKey;
@@ -56,9 +64,22 @@ public class OCRWebClientController {
             String result2 = jsonNode.path("text").asText();
             String result = result2.replaceAll(" ","").replaceAll("\n","");
             OCRWebClientDto ocrWebClientDto = new OCRWebClientDto();
+            int startIdxUserName = result.indexOf("성명:");
+            String userName = result.substring(startIdxUserName + ("성명:").length(), result.indexOf("생년월일:", startIdxUserName));
+            if (userName.length() > 10) {
+                userName = result.substring(startIdxUserName + ("성명:").length(), result.indexOf("개업", startIdxUserName));
+            }
+//            if(!userName.equals(userRepository.getUserNameByUserId(authenticationFacade.getSignedUserId()))) {
+//                throw new CustomException(UserErrorCode.INCORRECT_NAME);
+//            }
+            int startIdxNum = result.indexOf("등록번호:");
+            ocrWebClientDto.setBusinessNum(result.substring(startIdxNum + ("등록번호:").length(), result.indexOf("상호:", startIdxNum)).replaceAll("-",""));
             int startIdxName = result.indexOf("상호:");
             ocrWebClientDto.setBusinessName(result.substring(startIdxName + ("상호:").length(), result.indexOf("성명:", startIdxName)));
             int startIdxBusiCreatedAt = result.indexOf("개업연월일:");
+            if(startIdxBusiCreatedAt == -1) {
+                startIdxBusiCreatedAt = result.indexOf("개업년월일:");
+            }
 //            String busiCreatedAt = result.substring(startIdxBusiCreatedAt + ("개업연월일:").length(), result.indexOf("생년월일", startIdxBusiCreatedAt));
             try {
                 String busiCreatedAt = result.substring(
