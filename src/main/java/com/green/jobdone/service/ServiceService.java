@@ -1,5 +1,6 @@
 package com.green.jobdone.service;
 
+import com.green.jobdone.business.BusinessRepository;
 import com.green.jobdone.common.exception.CustomException;
 import com.green.jobdone.common.exception.ServiceErrorCode;
 import com.green.jobdone.config.security.AuthenticationFacade;
@@ -38,6 +39,7 @@ public class ServiceService {
     private final ProductRepository productRepository;
     private final OptionDetailRepository optionDetailRepository;
     private final EtcRepository etcRepository;
+    private final BusinessRepository businessRepository;
 
 
     @Transactional
@@ -95,7 +97,8 @@ public class ServiceService {
         if(p.getStatus()>5 || p.getStatus()<0){
             throw new CustomException(ServiceErrorCode.INVALID_SERVICE_STATUS);
         }
-        if(p.getBusinessId()!= null && !p.getUserId().equals(serviceMapper.findUserId(p.getBusinessId()))) {
+//        if(p.getBusinessId()!= null && !p.getUserId().equals(serviceMapper.findUserId(p.getBusinessId()))) {
+        if(p.getBusinessId()!= null && !p.getUserId().equals(businessRepository.findUserIdByBusinessId(p.getBusinessId()))) {
             throw new CustomException(ServiceErrorCode.BUSINESS_OWNER_MISMATCH);
         }
 
@@ -149,7 +152,8 @@ public class ServiceService {
             //이부분 어케할지 userId 없이도 볼수 있도록? 주소가 보여버리는데??
         }
         log.info("businessId:{}",businessId);
-        if(businessId != null && !userId.equals(serviceMapper.findUserId(businessId))) {
+//        if(businessId != null && !userId.equals(serviceMapper.findUserId(businessId))) {
+        if(businessId != null && !userId.equals(businessRepository.findUserIdByBusinessId(businessId))) {
             // 토큰의 userId랑 businessId를 이용한 조회(userId) 다르면 리턴
             throw new CustomException(ServiceErrorCode.BUSINESS_OWNER_MISMATCH);
         }
@@ -159,7 +163,8 @@ public class ServiceService {
 
     @Transactional
     public int updService(ServicePutReq p){
-        Long serviceProviderUserId = serviceMapper.providerUserId(p.getServiceId());
+//        Long serviceProviderUserId = serviceMapper.providerUserId(p.getServiceId());
+        Long serviceProviderUserId = serviceRepository.providerUserIdByServiceId(p.getServiceId());
         if(!serviceProviderUserId.equals(authenticationFacade.getSignedUserId())){
 //             p.getProviderUserId 대신 authenticationFacade.getSignedUserId()
             throw new CustomException(ServiceErrorCode.BUSINESS_OWNER_MISMATCH);
