@@ -19,5 +19,6 @@ public class UserSignInReq {
     @NotNull(message = "비밀번호를 입력하셔야 합니다.")
     @Size(min=4, max=50, message = "비밀번호는 4~50자 사이만 가능합니다.")
     @Schema(description = "유저 비밀번호", example = "1111aaaa", requiredMode = Schema.RequiredMode.REQUIRED)
+
     private String upw;
 }
