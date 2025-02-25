@@ -49,6 +49,18 @@ public class UserController {
                 .resultData(res)
                 .build();
     }
+    @PostMapping("sign-in test business")
+    @Operation(summary = "로그인")
+    public ResultResponse<UserSignInRes> postUserSignInBusiness(@RequestBody UserTestReq p, HttpServletResponse response) {
+        UserSignInReq req = new UserSignInReq();
+        req.setEmail(p.getEmail());
+        req.setUpw(p.getUpw());
+        UserSignInRes res = service.postUserSignIn(req, response);
+        return ResultResponse.<UserSignInRes>builder()
+                .resultMessage(res.getMessage())
+                .resultData(res)
+                .build();
+    }
 
 
     @PostMapping("email")

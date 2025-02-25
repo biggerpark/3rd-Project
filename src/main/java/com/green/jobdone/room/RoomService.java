@@ -2,14 +2,14 @@ package com.green.jobdone.room;
 
 import com.green.jobdone.business.BusinessRepository;
 import com.green.jobdone.common.PicUrlMaker;
+import com.green.jobdone.common.exception.CustomException;
+import com.green.jobdone.common.exception.RoomErrorCode;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.Business;
 import com.green.jobdone.entity.Room;
 import com.green.jobdone.entity.User;
 import com.green.jobdone.room.chat.model.ChatPostReq;
-import com.green.jobdone.room.model.RoomGetReq;
-import com.green.jobdone.room.model.RoomGetRes;
-import com.green.jobdone.room.model.RoomPostReq;
+import com.green.jobdone.room.model.*;
 import com.green.jobdone.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,5 +58,37 @@ public class RoomService {
 //        int res = roomMapper.insRoom(p);
 //        return p.getRoomId();
         return room.getRoomId();
+    }
+    public int delRoom(RoomDelReq p){
+        Long userId = authenticationFacade.getSignedUserId();
+        RoomDto rUId = roomRepository.userIdByRoomId(p.getRoomId());
+        Room room = new Room();
+        room.setRoomId(p.getRoomId());
+        if(p.getBusinessId()==null){
+            if(rUId.getUserId()!=userId){
+                throw new CustomException(RoomErrorCode.FAIL_TO_OUT);
+            } else if(rUId.getState().equals("00201")) {
+                room.setState("00202");
+                roomRepository.save(room);
+                return 1;
+            } else {
+                room.setState("00204");
+                roomRepository.save(room);
+                return 1;
+            }
+
+        }
+        if(rUId.getBusinessId()!=p.getBusinessId()){
+            throw new CustomException(RoomErrorCode.FAIL_TO_OUT);
+        } else if(rUId.getState().equals("00201")) {
+            room.setState("00203");
+            roomRepository.save(room);
+            return 1;
+        } else {
+            room.setState("00204");
+            roomRepository.save(room);
+            return 1;
+        }
+
     }
 }
