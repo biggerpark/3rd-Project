@@ -3,6 +3,7 @@ package com.green.jobdone.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -25,4 +26,7 @@ public class Room extends CreatedAt{
     @OneToOne
     @JoinColumn(name = "serviceId")
     private Service service;
+
+    @Column(nullable = false, length = 5)
+    private String state="00201";
 }
