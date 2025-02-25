@@ -16,7 +16,8 @@ public enum UserErrorCode implements ErrorCode {
     TOKEN_REQUIRED(HttpStatus.UNAUTHORIZED, "토큰이 필요합니다."),
 
     // ✅ 추가: 권한 부족 (ROLE 없음)
-    FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
+    FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.")
+    , INCORRECT_NAME(HttpStatus.NOT_FOUND, "본인의 사업자등록증이 아닙니다.");
 
 
 
