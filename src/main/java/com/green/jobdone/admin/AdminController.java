@@ -1,5 +1,6 @@
 package com.green.jobdone.admin;
 
+import com.green.jobdone.admin.model.AdminUserInfoRes;
 import com.green.jobdone.admin.model.BusinessApplicationGetRes;
 import com.green.jobdone.admin.model.BusinessCategoryRes;
 import com.green.jobdone.admin.model.BusinessRejectReq;
@@ -71,6 +72,21 @@ public class AdminController {
                 .resultData(result)
                 .build();
     }
+
+
+    @GetMapping("userInfo")
+    @Operation(summary = "관리자 측 고객 정보 조회")
+    public ResultResponse<List<AdminUserInfoRes>> getAdminUserInfo(@RequestParam int page) {
+
+        List<AdminUserInfoRes> result = adminService.getAdminUserInfo(page);
+
+
+        return ResultResponse.< List<AdminUserInfoRes>>builder()
+                .resultMessage("관리자 측 고객 정보 조회 완료")
+                .resultData(result)
+                .build();
+    }
+
 
 
 

@@ -1,5 +1,6 @@
 package com.green.jobdone.admin;
 
+import com.green.jobdone.admin.model.AdminUserInfoRes;
 import com.green.jobdone.admin.model.BusinessApplicationGetRes;
 import com.green.jobdone.admin.model.BusinessCategoryRes;
 import com.green.jobdone.admin.model.BusinessRejectReq;
@@ -67,6 +68,30 @@ public class AdminService {
 
 
         return adminMapper.getBusinessCategory(categoryId);
+
+    }
+
+
+    @Transactional
+    public List<AdminUserInfoRes> getAdminUserInfo(int page){
+        int offset = (page - 1) * 10;
+
+        List<AdminUserInfoRes> res = adminMapper.getAdminUserInfo(offset);
+
+        for(AdminUserInfoRes item : res){
+            String type=switch(item.getTypeName()){
+                case 100 -> "일반유저";
+                case 110 -> "업체 직원";
+                case 120 -> "업체 매니저";
+                case 130 -> "업체 사장";
+                case 140 -> "프리랜서";
+                default -> null;
+            };
+
+            item.setType(type);
+        }
+
+        return res;
 
     }
 
