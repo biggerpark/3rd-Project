@@ -21,6 +21,10 @@ public interface BusinessRepository extends JpaRepository<Business, Long> {
     Long findBusinessIdByUserId(@Param("UserId") Long UserId);
 
 
+    @Query("SELECT COUNT(*) FROM Business b WHERE b.businessId =:businessNum")
+    Integer findExistBusinessNum(@Param("businessNum") String businessNum);
+
+
     @Modifying
     @Query("update Business b set b.title=:#{#p.title} ,b.contents=:#{#p.contents} where b.businessId=:#{#p.businessId}")
     void updateBusinessContents(@Param("p") BusinessContentsPostReq p);
