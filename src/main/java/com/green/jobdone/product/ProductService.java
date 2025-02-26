@@ -42,7 +42,7 @@ public class ProductService {
     }
 
 
-    //관리자가함.
+    //관리자가함. >> 업체가 하기로 변경
     public int postOption(ProductOptionPostReq p) {
 
 

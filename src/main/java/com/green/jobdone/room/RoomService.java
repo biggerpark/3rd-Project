@@ -8,7 +8,6 @@ import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.Business;
 import com.green.jobdone.entity.Room;
 import com.green.jobdone.entity.User;
-import com.green.jobdone.room.chat.model.ChatPostReq;
 import com.green.jobdone.room.model.*;
 import com.green.jobdone.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -59,21 +58,20 @@ public class RoomService {
 //        return p.getRoomId();
         return room.getRoomId();
     }
+
     public int delRoom(RoomDelReq p){
         Long userId = authenticationFacade.getSignedUserId();
         RoomDto rUId = roomRepository.userIdByRoomId(p.getRoomId());
         Room room = new Room();
         room.setRoomId(p.getRoomId());
         if(p.getBusinessId()==null){
-            if(rUId.getUserId()!=userId){
+            if(!rUId.getUserId().equals(userId)){
                 throw new CustomException(RoomErrorCode.FAIL_TO_OUT);
             } else if(rUId.getState().equals("00201")) {
-                room.setState("00202");
-                roomRepository.save(room);
+                roomRepository.updateStateByRoomId("00202",p.getRoomId());
                 return 1;
             } else {
-                room.setState("00204");
-                roomRepository.save(room);
+                roomRepository.updateStateByRoomId("00204",p.getRoomId());
                 return 1;
             }
 
@@ -81,12 +79,10 @@ public class RoomService {
         if(rUId.getBusinessId()!=p.getBusinessId()){
             throw new CustomException(RoomErrorCode.FAIL_TO_OUT);
         } else if(rUId.getState().equals("00201")) {
-            room.setState("00203");
-            roomRepository.save(room);
+            roomRepository.updateStateByRoomId("00203",p.getRoomId());
             return 1;
         } else {
-            room.setState("00204");
-            roomRepository.save(room);
+            roomRepository.updateStateByRoomId("00204",p.getRoomId());
             return 1;
         }
 

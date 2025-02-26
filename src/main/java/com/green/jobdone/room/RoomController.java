@@ -8,11 +8,13 @@ import com.green.jobdone.room.model.RoomPostReq;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("room")
@@ -41,6 +43,7 @@ public class RoomController {
     @Operation(summary = "방 나가기")
     @DeleteMapping
     public ResultResponse<Integer> delRoom(@RequestBody RoomDelReq p) {
+        log.info("p: {}",p);
         int res = roomService.delRoom(p);
         return ResultResponse.<Integer>builder()
                 .resultData(res)

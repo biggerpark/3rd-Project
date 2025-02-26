@@ -2,6 +2,7 @@ package com.green.jobdone.room.chat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.green.jobdone.business.BusinessRepository;
 import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.common.exception.ChatErrorCode;
@@ -34,6 +35,7 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final RoomRepository roomRepository;
     private final ChatPicRepository chatPicRepository;
+    private final BusinessRepository businessRepository;
 
     @Transactional
     public String insChat(MultipartFile pic, ChatPostReq p){
@@ -42,7 +44,11 @@ public class ChatService {
 //        if(userId!=userIdRoom.getUserId()||userId!=userIdRoom.getBuid()){
 //            throw new CustomException(ChatErrorCode.FAIL_TO_REG);
 //        } // 채팅 인증 처리가 필요할때 사용용도
-        Room room = roomRepository.findById(p.getRoomId()).orElse(null);
+        Room room = roomRepository.findById(p.getRoomId()).orElseThrow(() -> new CustomException(ChatErrorCode.MISSING_ROOM));
+        Long userId = room.getUser().getUserId();
+        if(userId!=authenticationFacade.getSignedUserId()|| !room.getBusiness().getBusinessId().equals(businessRepository.findBusinessIdByUserId(userId))){
+            throw new CustomException(ChatErrorCode.FAIL_TO_REG);
+        }
         Chat chat = new Chat();
         chat.setRoom(room);
         chat.setFlag(p.getFlag());

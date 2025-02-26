@@ -8,10 +8,10 @@ global:
     cookie-expiry-seconds: 180
     authorized-redirect-uris:
       - http://localhost:8080/fe/redirect
-      - http://192.168.0.144:5234/fe/redirect
-      - http://192.168.0.144:52340/fe/redirect
-      - http://112.222.157.157:5234/fe/redirect
-      - http://112.222.157.157:52340/fe/redirect
+      - http://${DOMAIN.SERVER.PATH2}/fe/redirect
+      - http://${DOMAIN.SERVER.PATH2}0/fe/redirect
+      - http://${DOMAIN.SERVER.PATH}/fe/redirect
+      - http://${DOMAIN.SERVER.PATH}0/fe/redirect
       - http://localhost:5173/fe/redirect
 
 upstage:
@@ -27,8 +27,8 @@ file:
 
 domain:
   path:
-    #server: ${DOMAIN.SERVER.PATH}
-    server: 192.168.0.144:5234
+    server: ${DOMAIN.SERVER.PATH}
+    server2: ${DOMAIN.SERVER.PATH2}
 
 mybatis:
   mapper-locations: mappers/**/*.xml
@@ -45,7 +45,7 @@ jwt-const:
   claim-key: signedUser
   token-name: JWT
   token-type: Bearer
-  access-token-expiry: 3_600_000 #10분(MS)
+  access-token-expiry: 600_000_000 #10분(MS)
   refresh-token-expiry: 1_296_000_000 #15일(MS)
   refresh-token-cookie-name: refresh-token
   refresh-token-cookie-expiry: 1_296_000 #15일 (S)

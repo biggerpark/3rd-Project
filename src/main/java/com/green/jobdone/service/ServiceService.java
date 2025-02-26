@@ -176,7 +176,8 @@ public class ServiceService {
         List<ServiceEtcDto> etcDto = p.getEtc();
         int sum = 0;
         int i=0;
-        com.green.jobdone.entity.Service service = new com.green.jobdone.entity.Service();
+//        com.green.jobdone.entity.Service service = new com.green.jobdone.entity.Service();
+        com.green.jobdone.entity.Service service = serviceRepository.findById(p.getServiceId()).orElse(null);
         service.setCompleted(2);
         service.setServiceId(p.getServiceId());
         service.setAddComment(p.getAddComment());
