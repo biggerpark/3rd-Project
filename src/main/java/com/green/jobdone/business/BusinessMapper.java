@@ -55,4 +55,5 @@ public interface BusinessMapper {
     int insBusinessPhone(BusinessPhonePostReq p);
     int existBusinessPhone(long businessId, String phone);
 
+    BusinessGetServiceRes countBusinessServices(BusinessGetInfoReq p);
 }
