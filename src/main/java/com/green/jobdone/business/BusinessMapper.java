@@ -36,7 +36,7 @@ public interface BusinessMapper {
     List<BusinessGetRes> selAllBusiness(BusinessGetReq p);
     BusinessGetOneRes selOneBusiness(long businessId);
 
-    List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetMonthlyReq p);
+    List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetInfoReq p);
 
 
 

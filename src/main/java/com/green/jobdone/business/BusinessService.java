@@ -12,7 +12,6 @@ import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.common.model.Domain;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.Business;
-import com.green.jobdone.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +24,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -426,7 +424,7 @@ public class BusinessService {
 
 
 
-    public List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetMonthlyReq p){
+    public List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetInfoReq p){
 
 
             long userId = businessMapper.existBusinessId(p.getBusinessId());
@@ -438,6 +436,17 @@ public class BusinessService {
             }
 
         return businessMapper.getBusinessMonthly(p);
+    }
+
+    public int getBusinessService(BusinessGetInfoReq p) {
+        long userId = businessMapper.existBusinessId(p.getBusinessId());
+
+        long signedUserId = authenticationFacade.getSignedUserId();
+        p.setSignedUserId(signedUserId);
+        if (userId != signedUserId) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
+        }
+        return businessRepository.countBusinessServices(p.getBusinessId()); //이거 마저 해야해요
     }
 }
 

@@ -31,7 +31,7 @@ public class Business extends UpdatedAt {
     @Column(length = 20, name = "businessName")
     private String businessName;
 
-    @Column(length = 80)
+    @Column(length = 80)//ㅏㅏ
     private String title;
 
     @Column(length = 3000)
