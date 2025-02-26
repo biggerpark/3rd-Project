@@ -34,12 +34,12 @@ public class Qa extends CreatedAt {
     // 00101:미답변,00102:검토중,00103:답변완료
     private String qaState;
 
-    @Column
+    @Column // 일반문의는 없으므로 NULL 허용
     private Long qaTargetId;
 
 
     @Convert(converter = ReportReasonConverter.class)  // ENUM 을 DB에 저장할 때 코드(code) 로 변환
-    @Column(name = "reportReasonId")
+    @Column(name = "reportReasonId") // 일반문의는 따로 없으므로 NULL 허용
     private ReportReason reportReason;
 
     @PrePersist

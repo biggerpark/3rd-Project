@@ -10,7 +10,7 @@
         on a.detailTypeId=b.detailTypeId
         LEFT JOIN user c
         on a.userId=c.userId
-        ORDER BY a.createdAt
+        ORDER BY a.businessId DESC
         LIMIT 10 OFFSET #{offset}
     </select>
 
@@ -38,6 +38,34 @@
         b.categoryId=#{categoryId}
         GROUP BY
         a.businessId, a.businessName, a.tel, c.name, b.detailTypeName
+        ORDER BY a.businessId DESC
+    </select>
+
+    <select id="getAdminUserInfo">
+        WITH latest_service AS (
+        SELECT b.userId, d.detailTypeName
+        FROM service b
+        LEFT JOIN product c ON b.productId = c.productId
+        LEFT JOIN detail_type d ON c.detailTypeId = d.detailTypeId
+        WHERE b.createdAt = (
+        SELECT MAX(b2.createdAt)
+        FROM service b2
+        WHERE b2.userId = b.userId
+        )
+        )
+        SELECT a.name AS userName,
+        a.phone,
+        ls.detailTypeName,
+        COUNT(b.serviceId) AS serviceNumber,
+        a.type as typeName,
+        a.userId
+        FROM user a
+        LEFT JOIN service b ON a.userId = b.userId
+        LEFT JOIN latest_service ls ON a.userId = ls.userId
+        GROUP BY a.userId, a.name, a.phone, ls.detailTypeName, a.type
+        ORDER BY a.userId DESC
+        LIMIT 10 OFFSET #{offset}
+
     </select>
 
 </mapper>

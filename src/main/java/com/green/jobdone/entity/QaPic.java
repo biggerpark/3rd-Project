@@ -9,6 +9,7 @@ import lombok.*;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "qa_pic")
 public class QaPic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
