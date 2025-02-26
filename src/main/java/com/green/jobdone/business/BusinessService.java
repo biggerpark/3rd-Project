@@ -15,6 +15,7 @@ import com.green.jobdone.entity.Business;
 import com.green.jobdone.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -311,6 +312,9 @@ public class BusinessService {
         return  BusinessPicPostRes.builder().businessId(businessId).pics(tempPicUrls).build();
     }
 
+    @Value("${file.directory}")
+    private String fileDirectory;
+
     @Transactional
     public boolean businessPicConfirm( long businessId) {
         long signedUserId = authenticationFacade.getSignedUserId();
@@ -322,8 +326,8 @@ public class BusinessService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다, 근데 너 누구냐");
         }
 
-        String tempPath = String.format("business/%d/temp", businessId);
-        String middlePath = String.format("business/%d/pics", businessId);
+        String tempPath = String.format("%s/business/%d/temp", fileDirectory, businessId);
+        String middlePath = String.format("%s/business/%d/pics", fileDirectory, businessId);
         myFileUtils.makeFolders(middlePath);
 
         boolean moveSuccess = myFileUtils.moveFolder(tempPath,middlePath);

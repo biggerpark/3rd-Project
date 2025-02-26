@@ -121,9 +121,9 @@ public class MyFileUtils {
             // 대상 폴더가 없으면 생성
             Files.createDirectories(targetPath);
 
-            // 폴더 내 파일 및 하위 폴더 이동
+            // 파일 먼저 이동
             Files.walk(sourcePath)
-                    .sorted(Comparator.reverseOrder()) // 하위 폴더부터 삭제해야 함
+                    .filter(Files::isRegularFile) // 파일만 필터링
                     .forEach(source -> {
                         try {
                             Path destination = targetPath.resolve(sourcePath.relativize(source));
@@ -133,7 +133,7 @@ public class MyFileUtils {
                         }
                     });
 
-            return true;
+            return true; // 폴더 삭제는 안 함
         } catch (Exception e) {
             e.printStackTrace();
             return false;
