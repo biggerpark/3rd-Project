@@ -1,13 +1,25 @@
 package com.green.jobdone.product;
 
+import com.green.jobdone.business.BusinessRepository;
+import com.green.jobdone.common.exception.CommonErrorCode;
+import com.green.jobdone.common.exception.CustomException;
+import com.green.jobdone.common.exception.ServiceErrorCode;
 import com.green.jobdone.config.security.AuthenticationFacade;
+import com.green.jobdone.entity.Option;
+import com.green.jobdone.entity.OptionDetail;
+import com.green.jobdone.entity.Product;
 import com.green.jobdone.product.model.*;
+import com.green.jobdone.product.model.dto.OptionDto;
+import com.green.jobdone.product.model.dto.ProductOptionDetailDto;
+import com.green.jobdone.product.model.dto.ProductOptionPostDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -16,6 +28,10 @@ import java.util.List;
 public class ProductService {
     private final ProductMapper mapper;
     private final AuthenticationFacade authenticationFacade;
+    private final ProductRepository productRepository;
+    private final OptionRepository optionRepository;
+    private final OptionDetailRepository optionDetailRepository;
+    private final BusinessRepository businessRepository;
 
     public int postProduct(ProductPostReq p) {
 
@@ -183,5 +199,49 @@ public class ProductService {
         return result;
     }
 
+    @Transactional
+    public void postAll(ProductPostAllReq p){
+        if (p.getProductId() == null) {
+            throw new CustomException(CommonErrorCode.NOT_EXIST_BUSINESS);
+        }
+        if(!businessRepository.findUserIdByProductId(p.getProductId()).equals(authenticationFacade.getSignedUserId())){
+            throw new CustomException(ServiceErrorCode.BUSINESS_OWNER_MISMATCH);
+        };
+        Product product = productRepository.findById(p.getProductId()).orElse(null);
+        if(product!=null && (p.getPrice() != null) && !p.getPrice().equals(0)){
+            product.setPrice(p.getPrice());
+            productRepository.save(product);
+        }
+//        List<Option> optionList = new ArrayList<>(p.getOptions().size());
+        if(p.getOptions()!=null && !p.getOptions().isEmpty()) {
+            for (OptionDto ol : p.getOptions()) {
+                Option option = new Option();
+                if (ol.getOptionId() != null && ol.getOptionId() != 0) {
+                    option = optionRepository.findById(ol.getOptionId()).orElseGet(Option::new);
+                }
+                option.setProduct(product);
+                option.setName(ol.getOptionName());
+//                optionList.add(option);
+                List<OptionDetail> optionDetailList = new ArrayList<>(ol.getOptionDetails().size());
 
+                if (ol.getOptionDetails() != null && !ol.getOptionDetails().isEmpty()) {
+                    for (ProductOptionDetailDto od : ol.getOptionDetails()) {
+                        OptionDetail optionDetail = new OptionDetail();
+
+                        if (od.getOptionDetailId() != null) {
+                            optionDetail = optionDetailRepository.findById(od.getOptionDetailId())
+                                    .orElseGet(OptionDetail::new);
+                        }
+                        optionDetail.setOption(option);
+                        optionDetail.setName(od.getOptionDetailName());
+                        optionDetail.setPrice(od.getOptionDetailPrice());
+                        optionDetailList.add(optionDetail);
+                    }
+                }
+                optionRepository.save(option);
+                optionDetailRepository.saveAll(optionDetailList);
+            }
+        }
+//        optionRepository.saveAll(optionList);
+    }
 }

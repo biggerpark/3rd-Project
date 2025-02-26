@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OptionDetailDto {
-    private long optionDetailId;
+    private Long optionDetailId;
     private String optionDetailName;
     private int optionDetailPrice;
     private String contents;

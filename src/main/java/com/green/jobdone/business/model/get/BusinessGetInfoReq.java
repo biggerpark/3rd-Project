@@ -7,14 +7,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class BusinessGetMonthlyReq {
+public class BusinessGetInfoReq {
     @JsonIgnore
     private long signedUserId;
 
     @Schema(title = "businessId")
     private long businessId;
 
-    public BusinessGetMonthlyReq(long businessId) {
+    public BusinessGetInfoReq(long businessId) {
         this.businessId = businessId;
     }
 }

@@ -13,6 +13,7 @@ import com.green.jobdone.common.model.Domain;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.Business;
 import com.green.jobdone.entity.User;
+import com.green.jobdone.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +26,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -41,20 +41,14 @@ public class BusinessService {
     public final BusinessPicRepository businessPicRepository;
     public final Domain domain;
 
+    private final UserRepository userRepository;
 
-    public static String generateSafeTel(){
-        Random random = new Random();
-
-        int n1 = random.nextInt(10000);
-        int n2 = random.nextInt(10000);
-        return String.format("050-%04d-%04d", n1, n2);
-    }
 
 
     @Transactional
     public long insBusiness(MultipartFile paper, MultipartFile logo, BusinessPostSignUpReq p) {
 
-        long userId = authenticationFacade.getSignedUserId();
+        Long userId = authenticationFacade.getSignedUserId();
         p.setSignedUserId(userId);
 
 
@@ -62,22 +56,22 @@ public class BusinessService {
 
         int n1 = random.nextInt(10000);
         int n2 = random.nextInt(10000);
-        String safeTel = String.format("050%04d%04d", n1, n2);
+        String safeTel = String.format("050-%04d-%04d", n1, n2);
 
 
         // 사업자 등록번호 유효성 체크
         if (p.getBusinessNum() == null || p.getBusinessNum().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "유효하지 않은 사업자 번호입니다");
         }
+
         //사업자 등록번호 중복체크
-        int exists = businessMapper.existBusinessNum(p.getBusinessNum());
+        int exists = businessRepository.findExistBusinessNum(p.getBusinessNum());
         if (exists > 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 등록된 사업자 번호입니다");
         }
 
-//       if (userId == 0){
-//           throw new IllegalArgumentException("인증되지 않은 유저입니다.");
-//       }
+        Business business = Business.builder().user(userRepository.findById(userId).orElse(null)).build();
+
 
 
         if (paper == null || logo == null) {
@@ -109,8 +103,7 @@ public class BusinessService {
         log.debug("Generated safeTel: {}", safeTel);
         log.debug("BusinessPostSignUpReq: {}", p.toString());
 
-        return businessMapper.insBusiness(p);
-
+        return p.getBusinessId();
     }
 
     //사업상세정보 기입 - 로고사진은 따로 뺄게요 ~~
@@ -118,7 +111,7 @@ public class BusinessService {
 
     public int udtBusiness(BusinessDetailPutReq p) {
 
-        long userId = businessMapper.existBusinessId(p.getBusinessId());
+        long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
 
         long signedUserId = authenticationFacade.getSignedUserId();
         p.setSignedUserId(signedUserId);
@@ -134,7 +127,7 @@ public class BusinessService {
 
         long signedUserId = authenticationFacade.getSignedUserId();
 
-        long userId = businessMapper.existBusinessId(p.getBusinessId());
+        long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
         if (userId != signedUserId) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
         }
@@ -178,7 +171,7 @@ public class BusinessService {
 
         long signedUserId = authenticationFacade.getSignedUserId();
 
-        long userId = businessMapper.existBusinessId(p.getBusinessId());
+        long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
         if (userId != signedUserId) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
         }
@@ -416,17 +409,10 @@ public class BusinessService {
     }
 
 
-    public int insBusinessPhone(BusinessPhonePostReq p) {
-        int exists = businessMapper.existBusinessPhone(p.getBusinessId(), p.getPhone());
-        if (exists > 0) {
-            throw new IllegalArgumentException("이미 존재하는 전화번호입니다");
-        }
-        return businessMapper.insBusinessPhone(p);
-    }
 
 
 
-    public List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetMonthlyReq p){
+    public List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetInfoReq p){
 
 
             long userId = businessMapper.existBusinessId(p.getBusinessId());
@@ -438,6 +424,17 @@ public class BusinessService {
             }
 
         return businessMapper.getBusinessMonthly(p);
+    }
+
+    public BusinessGetServiceRes getBusinessService(BusinessGetInfoReq p) {
+        long userId = businessMapper.existBusinessId(p.getBusinessId());
+
+        long signedUserId = authenticationFacade.getSignedUserId();
+        p.setSignedUserId(signedUserId);
+        if (userId != signedUserId) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
+        }
+        return businessMapper.countBusinessServices(p); //이거 마저 해야해요
     }
 }
 

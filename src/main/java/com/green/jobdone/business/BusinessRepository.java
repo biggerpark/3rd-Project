@@ -16,13 +16,26 @@ public interface BusinessRepository extends JpaRepository<Business, Long> {
 
     @Query("select b.user.userId from Business b where b.businessId=:businessId")
     Long findUserIdByBusinessId(@Param("businessId") Long businessId);
+
     @Query("select b.businessId from Business b where b.user.userId=:UserId")
     Long findBusinessIdByUserId(@Param("UserId") Long UserId);
-  
-    Optional<Business> findById(long id);
-   // Optional<Business> findByUserIdAndBusinessId(Long businessId, Long userId);
+
+
+    @Query("SELECT COUNT(*) FROM Business b WHERE b.businessId =:businessNum")
+    Integer findExistBusinessNum(@Param("businessNum") String businessNum);
+
+
+    @Query("select b.user.userId from Product p join p.business b where p.productId=:productId")
+    Long findUserIdByProductId(@Param("productId") Long productId);
 
     @Modifying
     @Query("update Business b set b.title=:#{#p.title} ,b.contents=:#{#p.contents} where b.businessId=:#{#p.businessId}")
     void updateBusinessContents(@Param("p") BusinessContentsPostReq p);
+
+
+    @Query("select count(s.serviceId) from Service s " +
+            "join s.product p " +
+            "join p.business b " +
+            "where b.businessId = :businessId")
+    Integer countBusinessServices(@Param("businessId") Long businessId);
 }
