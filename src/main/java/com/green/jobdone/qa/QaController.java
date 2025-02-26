@@ -5,6 +5,7 @@ import com.green.jobdone.common.model.ResultResponse;
 import com.green.jobdone.qa.model.QaReq;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,13 +23,13 @@ public class QaController {
     private final QaService qaService;
 
     @PostMapping
-    @Operation(summary = "qa 등록")
-    public ResultResponse<String> postQa(@Valid @RequestBody QaReq p){
+    @Operation(summary = "문의 등록")
+    public ResultResponse<Integer> postQa(@Valid @RequestBody QaReq p){
         log.info("p: {}",p);
         qaService.insQa(p);
-        return ResultResponse.<String>builder()
+        return ResultResponse.<Integer>builder()
                 .resultMessage("등록 완료")
-                .resultData("문의사항이 등록 되었습니다.")
+                .resultData(1)
                 .build();
     }
 
