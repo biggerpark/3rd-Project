@@ -42,21 +42,20 @@ public class ReviewCommentController {
 
     @PutMapping
     @Operation(summary = "리뷰 댓글 수정")
-    public ResultResponse<Integer> updReviewComment (@RequestBody ReviewCommentUpdReq p) {
-        int result = reviewCommentService.updReviewComment(p);
-        return ResultResponse.<Integer>builder()
+    public ResultResponse<String> updReviewComment (@RequestBody ReviewCommentUpdReq p) {
+        String result = reviewCommentService.updReviewComment(p);
+        return ResultResponse.<String>builder()
                 .resultMessage("댓글 수정 완료")
-                .resultData(result)
+                .resultData(result + "로 수정되었습니다.")
                 .build();
     }
 
     @DeleteMapping
     @Operation(summary = "리뷰 댓글 삭제")
     public ResultResponse<Integer> delFeed(@ParameterObject @ModelAttribute ReviewCommentDelReq p) {
-        int result = reviewCommentService.delReviewComment(p);
+        reviewCommentService.delReviewComment(p);
         return ResultResponse.<Integer>builder()
                 .resultMessage("리뷰 댓글 삭제 완료")
-                .resultData(result)
                 .build();
     }
 }
