@@ -1,9 +1,7 @@
 package com.green.jobdone.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.apache.ibatis.annotations.Many;
 
 @Entity

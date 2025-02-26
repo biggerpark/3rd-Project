@@ -1,4 +1,4 @@
-package com.green.jobdone.product.model;
+package com.green.jobdone.product.model.dto;
 
 import lombok.Getter;
 import lombok.Setter;

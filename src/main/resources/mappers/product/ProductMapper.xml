@@ -58,7 +58,7 @@
         <result property="detailTypeName" column="detailTypeName"/>
         <collection property="detailTypeOptions" resultMap="selOptionDetailResultMap"/>
     </resultMap>
-    <resultMap id="selOptionDetailResultMap" type="com.green.jobdone.product.model.ProductGetOptionDto">
+    <resultMap id="selOptionDetailResultMap" type="com.green.jobdone.product.model.dto.ProductGetOptionDto">
         <result property="optionId" column="optionId"/>
         <result property="optionName" column="name"/>
     </resultMap>
@@ -153,13 +153,13 @@
         <collection property="optionList" resultMap="selProductOptionListResultMap"/>
     </resultMap>
 
-    <resultMap id="selProductOptionListResultMap" type="com.green.jobdone.product.model.ProductGetDto">
+    <resultMap id="selProductOptionListResultMap" type="com.green.jobdone.product.model.dto.ProductGetDto">
         <id property="optionId" column="optionId"/>
         <result property="optionName" column="optionName"/>
         <collection property="optionDetailList" resultMap="selProductOptionDetailListResultMap"/>
     </resultMap>
 
-    <resultMap id="selProductOptionDetailListResultMap" type="com.green.jobdone.product.model.ProductGetDtoDto">
+    <resultMap id="selProductOptionDetailListResultMap" type="com.green.jobdone.product.model.dto.ProductGetDtoDto">
     <id property="optionDetailId" column="optionDetailId"/>
     <result property="optionDetailName" column="optionDetailName"/>
     <result property="optionDetailPrice" column="optionDetailPrice"/>

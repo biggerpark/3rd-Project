@@ -1,4 +1,4 @@
-package com.green.jobdone.product.model;
+package com.green.jobdone.product.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
