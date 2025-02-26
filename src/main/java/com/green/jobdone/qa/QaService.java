@@ -10,6 +10,7 @@ import com.green.jobdone.qa.model.QaReq;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -17,13 +18,16 @@ import org.springframework.stereotype.Service;
 public class QaService {
     private final QaMapper qaMapper;
     private final QaRepository qaRepository;
+    private final QaTypeDetailRepository qaTypeDetailRepository;
     private final AuthenticationFacade authenticationFacade;
 
+    @Transactional
     public void insQa(QaReq p) {
         Long userId = authenticationFacade.getSignedUserId();
         User user = new User();
         user.setUserId(userId);
-        QaTypeDetail qaTypeDetail = QaTypeDetail.builder()
+        QaTypeDetail qaTypeDetail =
+                QaTypeDetail.builder()
                 .qaTypeDetailId(p.getQaTypeDetailId())
                 .build();
         Qa qa = Qa.builder()
@@ -31,6 +35,7 @@ public class QaService {
                 .qaTypeDetail(qaTypeDetail)
                 .contents(p.getContents())
                 .reportReason(p.getQaReportReason())
+                .qaTargetId(p.getQaTargetId())
                 .build();
         qaRepository.save(qa);
     }
