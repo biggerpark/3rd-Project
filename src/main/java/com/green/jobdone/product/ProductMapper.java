@@ -1,6 +1,7 @@
 package com.green.jobdone.product;
 
 import com.green.jobdone.product.model.*;
+import com.green.jobdone.product.model.dto.ProductOptionPostDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

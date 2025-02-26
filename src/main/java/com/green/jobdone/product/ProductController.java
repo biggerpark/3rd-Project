@@ -2,6 +2,7 @@ package com.green.jobdone.product;
 
 import com.green.jobdone.common.model.ResultResponse;
 import com.green.jobdone.product.model.*;
+import com.green.jobdone.product.model.dto.ProductOptionPostDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -142,6 +143,17 @@ public class ProductController {
                 .resultData(result)
                 .build();
 
+    }
+
+    @PostMapping("postAll")
+    @Operation(summary = "상품가격, 옵션, 옵션디테일 한번에")
+    public ResultResponse<Integer> postAll(@RequestBody ProductPostAllReq p) {
+        log.info("p: {}",p);
+        service.postAll(p);
+        return ResultResponse.<Integer>builder()
+                .resultData(1)
+                .resultMessage("성공")
+                .build();
     }
 
 

@@ -1,5 +1,6 @@
 package com.green.jobdone.product.model;
 
+import com.green.jobdone.product.model.dto.ProductGetDto;
 import lombok.Getter;
 import lombok.Setter;
 
