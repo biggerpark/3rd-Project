@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 public class QaService {
-    private final QaMapper qaMapper;
     private final QaRepository qaRepository;
     private final QaTypeDetailRepository qaTypeDetailRepository;
     private final AuthenticationFacade authenticationFacade;

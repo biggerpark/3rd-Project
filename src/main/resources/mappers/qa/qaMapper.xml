@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.green.jobdone.qa.QaMapper">
+    <select id="getQa">
+        SELECT a.createdAt,a.qaId,b.name as userName,b.type as userType,d.type as qaType,a.qaState
+        FROM qa a
+        LEFT JOIN user b
+        on a.userId=b.userId
+        LEFT JOIN qaTypeDetail c
+        on a.qaTypeDetailId=c.qaTypeDetailId
+        LEFT JOIN qaType d
+        on c.qaTypeId=d.qaTypeId
+        ORDER BY a.qaId DESC
+    </select>
+
+
+
+
+
+
+</mapper>
