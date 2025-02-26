@@ -32,7 +32,7 @@ public class Qa extends CreatedAt {
 
     @Column(length = 10, nullable = false)
     // 00101:미답변,00102:검토중,00103:답변완료
-    private String qaState="00101";
+    private String qaState;
 
     @Column
     private Long qaTargetId;
@@ -42,5 +42,11 @@ public class Qa extends CreatedAt {
     @Column(name = "reportReasonId")
     private ReportReason reportReason;
 
+    @PrePersist
+    public void prePersist() {
+        if (this.qaState == null) {
+            this.qaState = "00101";
+        }
+    }
 
 }

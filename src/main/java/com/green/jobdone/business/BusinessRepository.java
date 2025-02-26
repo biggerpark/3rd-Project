@@ -14,7 +14,8 @@ public interface BusinessRepository extends JpaRepository<Business, Long> {
 
     @Query("select b.user.userId from Business b where b.businessId=:businessId")
     Long findUserIdByBusinessId(@Param("businessId") Long businessId);
-
+    @Query("select b.businessId from Business b where b.user.userId=:UserId")
+    Long findBusinessIdByUserId(@Param("UserId") Long UserId);
   
     Optional<Business> findById(long id);
    // Optional<Business> findByUserIdAndBusinessId(Long businessId, Long userId);
