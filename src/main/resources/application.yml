@@ -8,10 +8,10 @@ global:
     cookie-expiry-seconds: 180
     authorized-redirect-uris:
       - http://localhost:8080/fe/redirect
-      - http://192.168.0.144:5234/fe/redirect
-      - http://192.168.0.144:52340/fe/redirect
-      - http://112.222.157.157:5234/fe/redirect
-      - http://112.222.157.157:52340/fe/redirect
+      - http://${DOMAIN.SERVER.PATH2}/fe/redirect
+      - http://${DOMAIN.SERVER.PATH2}0/fe/redirect
+      - http://${DOMAIN.SERVER.PATH}/fe/redirect
+      - http://${DOMAIN.SERVER.PATH}0/fe/redirect
       - http://localhost:5173/fe/redirect
 
 upstage:
@@ -27,8 +27,8 @@ file:
 
 domain:
   path:
-    #server: ${DOMAIN.SERVER.PATH}
-    server: 192.168.0.144:5234
+    server: ${DOMAIN.SERVER.PATH}
+    server2: ${DOMAIN.SERVER.PATH2}
 
 mybatis:
   mapper-locations: mappers/**/*.xml
