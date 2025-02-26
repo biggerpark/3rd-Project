@@ -1,5 +1,6 @@
 package com.green.jobdone.admin;
 
+import com.green.jobdone.admin.model.AdminUserInfoRes;
 import com.green.jobdone.admin.model.BusinessApplicationGetRes;
 import com.green.jobdone.admin.model.BusinessCategoryRes;
 import jakarta.persistence.ManyToOne;
@@ -11,4 +12,5 @@ import java.util.List;
 public interface AdminMapper {
     List<BusinessApplicationGetRes> getBusinessApplication(int offset);
     List<BusinessCategoryRes> getBusinessCategory(long categoryId);
+    List<AdminUserInfoRes> getAdminUserInfo(int offset);
 }

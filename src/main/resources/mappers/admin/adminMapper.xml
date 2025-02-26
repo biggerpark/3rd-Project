@@ -40,4 +40,29 @@
         a.businessId, a.businessName, a.tel, c.name, b.detailTypeName
     </select>
 
+    <select id="getAdminUserInfo">
+        WITH latest_service AS (
+        SELECT b.userId, d.detailTypeName
+        FROM service b
+        LEFT JOIN product c ON b.productId = c.productId
+        LEFT JOIN detail_type d ON c.detailTypeId = d.detailTypeId
+        WHERE b.createdAt = (
+        SELECT MAX(b2.createdAt)
+        FROM service b2
+        WHERE b2.userId = b.userId
+        )
+        )
+        SELECT a.name AS userName,
+        a.phone,
+        ls.detailTypeName,
+        COUNT(b.serviceId) AS serviceNumber,
+        a.type,
+        a.userId
+        FROM user a
+        LEFT JOIN service b ON a.userId = b.userId
+        LEFT JOIN latest_service ls ON a.userId = ls.userId
+        GROUP BY a.userId, a.name, a.phone, ls.detailTypeName, a.type
+
+    </select>
+
 </mapper>

@@ -14,8 +14,8 @@ public class QaReq {
     private Long qaTypeDetailId;
     @Schema(description = "문의 관련 코멘트 ", example = "상품이 다 부서져서 왔어요", requiredMode = Schema.RequiredMode.REQUIRED)
     private String contents;
-    @Schema(example = "서비스, 업체, 리뷰, 채팅, 댓글 중하나")
+    @Schema(example = "SERVICE,COMMENT,REVIEW,CHAT,BUSINESS 중 하나")
     private ReportReason qaReportReason;
-    @Schema(description = "환불할 서비스에 해당되는 서비스 pk", example = "환불할 서비스에 해당되는 서비스 pk,1", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "환불할 서비스에 해당되는 서비스 pk", example = "환불할 서비스에 해당되는 서비스 pk,1")
     private Long qaTargetId;
 }
