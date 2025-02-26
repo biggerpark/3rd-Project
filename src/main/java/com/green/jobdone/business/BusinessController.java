@@ -88,6 +88,29 @@ public class BusinessController {
                 .build();
     }
 
+    @PostMapping("businessPicTemp")
+    @Operation(summary = "업체 사진 임시 등록")
+    public ResultResponse<BusinessPicPostRes> postBusinessPicTemp(@RequestPart List<MultipartFile> pics,
+                                                              @Valid @RequestPart BusinessGetOneReq p) {
+
+        BusinessPicPostRes res = businessService.businessPicTemp(pics, p.getBusinessId());
+        return ResultResponse.<BusinessPicPostRes>builder()
+                .resultMessage("업체사진등록 완료")
+                .resultData(res)
+                .build();
+    }
+
+    @PostMapping("businessPicConf")
+    @Operation(summary = "파일경로 변경 및 확정")
+    public ResultResponse<Boolean> postBusinessPicConf( long businessId){
+        boolean moveSuccess = businessService.businessPicConfirm(businessId);
+
+        return ResultResponse.<Boolean>builder().resultData(moveSuccess).resultMessage(moveSuccess == true ?"댐":"싯빠이").build();
+// 귀찮은데 내일 테스트 해야지
+
+    }
+
+
     @DeleteMapping("businessPic")
     @Operation(summary = "업체 사진 삭제")
     public ResultResponse<Integer> delBusinessPic(@Valid @ParameterObject @ModelAttribute BusinessPicReq p ) {

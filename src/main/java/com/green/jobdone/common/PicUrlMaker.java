@@ -1,10 +1,17 @@
 package com.green.jobdone.common;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 
 @RequiredArgsConstructor
 public class PicUrlMaker {
     private final MyFileUtils myFileUtils;
+
+
+    @Value("${file.directory}")
+    public static String makeFolder(long businessId){
+        return String.format("");
+    }
 
     public static String makePicUrl(long businessId, String picName) {
         return String.format("/pic/business/%d/%s", businessId, picName);
