@@ -29,8 +29,8 @@ public class PortfolioController {
         long res = portfolioService.insPortfolio(p);
         return ResultResponse.<Long>builder()
                 .resultData(p.getPortfolioId())
-                .resultMessage("포트폴리오 등록 완료")
-                .build();
+                .resultMessage(String.format("포트폴리오 pk는 %d",p.getPortfolioId())
+                ).build();
     }
 
     @PostMapping("portfolioPic")
@@ -42,6 +42,7 @@ public class PortfolioController {
                 .resultMessage(res != null? "포트폴리오 사진 등록":"빠꾸먹음")
                 .resultData(res)
                 .build();
+
     }
 
     @PutMapping("pic")
