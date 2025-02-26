@@ -30,9 +30,11 @@
         WHERE
         <if test="userId != null">
             a.userId = #{userId}
+            and a.state in('00201','00203')
         </if>
         <if test="businessId != null">
             a.businessId = #{businessId}
+            and a.state in('00201','00202')
         </if>
         order by c.chatId desc, a.roomId desc;
     </select>

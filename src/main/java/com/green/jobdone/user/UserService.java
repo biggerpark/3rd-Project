@@ -64,6 +64,7 @@ public class UserService {
         user.setName(p.getName());
         user.setPic(savedPicName);
         user.setPhone(p.getPhone());
+        user.setRole(UserRole.USER);
 
         //int result = mapper.insUser(p);
         userRepository.save(user);
@@ -164,11 +165,14 @@ public class UserService {
 
         String profile = res.getPic().substring(0,3);
         String profile2 = "img";
+        String profile3 = "htt";
 
         if(profile.equals(profile2)) {
             res.setPic(String.format("/pic/user/defaultImg/%s", res.getPic()));
+        } else if(profile.equals(profile3)){
+            res.setPic(res.getPic());
         } else {
-            res.setPic(PicUrlMaker.makePicUserUrl(userId, res.getPic()));
+                res.setPic(PicUrlMaker.makePicUserUrl(userId, res.getPic()));
         }
 
         return res;

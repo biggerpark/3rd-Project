@@ -3,8 +3,13 @@ package com.green.jobdone.user;
 import com.green.jobdone.config.security.SignInProviderType;
 import com.green.jobdone.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 //<연결할 엔터티, PK 타입>
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByEmailAndProviderType(String email, SignInProviderType signInProviderType); //메소드 쿼리
 
+    @Query("SELECT u.name FROM User u WHERE u.userId = :userId")
+    String getUserNameByUserId(@Param("userId") Long userId);
 }

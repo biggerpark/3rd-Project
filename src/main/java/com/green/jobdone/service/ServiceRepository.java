@@ -30,6 +30,12 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
     @Query("UPDATE Service s Set s.tid = :tid WHERE s.serviceId = :serviceId")
     void saveTid(@Param("serviceId") Long serviceId, String tid);
 
+    @Query("SELECT u.userId FROM Service s " +
+            "join s.product p join p.business b join b.user u" +
+            " WHERE s.serviceId=:serviceId")
+    Long providerUserIdByServiceId(Long serviceId);
+
+
 //    @Query("SELECT a.user.userId, a.price, c.detailTypeName as productName, ifnull(a.tid,0) as tid" +
 //            "FROM Service a" +
 //            "JOIN a.product b "+
