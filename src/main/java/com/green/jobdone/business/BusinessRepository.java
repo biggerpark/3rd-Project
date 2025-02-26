@@ -24,4 +24,11 @@ public interface BusinessRepository extends JpaRepository<Business, Long> {
     @Modifying
     @Query("update Business b set b.title=:#{#p.title} ,b.contents=:#{#p.contents} where b.businessId=:#{#p.businessId}")
     void updateBusinessContents(@Param("p") BusinessContentsPostReq p);
+
+
+    @Query("select count(s.serviceId) from Service s " +
+            "join s.product p " +
+            "join p.business b " +
+            "where b.businessId = :businessId")
+    Integer countBusinessServices(@Param("businessId") Long businessId);
 }

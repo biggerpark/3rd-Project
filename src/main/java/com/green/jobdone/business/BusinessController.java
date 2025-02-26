@@ -181,7 +181,7 @@ public class BusinessController {
     @GetMapping("monthly/{businessId}")
     @Operation(summary = "업체의 월매출 조회하기")
     public ResultResponse<List<BusinessGetMonthlyRes>> getBusinessMonthly(@Valid @ParameterObject @ModelAttribute BusinessGetOneReq p) {
-        BusinessGetMonthlyReq req = new BusinessGetMonthlyReq(p.getBusinessId());
+        BusinessGetInfoReq req = new BusinessGetInfoReq(p.getBusinessId());
         List<BusinessGetMonthlyRes> res = (List<BusinessGetMonthlyRes>) businessService.getBusinessMonthly(req);
         return ResultResponse.<List<BusinessGetMonthlyRes>>builder()
                 .resultData(res)
@@ -197,6 +197,14 @@ public class BusinessController {
         return ResultResponse.<BusinessContentsPostRes>builder()
                 .resultData(res)
                 .resultMessage(res != null? "네":"아니요").build();
+    }
+
+    @GetMapping("serviceCount")
+    @Operation(summary = "업체가 받은 주문 카운트")
+    public ResultResponse<Integer> getBusinessServiceCount(@Valid @ParameterObject @ModelAttribute BusinessGetInfoReq p) {
+        //루키루키 나의루키루키뤀; 마치마치 느낌적인 느낌느낌
+        int res = businessService.getBusinessService(p);
+        return ResultResponse.<Integer>builder().resultData(res).resultMessage("네").build();
     }
 
 
