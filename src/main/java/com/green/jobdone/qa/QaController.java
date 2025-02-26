@@ -1,5 +1,6 @@
 package com.green.jobdone.qa;
 
+
 import com.green.jobdone.common.model.ResultResponse;
 import com.green.jobdone.qa.model.QaReq;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,4 +31,5 @@ public class QaController {
                 .resultData("문의사항이 등록 되었습니다.")
                 .build();
     }
+
 }

@@ -1,5 +1,6 @@
 package com.green.jobdone.qa;
 
+
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.Qa;
 import com.green.jobdone.entity.QaTypeDetail;
@@ -33,5 +34,6 @@ public class QaService {
                 .build();
         qaRepository.save(qa);
     }
+
 
 }

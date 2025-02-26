@@ -4,14 +4,40 @@
 <mapper namespace="com.green.jobdone.admin.AdminMapper">
 
     <select id="getBusinessApplication">
-        SELECT a.busiCreatedAt as businessCreatedAt,a.paper,b.detailTypeName,c.name as userName,a.businessName,a.state
+        SELECT a.businessId,a.createdAt as applicationCreatedAt,a.paper,b.detailTypeName,c.name as userName,a.businessName,a.state
         FROM business a
         LEFT JOIN detail_type b
         on a.detailTypeId=b.detailTypeId
         LEFT JOIN user c
         on a.userId=c.userId
         ORDER BY a.createdAt
-        LIMIT #{page}, 10
+        LIMIT 10 OFFSET #{offset}
+    </select>
+
+    <select id="getBusinessCategory">
+        SELECT a.businessId
+        , a.createdAt as applicationCreatedAt
+        , a.businessName
+        , a.tel
+        , c.name as userName
+        , b.detailTypeName
+        , ROUND(AVG(r.score),2) AS reviewScore
+        , COUNT(r.reviewId) AS reviewNumbers
+        FROM business a
+        LEFT JOIN detail_type b
+        ON a.detailTypeId = b.detailTypeId
+        LEFT JOIN user c
+        ON a.userId = c.userId
+        LEFT JOIN product d
+        ON a.businessId = d.businessId
+        LEFT JOIN service s
+        ON d.productId = s.productId
+        LEFT JOIN review r
+        ON s.serviceId = r.serviceId
+        WHERE
+        b.categoryId=#{categoryId}
+        GROUP BY
+        a.businessId, a.businessName, a.tel, c.name, b.detailTypeName
     </select>
 
 </mapper>

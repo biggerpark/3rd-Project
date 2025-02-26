@@ -1,9 +1,7 @@
 package com.green.jobdone.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,7 +11,8 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-public class Business {
+
+public class Business extends UpdatedAt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) //auto_increment
     private Long businessId;
@@ -70,6 +69,10 @@ public class Business {
 
     @Column
     private Double lng;
+
+
+    @Column(length = 200)
+    private String rejectContents;
 
 
 

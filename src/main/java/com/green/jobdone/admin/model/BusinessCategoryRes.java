@@ -7,13 +7,13 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class BusinessApplicationGetRes {
+public class BusinessCategoryRes {
     private String applicationCreatedAt;
-    private String paper;
+    private double reviewScore;
+    private int reviewNumbers;
     private String detailTypeName;
     private String userName;
     private String businessName;
-    private int state;
-    private long businessId;
+    private String tel;
 
 }

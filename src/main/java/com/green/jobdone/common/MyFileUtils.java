@@ -7,6 +7,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 import java.util.UUID;
 
 @Slf4j
@@ -105,6 +110,33 @@ public class MyFileUtils {
         } else {
             log.error("File does not exist or is not a file: {}", file.getAbsolutePath());
             return false;  // 파일이 존재하지 않거나 파일이 아니면 false 반환
+        }
+    }
+
+    public boolean moveFolder(String oldFolderPath, String newFolderPath) {
+        Path sourcePath = Paths.get(oldFolderPath);
+        Path targetPath = Paths.get(newFolderPath);
+
+        try {
+            // 대상 폴더가 없으면 생성
+            Files.createDirectories(targetPath);
+
+            // 파일 먼저 이동
+            Files.walk(sourcePath)
+                    .filter(Files::isRegularFile) // 파일만 필터링
+                    .forEach(source -> {
+                        try {
+                            Path destination = targetPath.resolve(sourcePath.relativize(source));
+                            Files.move(source, destination, StandardCopyOption.REPLACE_EXISTING);
+                        } catch (IOException e) {
+                            throw new RuntimeException("파일 이동 실패: " + source, e);
+                        }
+                    });
+
+            return true; // 폴더 삭제는 안 함
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }

@@ -1,14 +1,14 @@
 package com.green.jobdone.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Getter
-@Setter
+@Builder
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class Category extends UpdatedAt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // auto_increment 속성이 들어감.
