@@ -12,7 +12,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
     @Query("UPDATE Service s Set s.completed = :completed WHERE s.serviceId = :serviceId")
     void updCompleted(@Param("serviceId") Long serviceId, int completed);
 
-    @Query("SELECT s.user.userId from Service s WHERE s.serviceId = :serviceId")
+    @Query("SELECT b.user.userId from Service s join s.product p join p.business b WHERE s.serviceId = :serviceId")
     Long userIdByServiceId(@Param("serviceId") Long serviceId);
 
     @Query("SELECT s.completed from Service s WHERE s.serviceId = :serviceId")
