@@ -185,6 +185,7 @@
 
     <select id="selOneBusiness">
         SELECT
+        p.productId,
         d.categoryId,
         b.detailTypeId,
         d.detailTypeName,
