@@ -292,7 +292,7 @@ public class BusinessService {
         if (userId != signedUserId) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
         }
-        return businessRepository.updateBusiness(p);
+        return businessMapper.udtBusiness(p);
     }
 
 
