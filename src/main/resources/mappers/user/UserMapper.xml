@@ -88,11 +88,11 @@
         WHERE userId=#{userId}
     </select>
 
-    <delete id="deleteUser">
-        DELETE
-        FROM user
+    <update id="deleteUser">
+        UPDATE user
+        set type=999
         WHERE userId=#{userId}
-    </delete>
+    </update>
 
     <update id="updatePassword">
         UPDATE user

@@ -244,4 +244,21 @@ public class ProductService {
         }
 //        optionRepository.saveAll(optionList);
     }
+    @Transactional
+    public void delOption(ProductOptionDelReq p){
+        if(authenticationFacade.getSignedUserId()!=businessRepository.findUserIdByBusinessId(p.getBusinessId())){
+            throw new CustomException(ServiceErrorCode.BUSINESS_OWNER_MISMATCH);
+        }
+        Option option = optionRepository.findById(p.getOptionId()).orElseThrow(() -> new CustomException(ServiceErrorCode.OPTION_NOT_FOUND));
+        optionRepository.delete(option);
+    }
+
+    @Transactional
+    public void delOptionDetail(ProductOptionDetailDelReq p){
+        if(authenticationFacade.getSignedUserId()!=businessRepository.findUserIdByBusinessId(p.getBusinessId())){
+            throw new CustomException(ServiceErrorCode.BUSINESS_OWNER_MISMATCH);
+        }
+        OptionDetail optionDetail = optionDetailRepository.findById(p.getOptionDetailId()).orElseThrow(() -> new CustomException((ServiceErrorCode.OPTION_DETAIL_NOT_FOUND)));
+        optionDetailRepository.delete(optionDetail);
+    }
 }

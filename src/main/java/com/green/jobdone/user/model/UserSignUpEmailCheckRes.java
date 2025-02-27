@@ -9,4 +9,5 @@ import lombok.Setter;
 @Schema(title = "유저 이메일 중복 확인 응답")
 public class UserSignUpEmailCheckRes {
     private String email;
+    private Integer type;
 }

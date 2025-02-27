@@ -156,6 +156,25 @@ public class ProductController {
                 .build();
     }
 
+    @DeleteMapping("option")
+    @Operation(summary = "옵션 삭제")
+    public ResultResponse<Integer> deleteOption(@RequestBody ProductOptionDelReq p) {
+        service.delOption(p);
+        return ResultResponse.<Integer>builder()
+                .resultData(1)
+                .resultMessage("삭제 완료")
+                .build();
+    }
+    @DeleteMapping("option/detail")
+    @Operation(summary = "세부 옵션 삭제")
+    public ResultResponse<Integer> deleteOptionDetail(@RequestBody ProductOptionDetailDelReq p) {
+        service.delOptionDetail(p);
+        return ResultResponse.<Integer>builder()
+                .resultData(1)
+                .resultMessage("삭제 완료")
+                .build();
+    }
+
 
 
 

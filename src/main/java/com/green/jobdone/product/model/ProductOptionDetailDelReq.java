@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ProductOptionDelReq {
+public class ProductOptionDetailDelReq {
     private Long businessId;
-    private Long optionId;
+    private Long optionDetailId;
 }

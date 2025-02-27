@@ -19,14 +19,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.util.List;
 
 @Service
 @Slf4j
@@ -45,10 +42,16 @@ public class UserService {
 
 
     public int postUserSignUp(UserSignUpReq p, MultipartFile pic) {
-        String existsEmail = mapper.checkEmailExists(p.getEmail());
+//        String existsEmail = mapper.checkEmailExists(p.getEmail());
 
-        if (existsEmail != null) {
-            throw new IllegalArgumentException("이미 등록된 이메일입니다.");
+        User user = new User();
+        UserDto existsEmail = userRepository.checkPostUser(p.getEmail());
+        if(existsEmail!=null) {
+            if(existsEmail.getRole().getCode()==999){
+                user = userRepository.findById(existsEmail.getUserId()).orElseGet(User::new);
+            } else {
+                throw new IllegalArgumentException("이미 등록된 이메일입니다.");
+            }
         }
         String img = String.format("img%d.jpg", (int)(Math.random()*4)+1);
         String savedPicName = (pic != null ? myFileUtils.makeRandomFileName(pic) : img);
@@ -57,7 +60,6 @@ public class UserService {
         String hashedPassword = passwordEncoder.encode(p.getUpw());
         log.info("hashedPassword: {}", hashedPassword);
 
-        User user = new User();
         user.setProviderType(SignInProviderType.LOCAL);
         user.setEmail(p.getEmail());
         user.setUpw(hashedPassword);
@@ -143,9 +145,8 @@ public class UserService {
     }
 
     public int postUserEmailCheck(String email) {
-        UserSignUpEmailCheckRes res = mapper.postUserEmailCheck(email);
-
-        if (res == null) {
+        UserDto res = userRepository.checkPostUser(email);
+        if (res==null|| res.getRole().getCode()==999) {
             return 1;
         }
 
