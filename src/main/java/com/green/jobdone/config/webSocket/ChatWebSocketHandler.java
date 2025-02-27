@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.common.exception.ChatErrorCode;
 import com.green.jobdone.common.exception.CustomException;
+import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.room.chat.ChatMapper;
 import com.green.jobdone.room.chat.ChatService;
 import com.green.jobdone.room.chat.model.ChatPicDto;
@@ -35,13 +36,16 @@ import java.util.*;
 @Component
 @Slf4j
 public class ChatWebSocketHandler extends TextWebSocketHandler {
+
+    private final AuthenticationFacade authenticationFacade;
     private ObjectMapper objectMapper = new ObjectMapper();
     private final ChatService chatService;
     private static final Logger logger = LoggerFactory.getLogger(ChatWebSocketHandler.class);
     private final List<WebSocketSession> sessions = new ArrayList<>();
     private final Map<Long, Set<WebSocketSession>> roomSessions = new HashMap<>();
-    public ChatWebSocketHandler(ChatService chatService) {
+    public ChatWebSocketHandler(ChatService chatService, AuthenticationFacade authenticationFacade) {
         this.chatService = chatService;
+        this.authenticationFacade = authenticationFacade;
     }
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -53,7 +57,12 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         // 마지막 부분이 roomId이므로, 이를 추출
         long roomId = Long.parseLong(uriParts[uriParts.length - 1]);
         session.setBinaryMessageSizeLimit(10*1024*1024);
-        roomSessions.computeIfAbsent(roomId, k -> new HashSet<>()).add(session);
+        roomSessions.computeIfAbsent(roomId, k -> new HashSet<>());
+        if(!sessions.contains(session)) {
+            sessions.add(session);
+        }
+        String token = authenticationFacade.getToken();
+        log.info("token :{} ", token);
 
         // 추출된 roomId를 사용하여 채팅방 설정 등 처리
         log.info("Room ID: " + roomId);
@@ -120,7 +129,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
                     }
                 }
                         log.info("req확인: {}", req);
-                        chatService.insChat(null,req);
+                        chatService.insChat(extractToken(session),null,req);
             }
         } catch (Exception e) {
             throw new CustomException(ChatErrorCode.FAIL_TO_REG);
@@ -151,10 +160,10 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
         log.info("사진 보내는곳으로 정상접속");
 
+        try {
             byte[] payload = message.getPayload().array();
             String jsonString = new String(payload, StandardCharsets.UTF_8);
             ObjectMapper objectMapper = new ObjectMapper();
-        try {
             JsonNode jsonNode = objectMapper.readTree(jsonString);
             if (!jsonNode.has("roomId") || !jsonNode.has("flag")) {
                 throw new RuntimeException("JSON 데이터에 roomId 또는 flag가 없습니다.");
@@ -194,8 +203,9 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             chatPostReq.setRoomId(roomId);
             chatPostReq.setContents(textMessage.isEmpty() ? null : textMessage);
             chatPostReq.setFlag(flag);
-
-            String jsonData = chatService.insChat(pic, chatPostReq);
+            String token = extractToken(session);
+            log.info("토큰: " + token);
+            String jsonData = chatService.insChat(token, pic, chatPostReq);
             log.info("jsonData 어케 나옴: "+jsonData);
             // string 으로넘어옴
 
@@ -222,6 +232,18 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
 
     private MultipartFile convertByteArrayToMultipartFile(byte[] payload, String fileName) {
         return new CustomMultipartFile(payload, fileName, "application/octet-stream");
+    }
+    private String extractToken(WebSocketSession session) {
+        // WebSocket 세션에서 Authorization 헤더를 추출
+        List<String> authHeader = session.getHandshakeHeaders().get("Authorization");
+        if (authHeader != null && !authHeader.isEmpty()) {
+            String token = authHeader.get(0);  // 토큰 값이 첫 번째로 들어있다고 가정
+            // "Bearer " 접두어를 제거하고 실제 토큰만 반환
+            if (token.startsWith("Bearer ")) {
+                return token.substring(7);  // "Bearer "를 제거한 나머지 부분
+            }
+        }
+        return null;  // Authorization 헤더가 없으면 null 반환
     }
 }
 

@@ -38,7 +38,7 @@ public class ChatService {
     private final BusinessRepository businessRepository;
 
     @Transactional
-    public String insChat(MultipartFile pic, ChatPostReq p){
+    public String insChat(String token ,MultipartFile pic, ChatPostReq p){
 //        long userId = authenticationFacade.getSignedUserId();
 //        UserIdRoom userIdRoom = chatMapper.checkUserId(p.getRoomId());
 //        if(userId!=userIdRoom.getUserId()||userId!=userIdRoom.getBuid()){
@@ -46,9 +46,9 @@ public class ChatService {
 //        } // 채팅 인증 처리가 필요할때 사용용도
         Room room = roomRepository.findById(p.getRoomId()).orElseThrow(() -> new CustomException(ChatErrorCode.MISSING_ROOM));
         Long userId = room.getUser().getUserId();
-        if(userId!=authenticationFacade.getSignedUserId()|| !room.getBusiness().getBusinessId().equals(businessRepository.findBusinessIdByUserId(userId))){
-            throw new CustomException(ChatErrorCode.FAIL_TO_REG);
-        }
+//        if(userId!=authenticationFacade.getSignedUserId()|| !room.getBusiness().getBusinessId().equals(businessRepository.findBusinessIdByUserId(userId))){
+//            throw new CustomException(ChatErrorCode.FAIL_TO_REG);
+//        } 인증처리 나중에 복구해볼 생각 ㄱ
         Chat chat = new Chat();
         chat.setRoom(room);
         chat.setFlag(p.getFlag());
