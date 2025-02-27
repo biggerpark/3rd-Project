@@ -212,8 +212,8 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             if (sessionSet != null) {
                 for (WebSocketSession webSocketSession : sessionSet) {
                     if (webSocketSession.isOpen()) {
-                        webSocketSession.sendMessage(new TextMessage(jsonData));
-//                        webSocketSession.sendMessage(new TextMessage("새 메시지: " + textMessage));
+//                        webSocketSession.sendMessage(new TextMessage(jsonData));
+                        webSocketSession.sendMessage(new TextMessage(textMessage));
                     }
                 }
             }
