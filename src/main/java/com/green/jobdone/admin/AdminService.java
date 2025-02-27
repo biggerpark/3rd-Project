@@ -61,7 +61,10 @@ public class AdminService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 업체를 찾을 수 없습니다."));
 
 
+        LocalDate today = LocalDate.now();
 
+
+        business.setDate(today);
         business.setState(101); // 업체 상태를 수락완료로 바꿈
 
 
