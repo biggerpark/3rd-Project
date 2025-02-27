@@ -34,7 +34,7 @@ public class QaController {
 
 
     @GetMapping
-    @Operation(summary = "문의사항 조회,관리자가 조회")
+    @Operation(summary = "문의사항 조회,관리자 및 유저 조회, 같은 api 사용, 토큰에 따라 보내는 데이터 틀려짐")
     public ResultResponse<List<QaRes>> getQa(@RequestParam int page){
         List<QaRes> res = qaService.getQa(page);
 
@@ -72,7 +72,7 @@ public class QaController {
 
 
     @GetMapping("report")
-    @Operation(summary = "신고내역조회, 관리자가 조회")
+    @Operation(summary = "신고내역조회, 관리자 및 유저도 조회,토큰받아서 role 로  구분할거임")
     public ResultResponse<List<QaReportRes>> getQaReport(@RequestParam int page){
         List<QaReportRes> result=qaService.getQaReport(page);
 
