@@ -23,7 +23,6 @@ public interface BusinessMapper {
 
     //pic
     int insBusinessPic(BusinessPicDto p);
-    int putBusinessPic(long businessPicId);
     List<BusinessOnePicsGetRes> getBusinessPicList(BusinessOnePicsGetReq p);
     int delBusinessPic(BusinessPicReq p);
     String getBusinessPicName(long businessPicId);

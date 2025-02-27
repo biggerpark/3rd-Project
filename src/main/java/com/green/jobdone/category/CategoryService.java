@@ -3,7 +3,6 @@ package com.green.jobdone.category;
 import com.green.jobdone.category.detail.model.DetailTypeGetReq;
 import com.green.jobdone.category.detail.model.DetailTypeGetRes;
 import com.green.jobdone.category.detail.model.DetailTypePostReq;
-import com.green.jobdone.category.model.categoryGetReq;
 import com.green.jobdone.category.model.CategoryGetRes;
 import com.green.jobdone.category.model.CategoryPostReq;
 import com.green.jobdone.entity.Category;
