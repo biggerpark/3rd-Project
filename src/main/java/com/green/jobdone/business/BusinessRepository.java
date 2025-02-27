@@ -25,15 +25,7 @@ public interface BusinessRepository extends JpaRepository<Business, Long> {
     @Query("SELECT COUNT(*) FROM Business b WHERE b.businessNum =:businessNum")
     Integer findExistBusinessNum(@Param("businessNum") String businessNum); //사업자 등록번호 조회
 
-    @Modifying
-    @Transactional
-    @Query("UPDATE Business b " +
-            "SET " +
-            "b.closingTime = CASE WHEN :#{#p.closingTime} IS NOT NULL AND :#{#p.closingTime} <> '' THEN :#{#p.closingTime} ELSE b.closingTime END, " +
-            "b.openingTime = CASE WHEN :#{#p.openingTime} IS NOT NULL AND :#{#p.openingTime} <> '' THEN :#{#p.openingTime} ELSE b.openingTime END, " +
-            "b.tel = CASE WHEN :#{#p.tel} IS NOT NULL AND :#{#p.tel} <> '' THEN :#{#p.tel} ELSE b.tel END " +
-            "WHERE b.businessId = :#{#p.businessId} AND b.user.userId = :#{#p.signedUserId}")
-    int updateBusiness(@Param("p") BusinessDetailPutReq p);
+
 
     @Query("select b.user.userId from Product p join p.business b where p.productId=:productId")
     Long findUserIdByProductId(@Param("productId") Long productId);

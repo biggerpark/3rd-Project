@@ -1,10 +1,13 @@
 package com.green.jobdone.business.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -13,10 +16,12 @@ public class BusinessDetailPutReq {
     @JsonIgnore
     private long signedUserId;
 
-    @Schema(title = "업체 pk", example = "21:00")
+    @Schema(title = "업체 pk", example = "197")
     private long businessId;
+
     @Schema(title = "오픈 시간", example = "21:00")
     private String openingTime;
+
     @Schema(title = "마감 시간", example = "21:00")
     private String closingTime;
 
