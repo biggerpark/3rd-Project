@@ -53,7 +53,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         // 마지막 부분이 roomId이므로, 이를 추출
         long roomId = Long.parseLong(uriParts[uriParts.length - 1]);
         session.setBinaryMessageSizeLimit(10*1024*1024);
-        roomSessions.computeIfAbsent(roomId, k -> new HashSet<>()).add(session);
+        roomSessions.computeIfAbsent(roomId, k -> new HashSet<>());
+        if(!sessions.contains(session)) {
+            sessions.add(session);
+        }
 
         // 추출된 roomId를 사용하여 채팅방 설정 등 처리
         log.info("Room ID: " + roomId);
