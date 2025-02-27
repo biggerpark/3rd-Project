@@ -3,17 +3,35 @@
 
 <mapper namespace="com.green.jobdone.qa.QaMapper">
     <select id="getQa">
-        SELECT a.createdAt,a.qaId,b.name as userName,b.type as userType,d.type as qaType,a.qaState
+        SELECT a.createdAt,a.qaId,b.name as userName,b.type as userTypeDB,d.type as qaType,a.qaState
         FROM qa a
         LEFT JOIN user b
         on a.userId=b.userId
-        LEFT JOIN qaTypeDetail c
+        LEFT JOIN qa_type_detail c
         on a.qaTypeDetailId=c.qaTypeDetailId
-        LEFT JOIN qaType d
+        LEFT JOIN qa_type d
         on c.qaTypeId=d.qaTypeId
         ORDER BY a.qaId DESC
     </select>
 
+
+
+    <resultMap id="qaPicDetail" type="com.green.jobdone.qa.model.QaDetailRes">
+        <result property="contents" column="contents"/>
+        <collection property="pics" column="pic" resultMap="qaPicDetails"/>
+    </resultMap>
+
+    <resultMap id="qaPicDetails" type="String">
+        <result property="pic" column="pic"/>
+    </resultMap>
+
+    <select id="getQaDetail" resultMap="qaPicDetail">
+        SELECT a.contents, b.pic
+        FROM qa a
+        LEFT JOIN qa_pic b
+        ON a.qaId=b.qaId
+        WHERE a.qaId=#{qaId}
+    </select>
 
 
 

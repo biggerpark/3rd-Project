@@ -48,4 +48,8 @@ public class PicUrlMaker {
         return String.format("/pic/review/%d/%s", reviewId, picName);
     }
 
+    public static String makePicQa(long qaId, String picName) {
+        return String.format("/pic/qa/%d/%s", qaId, picName);
+    }
+
 }
