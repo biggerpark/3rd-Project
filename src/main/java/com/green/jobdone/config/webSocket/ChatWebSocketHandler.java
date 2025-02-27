@@ -62,8 +62,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             sessions.add(session);
         }
         String token = authenticationFacade.getToken();
-        log.info("token :{} ", token);
-
+        log.info("토큰값 잘 저장되는거 맞아?? :{} ", token);
+        session.getAttributes().put("token", token);
         // 추출된 roomId를 사용하여 채팅방 설정 등 처리
         log.info("Room ID: " + roomId);
     }
@@ -197,13 +197,13 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
 
             log.info("if문 잘 넘어갔나?");
             Set<WebSocketSession> sessionSet = roomSessions.get(roomId);
-            log.info("sessionSet: " + sessionSet);
 
             ChatPostReq chatPostReq = new ChatPostReq();
             chatPostReq.setRoomId(roomId);
             chatPostReq.setContents(textMessage.isEmpty() ? null : textMessage);
             chatPostReq.setFlag(flag);
             String token = extractToken(session);
+            log.info("roomId {}, flag {}, message: {}", roomId, flag, textMessage);
             log.info("토큰: " + token);
             String jsonData = chatService.insChat(token, pic, chatPostReq);
             log.info("jsonData 어케 나옴: "+jsonData);

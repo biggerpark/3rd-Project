@@ -13,7 +13,7 @@
 
 
     <select id="selRoom">
-        SELECT a.roomId, a.createdAt AS roomCreatedAt, a.businessId, a.userId,
+        SELECT a.roomId, ifnull(c.createdAt,a.createdAt) AS roomCreatedAt, a.businessId, a.userId,
         b.title, b.businessName, c.chatId, a.serviceId,
         IF(d.pic IS NOT NULL, '사진', c.contents) AS recentlyChat, b.logo, e.pic
         FROM room a

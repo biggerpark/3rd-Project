@@ -48,15 +48,23 @@ public class ChatService {
         Long userId = room.getUser().getUserId();
 //        if(userId!=authenticationFacade.getSignedUserId()|| !room.getBusiness().getBusinessId().equals(businessRepository.findBusinessIdByUserId(userId))){
 //            throw new CustomException(ChatErrorCode.FAIL_TO_REG);
-//        } 인증처리 나중에 복구해볼 생각 ㄱ
+//        } //인증처리 나중에 복구해볼 생각 ㄱ
         Chat chat = new Chat();
         chat.setRoom(room);
         chat.setFlag(p.getFlag());
         chat.setContents(p.getContents());
         chatRepository.save(chat);
 //        int res = chatMapper.insChat(p);
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String ,Object> resJson = new HashMap<>();
+        resJson.put("flag",p.getFlag());
+        resJson.put("message",p.getContents());
         if(pic==null){
-            return null;
+            try {
+                return objectMapper.writeValueAsString(resJson);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         Long chatId = chat.getChatId();
@@ -81,11 +89,8 @@ public class ChatService {
 //        chatPicDto.setPic(fileName);
 //        int res2 = chatMapper.insChatPic(chatPicDto);
         String picUrl = String.format("/pic/%s",folderPath);
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<String ,Object> resJson = new HashMap<>();
-        resJson.put("flag",p.getFlag());
+
         resJson.put("pic",picUrl);
-        resJson.put("message",p.getContents());
         try {
             return objectMapper.writeValueAsString(resJson);
         } catch (JsonProcessingException e) {
