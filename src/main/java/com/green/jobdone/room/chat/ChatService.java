@@ -60,11 +60,12 @@ public class ChatService {
         resJson.put("flag",p.getFlag());
         resJson.put("message",p.getContents());
         if(pic==null){
-            try {
-                return objectMapper.writeValueAsString(resJson);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            return null;
+//            try {
+//                return objectMapper.writeValueAsString(resJson);
+//            } catch (JsonProcessingException e) {
+//                throw new RuntimeException(e);
+//            }
         }
 
         Long chatId = chat.getChatId();
@@ -91,12 +92,12 @@ public class ChatService {
         String picUrl = String.format("/pic/%s",folderPath);
 
         resJson.put("pic",picUrl);
-        try {
-            return objectMapper.writeValueAsString(resJson);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
+//        try {
+//            return objectMapper.writeValueAsString(resJson);
+//        } catch (JsonProcessingException e) {
+//            throw new RuntimeException(e);
+//        }
+        return picUrl;
     }
 
     public Long insertChat(ChatPostReq p){
