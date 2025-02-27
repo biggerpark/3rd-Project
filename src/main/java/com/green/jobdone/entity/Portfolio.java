@@ -1,13 +1,16 @@
 package com.green.jobdone.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 @Setter
 public class Portfolio extends UpdatedAt{
     @Id //모든 Entity(테이블)는 PK를 가지기 때문에 무조건 포함해야하는 애노테이션이다
