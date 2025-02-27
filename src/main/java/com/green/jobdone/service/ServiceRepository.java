@@ -41,4 +41,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
 //            "JOIN a.product b "+
 //            "JOIN b.detailType c")
 //    KakaoPayDto findServiceInfoByServiceId(@Param("serviceId") Long serviceId);
+
+    @Query("SELECT COUNT(s.serviceId) FROM Service s WHERE s.completed >= 6")
+    int getTotalCompletedInfo();
 }

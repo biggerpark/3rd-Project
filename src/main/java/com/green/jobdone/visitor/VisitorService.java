@@ -97,7 +97,7 @@ class VisitorService {
         return visitorCountRepository.findById(1L).map(VisitorCount::getCount).orElse(0);
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 1 0 * * *")
     public void resetVisitorCount() {
         VisitorCount visitorCount = visitorCountRepository.findById(1L).orElse(new VisitorCount());
         int yesterdayCount = visitorCount.getCount();
