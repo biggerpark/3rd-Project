@@ -90,6 +90,15 @@ public class BusinessController {
 
     }
 
+    @PutMapping("detail")
+    @Operation(summary = "업체 상세정보 기입")
+    public ResultResponse<Integer> udtBusinessDetail(@Valid @ParameterObject @ModelAttribute BusinessDetailPutReq p) {
+        int result = businessService.udtBusiness(p);
+        return ResultResponse.<Integer>builder()
+                .resultData(result)
+                .resultMessage(result == 0 ? "업체 정보 수정 실패" : "업체 정보 수정 성공")
+                .build();
+    }
 
     @DeleteMapping("businessPic")
     @Operation(summary = "업체 사진 삭제")
