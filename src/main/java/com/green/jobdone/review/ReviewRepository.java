@@ -26,27 +26,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "WHERE r.reviewId = :reviewId")
     ReviewCommentGetRes selReviewCommentByReviewId(Long reviewId);
 
-/*
-        SELECT A.commentId
-        , A.`contents`
-        , A. createdAt
-        , A. updatedAt
-        , F.userId AS writerUserId
-        , F.name
-        , E.logo
-        , E.businessId
-        FROM comment A
-        JOIN review B
-        ON A.reviewId = B.reviewId
-        JOIN service C
-        ON C.serviceId = B.serviceId
-        JOIN product D
-        ON D.productId = C.productId
-        JOIN business E
-        ON E.businessId = D.businessId
-        JOIN user F
-        ON F.userId = E.userId
-        WHERE B.reviewId = #{reviewId}
- */
 
 }

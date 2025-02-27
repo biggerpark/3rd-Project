@@ -1,10 +1,6 @@
 package com.green.jobdone.admin;
 
-import com.green.jobdone.admin.model.AdminUserInfoRes;
-import com.green.jobdone.admin.model.BusinessApplicationGetRes;
-import com.green.jobdone.admin.model.BusinessCategoryRes;
-import com.green.jobdone.admin.model.BusinessRejectReq;
-import com.green.jobdone.category.model.CategoryGetRes;
+import com.green.jobdone.admin.model.*;
 import com.green.jobdone.common.model.ResultResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -86,6 +82,69 @@ public class AdminController {
                 .resultData(result)
                 .build();
     }
+
+    @GetMapping("StatesDashBoard")
+    @Operation(summary = "관리자 통계) 대쉬보드 정보 조회")
+    public ResultResponse<AdminDashBoardInfoRes> getAdminDashBoardInfo() {
+        AdminDashBoardInfoRes result = adminService.getAdminDashBoardInfo();
+        return ResultResponse.<AdminDashBoardInfoRes>builder()
+                .resultMessage("관리자 측 카테고리 조회 완료")
+                .resultData(result)
+                .build();
+    }
+
+    @GetMapping("Statssales")
+    @Operation(summary = "관리자 통계) 근 6개월 총매출 조회")
+    public ResultResponse<List<AdminSalesInfoRes>> getAdminSalesInfo() {
+        List<AdminSalesInfoRes> result = adminService.getAdminSalesInfo();
+        return ResultResponse.<List<AdminSalesInfoRes>>builder()
+                .resultMessage("관리자 측 총매출 조회 완료")
+                .resultData(result)
+                .build();
+    }
+
+    @GetMapping("Statsvisitor")
+    @Operation(summary = "관리자 통계) 일주일 방문자 수 조회")
+    public ResultResponse<List<AdminVisitorInfoRes>> getAdminVisitorInfo() {
+        List<AdminVisitorInfoRes> result = adminService.getAdminVisitorInfo();
+        return ResultResponse.<List<AdminVisitorInfoRes>>builder()
+                .resultMessage("관리자 측 방문자 수 조회 완료")
+                .resultData(result)
+                .build();
+    }
+
+    @GetMapping("Statscategory")
+    @Operation(summary = "관리자 통계) 카테고리 비율 조회")
+    public ResultResponse<AdminCategoryInfoDto> getAdminCategoryInfo() {
+        AdminCategoryInfoDto result = adminService.getAdminCategoryInfo();
+        return ResultResponse.<AdminCategoryInfoDto>builder()
+                .resultMessage("관리자 측 카테고리 조회 완료")
+                .resultData(result)
+                .build();
+    }
+
+    @GetMapping("StatsMain")
+    @Operation(summary = "관리자 통계) 주요 통계 조회")
+    public ResultResponse<AdminMainStatsRes> getAdminMainStatsInfo() {
+        AdminMainStatsRes result = adminService.getAdminMainStatsInfo();
+        return ResultResponse.<AdminMainStatsRes>builder()
+                .resultMessage("관리자 측 주요 통계 조회 완료")
+                .resultData(result)
+                .build();
+    }
+
+    @GetMapping("StatsNewBusiness")
+    @Operation(summary = "관리자 통계) 신규 등록 업체 조회")
+    public ResultResponse<List<AdminNewBusinessInfoRes>> getAdminNewBusinessInfo() {
+        List<AdminNewBusinessInfoRes> result = adminService.getAdminNewBusinessInfo();
+        return ResultResponse.<List<AdminNewBusinessInfoRes>>builder()
+                .resultMessage("관리자 측 신규 등록 업체 조회 완료")
+                .resultData(result)
+                .build();
+    }
+
+
+
 
 
 
