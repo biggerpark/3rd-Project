@@ -83,7 +83,7 @@ public class UserService {
         // 저장 위치 만든다.
         // middlePath = user/${userId}
         // filePath = user/${userId}/${savedPicName}
-        long userId = p.getUserId(); //userId를 insert 후에 얻을 수 있다.
+        long userId = user.getUserId(); //userId를 insert 후에 얻을 수 있다.
         String middlePath = String.format("user/%d", userId);
         myFileUtils.makeFolders(middlePath);
         log.info("middlePath: {}", middlePath);
@@ -102,7 +102,14 @@ public class UserService {
 
     public UserSignInRes postUserSignIn(UserSignInReq p, HttpServletResponse response) {
 
+
+
         UserSignInResDto res = mapper.postUserSignIn(p.getEmail()); // email 에 해당하는 유저 res 가져오기
+
+        if(res==null){
+            throw new CustomException(UserErrorCode.INCORRECT_ID_PW);
+        }
+
 
         if (res.getPic() != null) {
             res.setPic(PicUrlMaker.makePicUserUrl(res.getUserId(), res.getPic()));
@@ -207,26 +214,39 @@ public class UserService {
 
         long userId = authenticationFacade.getSignedUserId();
 
-        p.setUserId(userId);
+//        p.setUserId(userId);
+
+        User user=new User();
+        user.setUserId(userId);
+        user.setPhone(p.getPhone());
+        user.setName(p.getName());
+
+
 
 
         if (pic == null) {
-            int result = mapper.updateUserInfo(p);
+//            int result = mapper.updateUserInfo(p);
+
+            int result=userRepository.updateUserInfo(user);
+
             return result;
+
         }
 
 
         String savedPicName = myFileUtils.makeRandomFileName(pic);
 
-        p.setPic(savedPicName);
+        user.setPic(savedPicName);
 
 
-        int result = mapper.updateUserInfo(p);
+//        int result = mapper.updateUserInfo(p);
 
-        String middlePath = String.format("user/%d", p.getUserId());
+        int result=userRepository.updateUserInfo(user);
+
+        String middlePath = String.format("user/%d", userId);
 
 
-        myFileUtils.deleteFile(middlePath);
+        myFileUtils.deleteFolder(middlePath,true);
 
         myFileUtils.makeFolders(middlePath);
 
@@ -248,17 +268,20 @@ public class UserService {
         long userId=authenticationFacade.getSignedUserId();
         p.setUserId(userId);
 
-
         String pw = mapper.selectInfoPwUser(p.getUserId());
 
         if (pw == null || !passwordEncoder.matches(p.getUpw(), pw)) {
             return 0;
         }
 
-        int result = mapper.deleteUser(p);
 
 
-        String deletePath = String.format("%s/user/%d", myFileUtils.getUploadPath(), p.getUserId());
+//        int result = mapper.deleteUser(p);
+
+        int result=userRepository.deleteUser(userId);
+
+
+        String deletePath = String.format("user/%d", p.getUserId());
         myFileUtils.deleteFolder(deletePath, true);
 
 
