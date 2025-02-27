@@ -6,7 +6,8 @@ public enum UserRole {
     EMPLOYEE(110),
     MANAGER(120),
     PRESIDENT(130),
-    FREELANCER(140);
+    FREELANCER(140),
+    EXA(999);
 
     private final int code;
 
