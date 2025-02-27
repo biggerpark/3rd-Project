@@ -63,7 +63,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         }
         String token = authenticationFacade.getToken();
         log.info("토큰값 잘 저장되는거 맞아?? :{} ", token);
-        session.getAttributes().put("token", token);
+//        session.getAttributes().put("token", token);
         // 추출된 roomId를 사용하여 채팅방 설정 등 처리
         log.info("Room ID: " + roomId);
     }
