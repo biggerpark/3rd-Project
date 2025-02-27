@@ -2,10 +2,7 @@ package com.green.jobdone.qa;
 
 
 import com.green.jobdone.common.model.ResultResponse;
-import com.green.jobdone.qa.model.QaAnswerReq;
-import com.green.jobdone.qa.model.QaDetailRes;
-import com.green.jobdone.qa.model.QaReq;
-import com.green.jobdone.qa.model.QaRes;
+import com.green.jobdone.qa.model.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -72,6 +69,21 @@ public class QaController {
                 .build();
 
     }
+
+
+    @GetMapping("report")
+    @Operation(summary = "신고내역조회, 관리자가 조회")
+    public ResultResponse<List<QaReportRes>> getQaReport(@RequestParam int page){
+        List<QaReportRes> result=qaService.getQaReport(page);
+
+
+        return ResultResponse.<List<QaReportRes>>builder()
+                .resultMessage("신고내역조회 조회 완료")
+                .resultData(result)
+                .build();
+
+    }
+
 
 
 }

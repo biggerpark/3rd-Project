@@ -5,10 +5,7 @@ import com.green.jobdone.admin.model.AdminUserInfoRes;
 import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.*;
-import com.green.jobdone.qa.model.QaAnswerReq;
-import com.green.jobdone.qa.model.QaDetailRes;
-import com.green.jobdone.qa.model.QaReq;
-import com.green.jobdone.qa.model.QaRes;
+import com.green.jobdone.qa.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -104,6 +101,19 @@ public class QaService {
 
        return 1;
     }
+
+
+    public List<QaReportRes> getQaReport(int page) {
+       int offset = (page - 1) * 10;
+
+
+       List<QaReportRes> res = qaMapper.getQaReport(offset);
+
+       return res;
+
+    }
+
+
 
 }
 
