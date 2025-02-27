@@ -38,15 +38,7 @@ public class BusinessController {
                 .build();
     }
 
-    @PutMapping("detail")
-    @Operation(summary = "업체 상세정보 기입")
-    public ResultResponse<Integer> udtBusinessDetail(@Valid @ParameterObject @ModelAttribute BusinessDetailPutReq p) {
-        int result = businessService.udtBusiness(p);
-        return ResultResponse.<Integer>builder()
-                .resultData(result)
-                .resultMessage(result == 0 ? "업체 정보 수정 실패" : "업체 정보 수정 성공")
-                .build();
-    }
+
 
     @PatchMapping("logo")
     @Operation(summary = "업체 로고사진 변경")
@@ -75,17 +67,6 @@ public class BusinessController {
     }
 
 
-    @PostMapping("businessPic")
-    @Operation(summary = "업체 사진 등록")
-    public ResultResponse<BusinessPicPostRes> postBusinessPic(@RequestPart List<MultipartFile> pics,
-                                                              @Valid @RequestPart BusinessGetOneReq p) {
-
-        BusinessPicPostRes res = businessService.insBusinessPic(pics, p.getBusinessId());
-        return ResultResponse.<BusinessPicPostRes>builder()
-                .resultMessage("업체사진등록 완료")
-                .resultData(res)
-                .build();
-    }
 
     @PostMapping("businessPicTemp")
     @Operation(summary = "업체 사진 임시 등록")
@@ -117,16 +98,6 @@ public class BusinessController {
         return ResultResponse.<Integer>builder().resultData(result).resultMessage("해당 업체 사진 삭제").build();
     }
 
-    @PutMapping("pic")
-    @Operation(summary = "사진 유형 수정")
-    public ResultResponse<Integer> putBusinessPic(@Valid @ParameterObject @ModelAttribute BusinessGetOneReq p) {
-        int res = businessService.udtBusinessPics(p.getBusinessId());
-
-        return ResultResponse.<Integer>builder()
-                .resultMessage(res == 0 ? "업체사진 수정 실패" : "업체 사진 수정 완료")
-                .resultData(res)
-                .build();
-    }
 
     @PutMapping("pic/thumbnail")
     @Operation(summary = "업체 사진 썸네일 설정")
@@ -138,11 +109,12 @@ public class BusinessController {
     @PutMapping("state")
     @Operation(summary = "업체 유형 수정")
     public ResultResponse<Integer> putBusinessState(@Valid @ParameterObject @ModelAttribute BusinessStatePutReq p) {
+
         int res = businessService.udtBusinessState(p);
 
         return ResultResponse.<Integer>builder()
-                .resultMessage("업체 유형 수정 완료")
                 .resultData(res)
+                .resultMessage(String.format("%d업체 유형 %d로 수정 완료",p.getBusinessId(),p.getState()))
                 .build();
     }
 
