@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,14 +52,26 @@ public class QaService {
         if(pics==null){
             qaRepository.save(qa);
         }
+
         if(pics!=null){
-//            String middlePath=String.format("")
+            long qaId=qa.getQaId();
+            String middlePath = String.format("qa/%d", qaId);
+            myFileUtils.makeFolders(middlePath);
+
             for(MultipartFile pic : pics){
                 String picName = myFileUtils.makeRandomFileName(pic);
                 QaPic qaPic=QaPic.builder()
                         .qa(qa)
                         .pic(picName)
                         .build();
+                qaPicRepository.save(qaPic);
+
+                String filePath = String.format("%s/%s", middlePath, picName);
+                try {
+                    myFileUtils.transferTo(pic, filePath);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
             }
 
