@@ -79,7 +79,7 @@ public class Business extends UpdatedAt {
 
 
     @Column
-    private LocalDate date;
+    private LocalDate approveAt;
 
 
 }

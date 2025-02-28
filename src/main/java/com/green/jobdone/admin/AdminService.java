@@ -64,7 +64,7 @@ public class AdminService {
         LocalDate today = LocalDate.now();
 
 
-        business.setDate(today);
+        business.setApproveAt(today);
         business.setState(101); // 업체 상태를 수락완료로 바꿈
 
 
