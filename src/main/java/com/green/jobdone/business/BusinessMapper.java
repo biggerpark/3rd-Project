@@ -38,6 +38,7 @@ public interface BusinessMapper {
     List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetInfoReq p);
 
 
+    List<BusinessGetServiceRes> countBusinessServices(BusinessGetInfoReq p);
 
 
 
@@ -54,5 +55,4 @@ public interface BusinessMapper {
     int insBusinessPhone(BusinessPhonePostReq p);
     int existBusinessPhone(long businessId, String phone);
 
-    BusinessGetServiceRes countBusinessServices(BusinessGetInfoReq p);
 }

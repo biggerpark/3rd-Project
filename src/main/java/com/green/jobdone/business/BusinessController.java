@@ -181,10 +181,11 @@ public class BusinessController {
 
     @GetMapping("serviceCount")
     @Operation(summary = "업체가 받은 주문 카운트")
-    public ResultResponse<BusinessGetServiceRes> getBusinessServiceCount(@Valid @ParameterObject @ModelAttribute BusinessGetInfoReq p) {
+    public ResultResponse<List<BusinessGetServiceRes>> getBusinessServiceCount(@Valid @ParameterObject @ModelAttribute BusinessGetInfoReq p) {
         //루키루키 나의루키루키뤀; 마치마치 느낌적인 느낌느낌
-         BusinessGetServiceRes res = businessService.getBusinessService(p);
-        return ResultResponse.<BusinessGetServiceRes>builder().resultData(res).resultMessage("네").build();
+        BusinessGetInfoReq req = new BusinessGetInfoReq(p.getBusinessId());
+         List<BusinessGetServiceRes> res = (List<BusinessGetServiceRes>) businessService.getBusinessService(req);
+        return ResultResponse.<List<BusinessGetServiceRes>>builder().resultData(res).resultMessage("네").build();
     }
 }
 
