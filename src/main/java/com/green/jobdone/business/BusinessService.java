@@ -69,8 +69,8 @@ public class BusinessService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 등록된 사업자 번호입니다");
         }
 
-        String paperPath = String.format("business/%d/paper", p.getBusinessId());
-        String logoPath = String.format("business/%d/logo", p.getBusinessId());
+        String paperPath = String.format("pic/business/%d/paper", p.getBusinessId());
+        String logoPath = String.format("pic/business/%d/logo", p.getBusinessId());
         myFileUtils.makeFolders(paperPath);
         myFileUtils.makeFolders(logoPath);
 
@@ -112,6 +112,7 @@ public class BusinessService {
 
 
     // 로고 수정
+    @Transactional
     public int patchBusinessLogo(BusinessLogoPatchReq p, MultipartFile logo) {
 
         long signedUserId = authenticationFacade.getSignedUserId();
@@ -128,7 +129,7 @@ public class BusinessService {
         }
 
         // 로고파일 저장 폴더 경로
-        String folderPath = String.format("business/%d/logo", p.getBusinessId());
+        String folderPath = String.format("pic/business/%d/logo", p.getBusinessId());
 
         // 기존 로고 폴더가 있다면 폴더 삭제
         myFileUtils.deleteFolder(folderPath, true); // true: 폴더 내 모든 파일 및 하위 폴더 삭제
@@ -156,6 +157,7 @@ public class BusinessService {
     }
 
     // 사업자등록증 수정
+    @Transactional
     public int patchBusinessPaper(BusinessPaperPatchReq p, MultipartFile paper) {
 
         long signedUserId = authenticationFacade.getSignedUserId();
@@ -232,7 +234,7 @@ public class BusinessService {
         } //일단 보안먼저 챙겨주고
 
 
-        String tempPath = String.format("business/%d/temp", businessId);
+        String tempPath = String.format("pic/business/%d/temp", businessId);
         myFileUtils.makeFolders(tempPath);
 
         List<String> tempPicUrls = new ArrayList<>(pics.size());
@@ -274,8 +276,8 @@ public class BusinessService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다, 근데 너 누구냐");
         }
 
-        String tempPath = String.format("%s/business/%d/temp", fileDirectory, businessId);
-        String middlePath = String.format("%s/business/%d/pics", fileDirectory, businessId);
+        String tempPath = String.format("%s/pic/business/%d/temp", fileDirectory, businessId);
+        String middlePath = String.format("%s/pic/business/%d/pics", fileDirectory, businessId);
         myFileUtils.makeFolders(middlePath);
 
         boolean moveSuccess = myFileUtils.moveFolder(tempPath,middlePath);
@@ -283,6 +285,7 @@ public class BusinessService {
         return moveSuccess;
     }
 
+    @Transactional
     public int udtBusiness(BusinessDetailPutReq p) {
 
         long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
@@ -298,6 +301,7 @@ public class BusinessService {
 
 
 
+    @Transactional
     public int udtBusinessState(BusinessStatePutReq p) {
 
         int res = businessRepository.updateBusinessState(p);
@@ -306,15 +310,17 @@ public class BusinessService {
         return res;
     }
 
+    @Transactional
     public int setBusinessThumbnail(BusinessPicReq p) {
         return businessMapper.udtBusinessThumbnail(p);
     }
 
 
+    @Transactional
     public Integer delBusinessPic(BusinessPicReq p) {
         //String uploadPath = myFileUtils.getUploadPath();
         String businessPicName = businessMapper.getBusinessPicName(p.getBusinessPicId());
-        String filePath = String.format("business/%d/pics/%s",  p.getBusinessId(), businessPicName);
+        String filePath = String.format("pic/business/%d/pics/%s",  p.getBusinessId(), businessPicName);
 
         log.info("Generated file path: {}", filePath);  // 경로 출력
 
@@ -331,6 +337,7 @@ public class BusinessService {
 
     //업체 조회하기
     // 1. 업체 리스트 조회
+    @Transactional
     public List<BusinessGetRes> getBusinessList(BusinessGetReq p) {
         // 업체 리스트 조회
         List<BusinessGetRes> res = businessMapper.selAllBusiness(p);
@@ -346,6 +353,7 @@ public class BusinessService {
     }
 
     // 2. 단일업체 조회
+    @Transactional
     public BusinessGetOneRes getBusinessOne(BusinessGetOneReq p) {
         BusinessGetOneRes res = businessMapper.selOneBusiness(p.getBusinessId());
         if (res == null) {
@@ -363,6 +371,7 @@ public class BusinessService {
     }
 
     //업체 하나에 있는 사진들
+    @Transactional
     public List<BusinessOnePicsGetRes> getBusinessOnePics(BusinessOnePicsGetReq p) {
 
         List<BusinessOnePicsGetRes> res = businessMapper.getBusinessPicList(p);
@@ -378,6 +387,7 @@ public class BusinessService {
 
 
 
+    @Transactional
     public List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetInfoReq p){
 
         long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
@@ -390,6 +400,7 @@ public class BusinessService {
         return businessMapper.getBusinessMonthly(p);
     }
 
+    @Transactional
     public BusinessGetServiceRes getBusinessService(BusinessGetInfoReq p) {
         long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
 

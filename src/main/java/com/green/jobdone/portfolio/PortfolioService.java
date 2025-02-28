@@ -1,10 +1,13 @@
 package com.green.jobdone.portfolio;
 
 import com.green.jobdone.business.BusinessMapper;
+import com.green.jobdone.business.BusinessRepository;
 import com.green.jobdone.business.model.BusinessStatePutReq;
 import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.config.security.AuthenticationFacade;
+import com.green.jobdone.entity.Business;
+import com.green.jobdone.entity.Portfolio;
 import com.green.jobdone.portfolio.model.*;
 import com.green.jobdone.portfolio.model.get.*;
 import lombok.RequiredArgsConstructor;
@@ -23,22 +26,34 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class PortfolioService {
+    private final PortfolioRepository portfolioRepository;
     private final PortfolioMapper portfolioMapper;
     private final BusinessMapper businessMapper;
+    private final BusinessRepository businessRepository;
     private final MyFileUtils myFileUtils;
     private final AuthenticationFacade authenticationFacade; //인증받은 유저가 이용 할 수 있게.
 
 
     // 포폴 만들기
+    @Transactional
     public long insPortfolio(PortfolioPostReq p){
 
-//        long signedUserId =authenticationFacade.getSignedUserId();
-//
-//        long userId = businessMapper.existBusinessId(p.getBusinessId());
-//        if (userId != signedUserId){
-//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
-//        }
+        long signedUserId = authenticationFacade.getSignedUserId();
 
+        long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
+        if (userId != signedUserId) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
+        }
+
+        Portfolio portfolio = Portfolio.builder()
+                .business(businessRepository.findById(p.getBusinessId()).orElse(null))
+                .title(p.getTitle())
+                .price(p.getPrice())
+                .takingTime(p.getTakingTime())
+                .contents(p.getContents())
+                .build();
+
+        portfolioRepository.save(portfolio);
         return portfolioMapper.insPortfolio(p);
 
     }
@@ -55,7 +70,7 @@ public class PortfolioService {
 //        }
 
 
-        String middlePath = String.format("business/%d/portfolio/%d/pics", businessId, portfolioId);
+        String middlePath = String.format("pic/business/%d/portfolio/%d/pics", businessId, portfolioId);
         myFileUtils.makeFolders(middlePath);
 
         List<String> portfolioPicList = new ArrayList<>(pics.size());

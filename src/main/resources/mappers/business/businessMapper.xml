@@ -266,8 +266,8 @@
         JOIN business b ON p.businessId = b.businessId
         WHERE b.businessId = #{businessId}
         AND s.completed >= 7
-        GROUP BY b.businessName, YEAR(s.createdAt), MONTH(s.createdAt)  -- 각 연도/월별 그룹화
-        ORDER BY year DESC, month DESC;
+        GROUP BY  s.productId, YEAR(s.createdAt), MONTH(s.createdAt)  -- 각 연도/월별 그룹화
+        ORDER BY  s.productId, year DESC, month DESC;
     </select>
 
     <!-- copleted : 7 8 9 -->
