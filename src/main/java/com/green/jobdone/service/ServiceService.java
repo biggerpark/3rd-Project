@@ -178,6 +178,9 @@ public class ServiceService {
         int i=0;
 //        com.green.jobdone.entity.Service service = new com.green.jobdone.entity.Service();
         com.green.jobdone.entity.Service service = serviceRepository.findById(p.getServiceId()).orElse(null);
+        if(service!=null &&service.getCompleted()!=1){
+            throw new CustomException(ServiceErrorCode.FAIL_UPDATE_SERVICE);
+        }
         service.setCompleted(2);
         service.setServiceId(p.getServiceId());
         service.setAddComment(p.getAddComment());

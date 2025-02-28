@@ -6,6 +6,7 @@ import com.green.jobdone.common.KaKaoPay;
 import com.green.jobdone.common.model.Domain;
 import com.green.jobdone.service.model.Dto.CompletedDto;
 import com.green.jobdone.service.model.Dto.KakaoPayDto;
+import com.green.jobdone.service.model.KakaoPayCancelRes;
 import com.green.jobdone.service.model.KakaoPayRedayRes;
 import com.green.jobdone.service.model.KakaoPayRes;
 import lombok.RequiredArgsConstructor;
@@ -88,6 +89,10 @@ public class PayService {
         );
 
         return response.getBody();
+    }
+    public KakaoPayCancelRes cancelKakaoPay(Long serviceId){
+        KakaoPayCancelRes res = new KakaoPayCancelRes();
+        return res;
     }
 
     public void saveTid(Long serviceId, String tid){
