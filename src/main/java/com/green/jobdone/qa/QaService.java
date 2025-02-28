@@ -2,6 +2,7 @@ package com.green.jobdone.qa;
 
 
 import com.green.jobdone.admin.model.AdminUserInfoRes;
+import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.*;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,13 +25,18 @@ public class QaService {
     private final AuthenticationFacade authenticationFacade;
     private final QaMapper qaMapper;
     private final QaAnswerRepository qaAnswerRepository;
+    private final QaPicRepository qaPicRepository;
+    private final MyFileUtils myFileUtils;
 
 
     @Transactional
-    public void insQa(QaReq p) {
+    public void insQa(QaReq p, List<MultipartFile> pics) {
         Long userId = authenticationFacade.getSignedUserId();
         User user = new User();
         user.setUserId(userId);
+
+
+
         QaTypeDetail qaTypeDetail =
                 QaTypeDetail.builder()
                         .qaTypeDetailId(p.getQaTypeDetailId())
@@ -41,7 +48,22 @@ public class QaService {
                 .reportReason(p.getQaReportReason())
                 .qaTargetId(p.getQaTargetId())
                 .build();
-        qaRepository.save(qa);
+        if(pics==null){
+            qaRepository.save(qa);
+        }
+        if(pics!=null){
+//            String middlePath=String.format("")
+            for(MultipartFile pic : pics){
+                String picName = myFileUtils.makeRandomFileName(pic);
+                QaPic qaPic=QaPic.builder()
+                        .qa(qa)
+                        .pic(picName)
+                        .build();
+
+            }
+
+
+        }
     }
 
     @Transactional

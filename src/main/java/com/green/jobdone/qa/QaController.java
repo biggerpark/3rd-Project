@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,10 +23,10 @@ public class QaController {
     private final QaService qaService;
 
     @PostMapping
-    @Operation(summary = "문의 등록")
-    public ResultResponse<Integer> postQa(@Valid @RequestBody QaReq p){
+    @Operation(summary = "문의 및 신고 등록")
+    public ResultResponse<Integer> postQa(@Valid @RequestPart QaReq p, @Valid @RequestPart(required = false) List<MultipartFile> pics){
         log.info("p: {}",p);
-        qaService.insQa(p);
+        qaService.insQa(p,pics);
         return ResultResponse.<Integer>builder()
                 .resultMessage("등록 완료")
                 .resultData(1)
