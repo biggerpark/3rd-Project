@@ -42,12 +42,13 @@ public class BusinessController {
 
     @PatchMapping("logo")
     @Operation(summary = "업체 로고사진 변경")
-    public ResultResponse<Integer> patchProfilePic(@Valid @RequestPart BusinessLogoPatchReq p, @RequestPart(required = false) MultipartFile logo) {
+    public ResultResponse<Integer> patchProfilePic(@Valid @RequestPart BusinessLogoPatchReq p, @RequestPart MultipartFile logo) {
         log.info("UserController > patchProfilePic > p: {}", p);
 
         int result = businessService.patchBusinessLogo(p, logo);
 
         return ResultResponse.<Integer>builder()
+
                 .resultMessage("로고 사진 수정 완료")
                 .resultData(result)
                 .build();

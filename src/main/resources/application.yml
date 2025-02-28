@@ -23,7 +23,7 @@ const:
   auth-code-length: 6
 
 file:
-  directory: D:\pjh\3rd-Project\jobdone
+  directory: D:/pjh/3rd-Project/jobdone
 
 domain:
   path:
