@@ -60,6 +60,9 @@ spring:
     url: jdbc:log4jdbc:mariadb://${DEFAULT.DB_URL}?serverTimezone=Asia/Seoul
     username: ${DEFAULT.USERNAME}
     password: ${DEFAULT.PASSWORD}
+    hikari:
+      data-source-properties:
+        serverTimezone: Asia/Seoul
   servlet:
     multipart:
       max-file-size: 15MB

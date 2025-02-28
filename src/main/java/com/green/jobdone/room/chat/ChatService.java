@@ -44,6 +44,7 @@ public class ChatService {
 //        if(userId!=userIdRoom.getUserId()||userId!=userIdRoom.getBuid()){
 //            throw new CustomException(ChatErrorCode.FAIL_TO_REG);
 //        } // 채팅 인증 처리가 필요할때 사용용도
+        log.info("토큰값: {}",token);
         Room room = roomRepository.findById(p.getRoomId()).orElseThrow(() -> new CustomException(ChatErrorCode.MISSING_ROOM));
         Long userId = room.getUser().getUserId();
 //        if(userId!=authenticationFacade.getSignedUserId()|| !room.getBusiness().getBusinessId().equals(businessRepository.findBusinessIdByUserId(userId))){

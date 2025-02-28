@@ -61,8 +61,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         if(!sessions.contains(session)) {
             sessions.add(session);
         }
-        String token = authenticationFacade.getToken();
-        log.info("토큰값 잘 저장되는거 맞아?? :{} ", token);
+//        String token = authenticationFacade.getToken();
+//        log.info("토큰값 잘 저장되는거 맞아?? :{} ", token);
 //        session.getAttributes().put("token", token);
         // 추출된 roomId를 사용하여 채팅방 설정 등 처리
         log.info("Room ID: " + roomId);
@@ -129,7 +129,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
                     }
                 }
                         log.info("req확인: {}", req);
-                        chatService.insChat(extractToken(session),null,req);
+                        chatService.insChat(null,null,req);
             }
         } catch (Exception e) {
             throw new CustomException(ChatErrorCode.FAIL_TO_REG);
@@ -170,6 +170,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             }
             long roomId = jsonNode.get("roomId").asLong();
             int flag = jsonNode.get("flag").asInt();
+            String token = jsonNode.has("token") ? jsonNode.get("token").asText().trim() : null;
             String textMessage = jsonNode.has("message") ? jsonNode.get("message").asText().trim() : "";
             log.info("textMessage 확인: {}",textMessage);
 
@@ -202,7 +203,6 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             chatPostReq.setRoomId(roomId);
             chatPostReq.setContents(textMessage.isEmpty() ? null : textMessage);
             chatPostReq.setFlag(flag);
-            String token = extractToken(session);
             log.info("roomId {}, flag {}, message: {}", roomId, flag, textMessage);
             log.info("토큰: " + token);
             String jsonData = chatService.insChat(token, pic, chatPostReq);
@@ -243,17 +243,6 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
     private MultipartFile convertByteArrayToMultipartFile(byte[] payload, String fileName) {
         return new CustomMultipartFile(payload, fileName, "application/octet-stream");
     }
-    private String extractToken(WebSocketSession session) {
-        // WebSocket 세션에서 Authorization 헤더를 추출
-        List<String> authHeader = session.getHandshakeHeaders().get("Authorization");
-        if (authHeader != null && !authHeader.isEmpty()) {
-            String token = authHeader.get(0);  // 토큰 값이 첫 번째로 들어있다고 가정
-            // "Bearer " 접두어를 제거하고 실제 토큰만 반환
-            if (token.startsWith("Bearer ")) {
-                return token.substring(7);  // "Bearer "를 제거한 나머지 부분
-            }
-        }
-        return null;  // Authorization 헤더가 없으면 null 반환
-    }
+
 }
 
