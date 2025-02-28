@@ -112,6 +112,7 @@ public class BusinessService {
 
 
     // 로고 수정
+    @Transactional
     public int patchBusinessLogo(BusinessLogoPatchReq p, MultipartFile logo) {
 
         long signedUserId = authenticationFacade.getSignedUserId();
@@ -156,6 +157,7 @@ public class BusinessService {
     }
 
     // 사업자등록증 수정
+    @Transactional
     public int patchBusinessPaper(BusinessPaperPatchReq p, MultipartFile paper) {
 
         long signedUserId = authenticationFacade.getSignedUserId();
@@ -283,6 +285,7 @@ public class BusinessService {
         return moveSuccess;
     }
 
+    @Transactional
     public int udtBusiness(BusinessDetailPutReq p) {
 
         long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
@@ -298,6 +301,7 @@ public class BusinessService {
 
 
 
+    @Transactional
     public int udtBusinessState(BusinessStatePutReq p) {
 
         int res = businessRepository.updateBusinessState(p);
@@ -306,11 +310,13 @@ public class BusinessService {
         return res;
     }
 
+    @Transactional
     public int setBusinessThumbnail(BusinessPicReq p) {
         return businessMapper.udtBusinessThumbnail(p);
     }
 
 
+    @Transactional
     public Integer delBusinessPic(BusinessPicReq p) {
         //String uploadPath = myFileUtils.getUploadPath();
         String businessPicName = businessMapper.getBusinessPicName(p.getBusinessPicId());
@@ -331,6 +337,7 @@ public class BusinessService {
 
     //업체 조회하기
     // 1. 업체 리스트 조회
+    @Transactional
     public List<BusinessGetRes> getBusinessList(BusinessGetReq p) {
         // 업체 리스트 조회
         List<BusinessGetRes> res = businessMapper.selAllBusiness(p);
@@ -346,6 +353,7 @@ public class BusinessService {
     }
 
     // 2. 단일업체 조회
+    @Transactional
     public BusinessGetOneRes getBusinessOne(BusinessGetOneReq p) {
         BusinessGetOneRes res = businessMapper.selOneBusiness(p.getBusinessId());
         if (res == null) {
@@ -363,6 +371,7 @@ public class BusinessService {
     }
 
     //업체 하나에 있는 사진들
+    @Transactional
     public List<BusinessOnePicsGetRes> getBusinessOnePics(BusinessOnePicsGetReq p) {
 
         List<BusinessOnePicsGetRes> res = businessMapper.getBusinessPicList(p);
@@ -378,6 +387,7 @@ public class BusinessService {
 
 
 
+    @Transactional
     public List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetInfoReq p){
 
         long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
@@ -390,6 +400,7 @@ public class BusinessService {
         return businessMapper.getBusinessMonthly(p);
     }
 
+    @Transactional
     public BusinessGetServiceRes getBusinessService(BusinessGetInfoReq p) {
         long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
 
