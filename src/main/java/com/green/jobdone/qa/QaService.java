@@ -4,6 +4,8 @@ package com.green.jobdone.qa;
 import com.green.jobdone.admin.model.AdminUserInfoRes;
 import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.common.PicUrlMaker;
+import com.green.jobdone.common.exception.CustomException;
+import com.green.jobdone.common.exception.UserErrorCode;
 import com.green.jobdone.config.jwt.JwtUser;
 import com.green.jobdone.config.jwt.UserRole;
 import com.green.jobdone.config.security.AuthenticationFacade;
@@ -121,11 +123,14 @@ public class QaService {
         res.setPics(updatedPics);
 
         if(jwtUser.getRoles().contains(UserRole.ADMIN)){ // 권한이 관리자가 있으면 qa state 를 진행중으로 바꿔주기
-            Qa qa=Qa.builder()
-                    .qaId(qaId)
-                    .qaState("00102")
-                    .build();
+            Qa qa = qaRepository.findById(qaId)
+                    .orElseThrow(() -> new RuntimeException("해당 QA가 존재하지 않습니다."));
+
+            qa.setQaState("00102"); // state 를 검토중 으로 바꿔줌.
+
+
             qaRepository.save(qa);
+
         }
 
         return res;
@@ -133,19 +138,31 @@ public class QaService {
 
     @Transactional
     public int postQaAnswer(QaAnswerReq p){ // 관리자측 문의 답변
+      List<UserRole> userRole=authenticationFacade.getSignedUser().getRoles();
+
+      if(!userRole.contains(UserRole.ADMIN)){
+          throw  new CustomException(UserErrorCode.FORBIDDEN_ACCESS);
+      }
+
        Qa qa=Qa.builder()
                .qaId(p.getQaId())
+               .qaState("00103")
                .build();
 
        Admin admin = new Admin();
        admin.setAdminId(1L); // 나중에 JWT 넣기
 
-       QaAnswer qaAnswer=QaAnswer.builder()
+
+       QaAnswer qaAnswer= QaAnswer.builder()
                .qa(qa)
                .answer(p.getAnswer())
                .admin(admin)
                .build();
 
+
+
+
+       qaRepository.save(qa);
        qaAnswerRepository.save(qaAnswer);
 
 
