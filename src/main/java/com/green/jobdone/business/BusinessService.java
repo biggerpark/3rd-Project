@@ -15,6 +15,7 @@ import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.Business;
 import com.green.jobdone.entity.User;
 import com.green.jobdone.user.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +37,9 @@ public class BusinessService {
 
     @Value("${file.directory}")
     private String fileDirectory;
+
+    @Value("${domain.path.server}")
+    private String docker;
 
     private final BusinessMapper businessMapper;
     private final MyFileUtils myFileUtils;
@@ -229,6 +233,8 @@ public class BusinessService {
         return new BusinessContentsPostRes(business.getTitle(),business.getContents());
     }
 
+
+
     @Transactional
     public BusinessPicPostRes businessPicTemp(List<MultipartFile> pics, long businessId) {
         long signedUserId = authenticationFacade.getSignedUserId();
@@ -250,7 +256,8 @@ public class BusinessService {
             String savedPicName = myFileUtils.makeRandomFileName(pic);
             String filePath = String.format("%s/%s", tempPath, savedPicName);
 
-            String tempPicUrl = String.format("%s/%s",fileDirectory,filePath);
+            String tempPicUrl = String.format("%s/%s",docker,filePath);
+
 
             try{
                 myFileUtils.transferTo(pic,filePath);
