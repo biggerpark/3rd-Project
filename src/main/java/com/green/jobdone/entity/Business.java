@@ -2,8 +2,10 @@ package com.green.jobdone.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -76,6 +78,8 @@ public class Business extends UpdatedAt {
     private String rejectContents;
 
 
+    @Column
+    private LocalDate date;
 
 
 }
