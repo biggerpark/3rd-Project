@@ -401,7 +401,7 @@ public class BusinessService {
     }
 
     @Transactional
-    public BusinessGetServiceRes getBusinessService(BusinessGetInfoReq p) {
+    public List<BusinessGetServiceRes> getBusinessService(BusinessGetInfoReq p) {
         long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
 
         long signedUserId = authenticationFacade.getSignedUserId();
