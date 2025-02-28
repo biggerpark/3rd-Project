@@ -256,7 +256,7 @@ public class BusinessService {
             String savedPicName = myFileUtils.makeRandomFileName(pic);
             String filePath = String.format("%s/%s", tempPath, savedPicName);
 
-            String tempPicUrl = String.format("%s/%s",docker,filePath);
+            String tempPicUrl = String.format("%s/pic/%s",docker,filePath);
 
 
             try{
