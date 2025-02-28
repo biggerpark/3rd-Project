@@ -45,6 +45,7 @@ public interface BusinessRepository extends JpaRepository<Business, Long> {
     @Query("update Business b set b.state =:#{#p.state} where b.businessId =:#{#p.businessId}")
     Integer updateBusinessState(@Param("p") BusinessStatePutReq p);
 
+
     @Modifying
     @Query("update Business set paper=:#{#p.paper} where businessId=:#{#p.businessId}")
     Integer updateBusinessPaper(@Param("p") BusinessPaperPatchReq p);

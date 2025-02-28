@@ -34,6 +34,9 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class BusinessService {
 
+    @Value("${file.directory}")
+    private String fileDirectory;
+
     private final BusinessMapper businessMapper;
     private final MyFileUtils myFileUtils;
     private final AuthenticationFacade authenticationFacade; //인증받은 유저가 이용 할 수 있게.
@@ -123,13 +126,15 @@ public class BusinessService {
         }
 
 
+
+        Long businessId = p.getBusinessId();
         // 누락 파일 처리
         if (logo == null || logo.isEmpty()) {
             return 0;
         }
 
         // 로고파일 저장 폴더 경로
-        String folderPath = String.format("pic/business/%d/logo", p.getBusinessId());
+        String folderPath = String.format("business/%d/logo", businessId);
 
         // 기존 로고 폴더가 있다면 폴더 삭제
         myFileUtils.deleteFolder(folderPath, true); // true: 폴더 내 모든 파일 및 하위 폴더 삭제
@@ -152,6 +157,8 @@ public class BusinessService {
         }
 
         // DB에 로고 수정 정보 업데이트
+
+        p.setBusinessId(businessId);
         p.setLogo(savedPicName);
         return businessRepository.updateBusinessLogo(p);
     }
@@ -173,7 +180,7 @@ public class BusinessService {
         }
 
         // 로고파일 저장 폴더 경로
-        String folderPath = String.format("business/%d/paper", p.getBusinessId());
+        String folderPath = String.format("pic/business/%d/paper", p.getBusinessId());
 
         // 기존 로고 폴더가 있다면 폴더 삭제
         myFileUtils.deleteFolder(folderPath, true); // true: 폴더 내 모든 파일 및 하위 폴더 삭제
@@ -234,7 +241,7 @@ public class BusinessService {
         } //일단 보안먼저 챙겨주고
 
 
-        String tempPath = String.format("pic/business/%d/temp", businessId);
+        String tempPath = String.format("business/%d/temp", businessId);
         myFileUtils.makeFolders(tempPath);
 
         List<String> tempPicUrls = new ArrayList<>(pics.size());
@@ -243,7 +250,7 @@ public class BusinessService {
             String savedPicName = myFileUtils.makeRandomFileName(pic);
             String filePath = String.format("%s/%s", tempPath, savedPicName);
 
-            String tempPicUrl = String.format("%s/%s",domain.getServer(),filePath);
+            String tempPicUrl = String.format("%s/%s",fileDirectory,filePath);
 
             try{
                 myFileUtils.transferTo(pic,filePath);
@@ -262,9 +269,6 @@ public class BusinessService {
         return  BusinessPicPostRes.builder().businessId(businessId).pics(tempPicUrls).build();
     }
 
-    @Value("${file.directory}")
-    private String fileDirectory;
-
     @Transactional
     public boolean businessPicConfirm( long businessId) {
         long signedUserId = authenticationFacade.getSignedUserId();
@@ -276,8 +280,8 @@ public class BusinessService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다, 근데 너 누구냐");
         }
 
-        String tempPath = String.format("%s/pic/business/%d/temp", fileDirectory, businessId);
-        String middlePath = String.format("%s/pic/business/%d/pics", fileDirectory, businessId);
+        String tempPath = String.format("business/%d/temp",  businessId);
+        String middlePath = String.format("business/%d/pics",  businessId);
         myFileUtils.makeFolders(middlePath);
 
         boolean moveSuccess = myFileUtils.moveFolder(tempPath,middlePath);
@@ -364,8 +368,12 @@ public class BusinessService {
             res.setBusinessId(p.getBusinessId());
         }
 
+        String logo =PicUrlMaker.makePicUrlLogo(p.getBusinessId(), res.getLogo());
+
+
+
         if (res != null && res.getLogo() != null) {
-            res.setLogo(PicUrlMaker.makePicUrlLogo(p.getBusinessId(), res.getLogo()));
+            res.setLogo(logo);
         }
         return res;
     }
