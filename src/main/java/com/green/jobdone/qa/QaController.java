@@ -28,7 +28,7 @@ public class QaController {
         log.info("p: {}",p);
         qaService.insQa(p,pics);
         return ResultResponse.<Integer>builder()
-                .resultMessage("등록 완료")
+                .resultMessage("문의/신고 등록 완료")
                 .resultData(1)
                 .build();
     }

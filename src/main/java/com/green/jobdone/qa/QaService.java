@@ -4,6 +4,8 @@ package com.green.jobdone.qa;
 import com.green.jobdone.admin.model.AdminUserInfoRes;
 import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.common.PicUrlMaker;
+import com.green.jobdone.config.jwt.JwtUser;
+import com.green.jobdone.config.jwt.UserRole;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.*;
 import com.green.jobdone.qa.model.*;
@@ -54,6 +56,7 @@ public class QaService {
         }
 
         if(pics!=null){
+            qaRepository.save(qa);
             long qaId=qa.getQaId();
             String middlePath = String.format("qa/%d", qaId);
             myFileUtils.makeFolders(middlePath);
@@ -103,7 +106,10 @@ public class QaService {
         return res;
     }
 
-    public QaDetailRes getQaDetail(long qaId) {
+    @Transactional
+    public QaDetailRes getQaDetail(long qaId) { // 문의상세내역 확인
+        JwtUser jwtUser = authenticationFacade.getSignedUser(); // 관리자인지 일반유저인지 판단하기.
+
         QaDetailRes res = qaMapper.getQaDetail(qaId);
 
 
@@ -114,11 +120,19 @@ public class QaService {
         }
         res.setPics(updatedPics);
 
+        if(jwtUser.getRoles().contains(UserRole.ADMIN)){ // 권한이 관리자가 있으면 qa state 를 진행중으로 바꿔주기
+            Qa qa=Qa.builder()
+                    .qaId(qaId)
+                    .qaState("00102")
+                    .build();
+            qaRepository.save(qa);
+        }
+
         return res;
     }
 
     @Transactional
-    public int postQaAnswer(QaAnswerReq p){
+    public int postQaAnswer(QaAnswerReq p){ // 관리자측 문의 답변
        Qa qa=Qa.builder()
                .qaId(p.getQaId())
                .build();
@@ -134,11 +148,13 @@ public class QaService {
 
        qaAnswerRepository.save(qaAnswer);
 
+
        return 1;
     }
 
 
-    public List<QaReportRes> getQaReport(int page) {
+
+    public List<QaReportRes> getQaReport(int page) { // 신고내역 확인
        int offset = (page - 1) * 10;
 
 
