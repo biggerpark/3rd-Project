@@ -11,7 +11,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Portfolio_pic")
+@Table(name = "portfolio_pic")
 public class PortfolioPic extends CreatedAt{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) //auto_increment
@@ -25,6 +25,7 @@ public class PortfolioPic extends CreatedAt{
     @Column(length = 50)
     private String pic;
 
+    @Column(nullable = false)
     @ColumnDefault("1")
     private int state;
 
