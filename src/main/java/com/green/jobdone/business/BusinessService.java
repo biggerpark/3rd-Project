@@ -13,6 +13,7 @@ import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.common.model.Domain;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.Business;
+import com.green.jobdone.entity.BusinessPic;
 import com.green.jobdone.entity.User;
 import com.green.jobdone.user.UserRepository;
 import jakarta.validation.Valid;
@@ -251,7 +252,7 @@ public class BusinessService {
         myFileUtils.makeFolders(tempPath);
 
         List<String> tempPicUrls = new ArrayList<>(pics.size());
-        List<String> businessPicList = new ArrayList<>(pics.size());
+        List<BusinessPic> businessPicList = new ArrayList<>(pics.size());
         for (MultipartFile pic : pics) {
             String savedPicName = myFileUtils.makeRandomFileName(pic);
             String filePath = String.format("%s/%s", tempPath, savedPicName);
@@ -265,14 +266,14 @@ public class BusinessService {
                 e.printStackTrace();
             }
 
-            businessPicList.add(savedPicName);
+            BusinessPic businessPic = new BusinessPic();
+            businessPic.setBusiness(business);
+            businessPic.setPic(savedPicName);
+            businessPicList.add(businessPic);
+
             tempPicUrls.add(tempPicUrl);
         }
-        BusinessPicDto businessPicDto = new BusinessPicDto();
-        businessPicDto.setBusinessId(businessId);
-        businessPicDto.setPics(businessPicList);
-        int resultPics = businessMapper.insBusinessPic(businessPicDto);
-
+        businessPicRepository.saveAll(businessPicList);
         return  BusinessPicPostRes.builder().businessId(businessId).pics(tempPicUrls).build();
     }
 

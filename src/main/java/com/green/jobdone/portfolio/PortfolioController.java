@@ -25,12 +25,12 @@ public class PortfolioController {
     private final PortfolioService portfolioService;
 
     @PostMapping("post")
-    public ResultResponse<Long> insPortfolio(PortfolioPostReq p) {
-        long res = portfolioService.insPortfolio(p);
-        return ResultResponse.<Long>builder()
-                .resultData(p.getPortfolioId())
-                .resultMessage(String.format("포트폴리오 pk는 %d",p.getPortfolioId())
-                ).build();
+    public ResultResponse<PortfolioPostRes> insPortfolio(@RequestPart List<MultipartFile> pics
+            ,@Valid @RequestPart PortfolioPostReq p) {
+        PortfolioPostRes res = portfolioService.insPortfolio(pics,p);
+        return ResultResponse.<PortfolioPostRes>builder()
+                .resultData(res)
+                .resultMessage("옛다").build();
     }
 
     @PostMapping("portfolioPic")
