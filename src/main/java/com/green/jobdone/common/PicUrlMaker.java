@@ -30,7 +30,7 @@ public class PicUrlMaker {
 
     public static String makePicUrlLogo(long businessId, String picName) {
         return String.format("/pic/business/%d/logo/%s", businessId, picName);
-    }
+    } //D:\pjh\3rd-Project\jobdone\business\196\logo
     public static String makePicUrlPaper(long businessId, String picName) {
         return String.format("/pic/business/%d/paper/%s", businessId, picName);
     }
@@ -46,6 +46,10 @@ public class PicUrlMaker {
 
     public static String makePicUrlReview(long reviewId, String picName) {
         return String.format("/pic/review/%d/%s", reviewId, picName);
+    }
+
+    public static String makePicQa(long qaId, String picName) {
+        return String.format("/pic/qa/%d/%s", qaId, picName);
     }
 
 }

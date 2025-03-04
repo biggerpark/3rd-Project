@@ -69,11 +69,6 @@
         phone = #{phone}
     </insert>
 
-    <update id="putBusinessPic">
-        update business_pic
-        set state = 1
-        where businessId = #{businessId}
-    </update>
 
     <update id="udtBusinessState">
         update business
@@ -100,6 +95,7 @@
 
         where businessId = #{businessId}
     </update>
+
     <update id="udtBusinessPaper">
         update business
 
@@ -189,6 +185,7 @@
 
     <select id="selOneBusiness">
         SELECT
+        p.productId,
         d.categoryId,
         b.detailTypeId,
         d.detailTypeName,
@@ -201,7 +198,6 @@
         IF(l.userId IS NULL, 0, 1) AS `like`,
         b.address,
         COUNT(distinct s.serviceId) AS serviceCount,
-        -- openingTime과 closingTime에서 초를 00으로 설정하여 시:분 형태로 출력
         DATE_FORMAT(b.openingTime, '%H:%i') AS openingTime,
         DATE_FORMAT(b.closingTime, '%H:%i') AS closingTime,
         b.busiCreatedAt,
@@ -256,6 +252,23 @@
         GROUP BY s.productId, YEAR(s.paidAt), MONTH(s.paidAt)
         ORDER BY s.productId ,year DESC, month DESC;
     </select>
+
+    <select id="countBusinessServices">
+
+        SELECT
+        b.businessName,
+        YEAR(s.createdAt) AS year,
+        MONTH(s.createdAt) AS month,
+        COUNT(s.serviceId) AS serviceCount
+        FROM service s
+        JOIN product p ON s.productId = p.productId
+        JOIN business b ON p.businessId = b.businessId
+        WHERE b.businessId = #{businessId}
+        AND s.completed >= 7
+        GROUP BY  s.productId, YEAR(s.createdAt), MONTH(s.createdAt)
+        ORDER BY  s.productId, year DESC, month DESC;
+    </select>
+
 
 
 

@@ -7,11 +7,16 @@ import com.green.jobdone.business.pic.BusinessOnePicsGetReq;
 import com.green.jobdone.business.pic.BusinessOnePicsGetRes;
 import com.green.jobdone.business.pic.BusinessPicDto;
 import com.green.jobdone.business.pic.BusinessPicPostRes;
+import com.green.jobdone.category.DetailTypeRepository;
 import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.common.model.Domain;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.Business;
+import com.green.jobdone.entity.BusinessPic;
+import com.green.jobdone.entity.User;
+import com.green.jobdone.user.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +36,12 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class BusinessService {
 
+    @Value("${file.directory}")
+    private String fileDirectory;
+
+    @Value("${domain.path.server}")
+    private String docker;
+
     private final BusinessMapper businessMapper;
     private final MyFileUtils myFileUtils;
     private final AuthenticationFacade authenticationFacade; //인증받은 유저가 이용 할 수 있게.
@@ -39,112 +50,93 @@ public class BusinessService {
     public final BusinessPicRepository businessPicRepository;
     public final Domain domain;
 
-
-    public static String generateSafeTel(){
-        Random random = new Random();
-
-        int n1 = random.nextInt(10000);
-        int n2 = random.nextInt(10000);
-        return String.format("050-%04d-%04d", n1, n2);
-    }
+    private final UserRepository userRepository;
+    private final DetailTypeRepository detailTypeRepository;
 
 
     @Transactional
     public long insBusiness(MultipartFile paper, MultipartFile logo, BusinessPostSignUpReq p) {
 
-        long userId = authenticationFacade.getSignedUserId();
+        Long userId = authenticationFacade.getSignedUserId();
         p.setSignedUserId(userId);
 
 
         Random random = new Random();
 
-        int n1 = random.nextInt(10000);
-        int n2 = random.nextInt(10000);
-        String safeTel = String.format("050%04d%04d", n1, n2);
+        String safeTel = String.format("050-%04d-%04d", random.nextInt(10000), random.nextInt(10000));
 
 
         // 사업자 등록번호 유효성 체크
         if (p.getBusinessNum() == null || p.getBusinessNum().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "유효하지 않은 사업자 번호입니다");
         }
+
         //사업자 등록번호 중복체크
-        int exists = businessMapper.existBusinessNum(p.getBusinessNum());
+        int exists = businessRepository.findExistBusinessNum(p.getBusinessNum());
         if (exists > 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 등록된 사업자 번호입니다");
         }
 
-//       if (userId == 0){
-//           throw new IllegalArgumentException("인증되지 않은 유저입니다.");
-//       }
-
-
-        if (paper == null || logo == null) {
-            return businessMapper.insBusiness(p);
-        }
-
-
-        String paperPath = String.format("business/%d/paper", p.getBusinessId());
-        String logoPath = String.format("business/%d/logo", p.getBusinessId());
+        String paperPath = String.format("pic/business/%d/paper", p.getBusinessId());
+        String logoPath = String.format("pic/business/%d/logo", p.getBusinessId());
         myFileUtils.makeFolders(paperPath);
         myFileUtils.makeFolders(logoPath);
-        String savedPicName = (paper != null ? myFileUtils.makeRandomFileName(paper) : null);
-        String savedPicName2 = (paper != null ? myFileUtils.makeRandomFileName(logo) : null);
-        String filePath = String.format("%s/%s", paperPath, savedPicName);
-        String filePath2 = String.format("%s/%s", logoPath, savedPicName2);
-        try {
-            myFileUtils.transferTo(paper, filePath2);
-            myFileUtils.transferTo(paper, filePath);
-        } catch (IOException e) {
-            log.error(e.getMessage());
 
+        String savedPaperName = (paper != null ? myFileUtils.makeRandomFileName(paper) : null);
+        String savedLogoName = (logo != null ? myFileUtils.makeRandomFileName(logo) : null);
+
+        String paperFilePath = String.format("%s/%s", paperPath, savedPaperName);
+        String logoFilePath = String.format("%s/%s", logoPath, savedLogoName);
+
+        try {
+            if (paper != null) myFileUtils.transferTo(paper, paperFilePath);
+            if (logo != null) myFileUtils.transferTo(logo, logoFilePath);
+        } catch (IOException e) {
+            log.error("error occurs:{}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 
         }
         log.debug("Generated safeTel: {}", safeTel);
-
-        p.setSafeTel(safeTel);
-        p.setPaper(savedPicName);
-        p.setLogo(logoPath);
         log.debug("Generated safeTel: {}", safeTel);
         log.debug("BusinessPostSignUpReq: {}", p.toString());
 
-        return businessMapper.insBusiness(p);
-
+        Business business = new Business();
+        business.setUser(userRepository.findById(userId).orElse(null));
+        business.setDetailType(detailTypeRepository.findById(p.getDetailTypeId()).orElse(null));
+        business.setBusinessNum(p.getBusinessNum());
+        business.setBusinessName(p.getBusinessName());
+        business.setAddress(p.getAddress());
+        business.setTel(p.getTel());
+        business.setSafeTel(safeTel);
+        business.setLogo(logoFilePath);
+        business.setPaper(paperFilePath);
+        businessRepository.save(business);
+        return business.getBusinessId();
     }
 
     //사업상세정보 기입 - 로고사진은 따로 뺄게요 ~~
 
 
-    public int udtBusiness(BusinessDetailPutReq p) {
-
-        long userId = businessMapper.existBusinessId(p.getBusinessId());
-
-        long signedUserId = authenticationFacade.getSignedUserId();
-        p.setSignedUserId(signedUserId);
-        if (userId != signedUserId) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
-        }
-        return businessMapper.udtBusiness(p);
-    }
-
-
     // 로고 수정
+    @Transactional
     public int patchBusinessLogo(BusinessLogoPatchReq p, MultipartFile logo) {
 
         long signedUserId = authenticationFacade.getSignedUserId();
 
-        long userId = businessMapper.existBusinessId(p.getBusinessId());
+        long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
         if (userId != signedUserId) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
         }
 
 
+        Long businessId = p.getBusinessId();
         // 누락 파일 처리
         if (logo == null || logo.isEmpty()) {
             return 0;
         }
 
         // 로고파일 저장 폴더 경로
-        String folderPath = String.format("business/%d/logo", p.getBusinessId());
+        String folderPath = String.format("business/%d/logo", businessId);
 
         // 기존 로고 폴더가 있다면 폴더 삭제
         myFileUtils.deleteFolder(folderPath, true); // true: 폴더 내 모든 파일 및 하위 폴더 삭제
@@ -167,16 +159,19 @@ public class BusinessService {
         }
 
         // DB에 로고 수정 정보 업데이트
+
+        p.setBusinessId(businessId);
         p.setLogo(savedPicName);
-        return businessMapper.udtBusinessLogo(p);
+        return businessRepository.updateBusinessLogo(p);
     }
 
     // 사업자등록증 수정
+    @Transactional
     public int patchBusinessPaper(BusinessPaperPatchReq p, MultipartFile paper) {
 
         long signedUserId = authenticationFacade.getSignedUserId();
 
-        long userId = businessMapper.existBusinessId(p.getBusinessId());
+        long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
         if (userId != signedUserId) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
         }
@@ -187,7 +182,7 @@ public class BusinessService {
         }
 
         // 로고파일 저장 폴더 경로
-        String folderPath = String.format("business/%d/paper", p.getBusinessId());
+        String folderPath = String.format("pic/business/%d/paper", p.getBusinessId());
 
         // 기존 로고 폴더가 있다면 폴더 삭제
         myFileUtils.deleteFolder(folderPath, true); // true: 폴더 내 모든 파일 및 하위 폴더 삭제
@@ -211,44 +206,9 @@ public class BusinessService {
 
         // DB에 로고 수정 정보 업데이트
         p.setPaper(savedPicName);
-        return businessMapper.udtBusinessPaper(p);
+        return businessRepository.updateBusinessPaper(p);
     }
 
-
-    @Transactional
-    public BusinessPicPostRes insBusinessPic(List<MultipartFile> pics, long businessId) {
-
-        long signedUserId = authenticationFacade.getSignedUserId();
-
-        long userId = businessMapper.existBusinessId(businessId);
-        if (userId != signedUserId) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
-        }
-
-
-        String middlePath = String.format("business/%d/pics", businessId);
-        myFileUtils.makeFolders(middlePath);
-
-        List<String> businessPicList = new ArrayList<>(pics.size());
-        for (MultipartFile pic : pics) {
-            //pics리스트에 있는 사진들 전수조사
-            String savedPicName = myFileUtils.makeRandomFileName(pic);
-
-            businessPicList.add(savedPicName);
-            String filePath = String.format("%s/%s", middlePath, savedPicName);
-            try {
-                myFileUtils.transferTo(pic, filePath);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        BusinessPicDto businessPicDto = new BusinessPicDto();
-        businessPicDto.setBusinessId(businessId);
-        businessPicDto.setPics(businessPicList);
-        int resultPics = businessMapper.insBusinessPic(businessPicDto);
-
-        return BusinessPicPostRes.builder().businessId(businessId).pics(businessPicList).build();
-    }
 
     @Transactional
     public BusinessContentsPostRes postBusinessContents(BusinessContentsPostReq p) {
@@ -256,7 +216,7 @@ public class BusinessService {
         long signedUserId = authenticationFacade.getSignedUserId();
 
         Business business = businessRepository.findById(p.getBusinessId())
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"너 누구냐"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "너 누구냐"));
 
         if (business.getUser().getUserId() != signedUserId) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다, 근데 너 누구냐");
@@ -267,15 +227,16 @@ public class BusinessService {
 
         businessRepository.updateBusinessContents(p);
 
-        return new BusinessContentsPostRes(business.getTitle(),business.getContents());
+        return new BusinessContentsPostRes(business.getTitle(), business.getContents());
     }
+
 
     @Transactional
     public BusinessPicPostRes businessPicTemp(List<MultipartFile> pics, long businessId) {
         long signedUserId = authenticationFacade.getSignedUserId();
 
         Business business = businessRepository.findById(businessId)
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"너 누구냐"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "너 누구냐"));
 
         if (business.getUser().getUserId() != signedUserId) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다, 근데 너 누구냐");
@@ -286,74 +247,86 @@ public class BusinessService {
         myFileUtils.makeFolders(tempPath);
 
         List<String> tempPicUrls = new ArrayList<>(pics.size());
-        List<String> businessPicList = new ArrayList<>(pics.size());
+        List<BusinessPic> businessPicList = new ArrayList<>(pics.size());
         for (MultipartFile pic : pics) {
             String savedPicName = myFileUtils.makeRandomFileName(pic);
             String filePath = String.format("%s/%s", tempPath, savedPicName);
 
-            String tempPicUrl = String.format("%s/%s",domain.getServer(),filePath);
+            String tempPicUrl = String.format("%s/pic/%s", docker, filePath);
 
-            try{
-                myFileUtils.transferTo(pic,filePath);
-            }catch (IOException e) {
+
+            try {
+                myFileUtils.transferTo(pic, filePath);
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            businessPicList.add(savedPicName);
+            BusinessPic businessPic = new BusinessPic();
+            businessPic.setBusiness(business);
+            businessPic.setPic(savedPicName);
+            businessPicList.add(businessPic);
+
             tempPicUrls.add(tempPicUrl);
         }
-        BusinessPicDto businessPicDto = new BusinessPicDto();
-        businessPicDto.setBusinessId(businessId);
-        businessPicDto.setPics(businessPicList);
-        int resultPics = businessMapper.insBusinessPic(businessPicDto);
-
-        return  BusinessPicPostRes.builder().businessId(businessId).pics(tempPicUrls).build();
+        businessPicRepository.saveAll(businessPicList);
+        return BusinessPicPostRes.builder().businessId(businessId).pics(tempPicUrls).build();
     }
 
-    @Value("${file.directory}")
-    private String fileDirectory;
-
     @Transactional
-    public boolean businessPicConfirm( long businessId) {
+    public boolean businessPicConfirm(long businessId) {
         long signedUserId = authenticationFacade.getSignedUserId();
 
         Business business = businessRepository.findById(businessId)
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"너 누구냐"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "너 누구냐"));
 
         if (business.getUser().getUserId() != signedUserId) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다, 근데 너 누구냐");
         }
 
-        String tempPath = String.format("%s/business/%d/temp", fileDirectory, businessId);
-        String middlePath = String.format("%s/business/%d/pics", fileDirectory, businessId);
+        String tempPath = String.format("business/%d/temp", businessId);
+        String middlePath = String.format("business/%d/pics", businessId);
         myFileUtils.makeFolders(middlePath);
 
-        boolean moveSuccess = myFileUtils.moveFolder(tempPath,middlePath);
+        boolean moveSuccess = myFileUtils.moveFolder(tempPath, middlePath);
 
         return moveSuccess;
     }
 
+    @Transactional
+    public int udtBusiness(BusinessDetailPutReq p) {
 
+        long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
 
-
-    public int udtBusinessPics(long businessPicId) {
-        return businessMapper.putBusinessPic(businessPicId);
+        long signedUserId = authenticationFacade.getSignedUserId();
+        p.setSignedUserId(signedUserId);
+        if (userId != signedUserId) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
+        }
+        return businessMapper.udtBusiness(p);
     }
 
+
+    @Transactional
     public int udtBusinessState(BusinessStatePutReq p) {
 
-        return businessMapper.putBusinessState(p);
+        int res = businessRepository.updateBusinessState(p);
+        Business business = new Business();
+        business.setState(p.getState());
+
+        return res;
     }
 
+    @Transactional
     public int setBusinessThumbnail(BusinessPicReq p) {
         return businessMapper.udtBusinessThumbnail(p);
     }
 
 
-    public int delBusinessPic(BusinessPicReq p) {
+    @Transactional
+    public Integer delBusinessPic(BusinessPicReq p) {
         //String uploadPath = myFileUtils.getUploadPath();
         String businessPicName = businessMapper.getBusinessPicName(p.getBusinessPicId());
-        String filePath = String.format("business/%d/pics/%s",  p.getBusinessId(), businessPicName);
+        String filePath = String.format("pic/business/%d/pics/%s", p.getBusinessId(), businessPicName);
 
         log.info("Generated file path: {}", filePath);  // 경로 출력
 
@@ -365,11 +338,12 @@ public class BusinessService {
         }
 
         // DB에서 해당 사진 정보 삭제
-        return businessMapper.delBusinessPic(p);
+        return businessPicRepository.deleteByBusinessPicId(p.getBusinessPicId());
     }
 
     //업체 조회하기
     // 1. 업체 리스트 조회
+    @Transactional
     public List<BusinessGetRes> getBusinessList(BusinessGetReq p) {
         // 업체 리스트 조회
         List<BusinessGetRes> res = businessMapper.selAllBusiness(p);
@@ -385,6 +359,7 @@ public class BusinessService {
     }
 
     // 2. 단일업체 조회
+    @Transactional
     public BusinessGetOneRes getBusinessOne(BusinessGetOneReq p) {
         BusinessGetOneRes res = businessMapper.selOneBusiness(p.getBusinessId());
         if (res == null) {
@@ -395,13 +370,17 @@ public class BusinessService {
             res.setBusinessId(p.getBusinessId());
         }
 
+        String logo = PicUrlMaker.makePicUrlLogo(p.getBusinessId(), res.getLogo());
+
+
         if (res != null && res.getLogo() != null) {
-            res.setLogo(PicUrlMaker.makePicUrlLogo(p.getBusinessId(), res.getLogo()));
+            res.setLogo(logo);
         }
         return res;
     }
 
     //업체 하나에 있는 사진들
+    @Transactional
     public List<BusinessOnePicsGetRes> getBusinessOnePics(BusinessOnePicsGetReq p) {
 
         List<BusinessOnePicsGetRes> res = businessMapper.getBusinessPicList(p);
@@ -414,39 +393,29 @@ public class BusinessService {
     }
 
 
-    public int insBusinessPhone(BusinessPhonePostReq p) {
-        int exists = businessMapper.existBusinessPhone(p.getBusinessId(), p.getPhone());
-        if (exists > 0) {
-            throw new IllegalArgumentException("이미 존재하는 전화번호입니다");
-        }
-        return businessMapper.insBusinessPhone(p);
-    }
+    @Transactional
+    public List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetInfoReq p) {
 
-
-
-    public List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetInfoReq p){
-
-
-            long userId = businessMapper.existBusinessId(p.getBusinessId());
-
-            long signedUserId = authenticationFacade.getSignedUserId();
-            p.setSignedUserId(signedUserId);
-            if (userId != signedUserId) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
-            }
-
-        return businessMapper.getBusinessMonthly(p);
-    }
-
-    public int getBusinessService(BusinessGetInfoReq p) {
-        long userId = businessMapper.existBusinessId(p.getBusinessId());
+        long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
 
         long signedUserId = authenticationFacade.getSignedUserId();
         p.setSignedUserId(signedUserId);
         if (userId != signedUserId) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
         }
-        return businessRepository.countBusinessServices(p.getBusinessId()); //이거 마저 해야해요
+        return businessMapper.getBusinessMonthly(p);
+    }
+
+    @Transactional
+    public List<BusinessGetServiceRes> getBusinessService(BusinessGetInfoReq p) {
+        long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
+
+        long signedUserId = authenticationFacade.getSignedUserId();
+        p.setSignedUserId(signedUserId);
+        if (userId != signedUserId) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
+        }
+        return businessMapper.countBusinessServices(p); //이거 마저 해야해요
     }
 }
 

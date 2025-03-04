@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.green.jobdone.qa.QaMapper">
+    <select id="getQa">
+        SELECT a.createdAt
+                ,a.qaId
+            <if test="isAdmin">
+                ,b.name as userName
+                ,b.type as userTypeDB
+            </if>
+                ,d.type as qaType
+                ,a.qaState
+        FROM qa a
+        LEFT JOIN user b
+        on a.userId=b.userId
+        LEFT JOIN qa_type_detail c
+        on a.qaTypeDetailId=c.qaTypeDetailId
+        LEFT JOIN qa_type d
+        on c.qaTypeId=d.qaTypeId
+        <if test="!isAdmin">
+            WHERE b.userId=#{signedUserId}
+        </if>
+        ORDER BY a.qaId DESC
+        LIMIT 10 OFFSET #{offset}
+    </select>
+
+
+
+
+
+    <resultMap id="qaPicDetail" type="com.green.jobdone.qa.model.QaDetailRes">
+        <result property="contents" column="contents"/>
+        <collection property="pics" column="pic" resultMap="qaPicDetails"/>
+    </resultMap>
+
+    <resultMap id="qaPicDetails" type="String">
+        <result property="pic" column="pic"/>
+    </resultMap>
+
+    <select id="getQaDetail" resultMap="qaPicDetail">
+        SELECT a.contents, b.pic
+        FROM qa a
+        LEFT JOIN qa_pic b
+        ON a.qaId=b.qaId
+        WHERE a.qaId=#{qaId}
+    </select>
+
+    <select id="getQaAnswer">
+        SELECT a.answer,a.qaAnswerId
+        FROM qa_answer a
+        LEFT JOIN qa b
+        on a.qaId=b.qaId
+        WHERE a.qaId=#{qaId}
+        AND b.qaState='00103'
+    </select>
+
+<!--    <select id="getQaReport">-->
+<!--        SELECT a.qaId,a.createdAt as qaCreatedAt, c.type as qaTypeName, b.reason as qaDetailTypeName, d.email as userEmail, a.qaState-->
+<!--        FROM qa a-->
+<!--        LEFT JOIN qa_type_detail b-->
+<!--        on a.qaTypeDetailId=b.qaTypeDetailId-->
+<!--        LEFT JOIN qa_type c-->
+<!--        on b.qaTypeId=c.qaTypeId-->
+<!--        LEFT JOIN user d-->
+<!--        on a.userId=d.userId-->
+<!--        WHERE c.qaTypeId IN (1,2,3,4)-->
+<!--        ORDER BY a.qaId DESC-->
+<!--    </select>-->
+
+</mapper>

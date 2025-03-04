@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Table(name = "user_auth")
-public class UserAuth {
+public class UserAuth  {
     @EmbeddedId
     private UserAuthIds userAuthIds;
     private LocalDateTime expiredTime;

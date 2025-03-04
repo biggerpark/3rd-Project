@@ -68,10 +68,9 @@ public class ReviewController {
     @DeleteMapping
     @Operation(summary = "리뷰 삭제")
     public ResultResponse<Integer> delFeed(@ParameterObject @ModelAttribute ReviewDelReq p) {
-        int result = reviewService.delReview(p);
+        reviewService.delReview(p);
         return ResultResponse.<Integer>builder()
                 .resultMessage("리뷰 삭제 완료")
-                .resultData(result)
                 .build();
     }
 

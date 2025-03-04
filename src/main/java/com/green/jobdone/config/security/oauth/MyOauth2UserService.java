@@ -59,6 +59,7 @@ public class MyOauth2UserService extends DefaultOAuth2UserService {
             user.setUpw("");
             user.setName(oauth2UserInfo.getName());
             user.setPhone("");
+            user.setRole(UserRole.USER);
             user.setPic(oauth2UserInfo.getProfileImageUrl());
             userRepository.save(user);
         }
@@ -66,6 +67,11 @@ public class MyOauth2UserService extends DefaultOAuth2UserService {
 //        jwtUser.setSignedUserId(user.getUserId());
 //        jwtUser.setRoles(new ArrayList<>(1));
 //        jwtUser.getRoles().add("ROLE_USER");
+        if(!user.getPic().equals(oauth2UserInfo.getProfileImageUrl())) {
+            user.setUserId(user.getUserId());
+            user.setPic(oauth2UserInfo.getProfileImageUrl());
+            userRepository.save(user);
+        }
         List<UserRole> userRoles = new ArrayList<>();
         OAuth2JwtUser oauth2jwtUser = new OAuth2JwtUser(user.getName()
                 , user.getPic()

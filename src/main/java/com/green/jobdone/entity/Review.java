@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -13,6 +16,9 @@ public class Review extends UpdatedAt{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewId;
+
+    @OneToMany(mappedBy = "review", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<ReviewPic> reviewPics = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "serviceId", nullable = false)

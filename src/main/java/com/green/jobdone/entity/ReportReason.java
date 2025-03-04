@@ -6,7 +6,8 @@ public enum ReportReason {
     BUSINESS(2,"업체"),
     REVIEW(3,"리뷰"),
     CHAT(4,"채팅"),
-    COMMENT(5,"댓글");
+    COMMENT(5,"댓글"),
+    USERREPORT(6,"유저 측 문의");
 
     private final int code;
     private final String value;

@@ -28,34 +28,27 @@ public class BusinessController {
 
     @PostMapping("sign-up")
     @Operation(summary = "업체 등록")
-    public ResultResponse<Long> postBusiness(@RequestPart(required = false) MultipartFile paper,@RequestPart(required = false) MultipartFile logo,
-                                                 @Valid @RequestPart BusinessPostSignUpReq p) {
-        long result = businessService.insBusiness(paper,logo,p);
+    public ResultResponse<Long> postBusiness(@RequestPart(required = false) MultipartFile paper, @RequestPart(required = false) MultipartFile logo,
+                                             @Valid @RequestPart BusinessPostSignUpReq p) {
+        long result = businessService.insBusiness(paper, logo, p);
 
         return ResultResponse.<Long>builder()
                 .resultData(p.getBusinessId())
-                .resultMessage(result != 0? "업체 등록 완료" : "업체 등록 실패")
+                .resultMessage(result != 0 ? "업체 등록 완료" : "업체 등록 실패")
                 .build();
     }
 
-    @PutMapping("detail")
-    @Operation(summary = "업체 상세정보 기입")
-    public ResultResponse<Integer> udtBusinessDetail(@Valid @ParameterObject @ModelAttribute BusinessDetailPutReq p) {
-        int result = businessService.udtBusiness(p);
-        return ResultResponse.<Integer>builder()
-                .resultData(result)
-                .resultMessage(result == 0 ? "업체 정보 수정 실패" : "업체 정보 수정 성공")
-                .build();
-    }
+
 
     @PatchMapping("logo")
     @Operation(summary = "업체 로고사진 변경")
-    public ResultResponse<Integer> patchProfilePic(@Valid @RequestPart BusinessLogoPatchReq p, @RequestPart(required = false) MultipartFile logo) {
+    public ResultResponse<Integer> patchProfilePic(@Valid @RequestPart BusinessLogoPatchReq p, @RequestPart MultipartFile logo) {
         log.info("UserController > patchProfilePic > p: {}", p);
 
         int result = businessService.patchBusinessLogo(p, logo);
 
         return ResultResponse.<Integer>builder()
+
                 .resultMessage("로고 사진 수정 완료")
                 .resultData(result)
                 .build();
@@ -76,22 +69,10 @@ public class BusinessController {
 
 
 
-    @PostMapping("businessPic")
-    @Operation(summary = "업체 사진 등록")
-    public ResultResponse<BusinessPicPostRes> postBusinessPic(@RequestPart List<MultipartFile> pics,
-                                                              @Valid @RequestPart BusinessGetOneReq p) {
-
-        BusinessPicPostRes res = businessService.insBusinessPic(pics, p.getBusinessId());
-        return ResultResponse.<BusinessPicPostRes>builder()
-                .resultMessage("업체사진등록 완료")
-                .resultData(res)
-                .build();
-    }
-
     @PostMapping("businessPicTemp")
     @Operation(summary = "업체 사진 임시 등록")
     public ResultResponse<BusinessPicPostRes> postBusinessPicTemp(@RequestPart List<MultipartFile> pics,
-                                                              @Valid @RequestPart BusinessGetOneReq p) {
+                                                                  @Valid @RequestPart BusinessGetOneReq p) {
 
         BusinessPicPostRes res = businessService.businessPicTemp(pics, p.getBusinessId());
         return ResultResponse.<BusinessPicPostRes>builder()
@@ -102,36 +83,35 @@ public class BusinessController {
 
     @PostMapping("businessPicConf")
     @Operation(summary = "파일경로 변경 및 확정")
-    public ResultResponse<Boolean> postBusinessPicConf( long businessId){
+    public ResultResponse<Boolean> postBusinessPicConf(long businessId) {
         boolean moveSuccess = businessService.businessPicConfirm(businessId);
 
-        return ResultResponse.<Boolean>builder().resultData(moveSuccess).resultMessage(moveSuccess == true ?"댐":"싯빠이").build();
+        return ResultResponse.<Boolean>builder().resultData(moveSuccess).resultMessage(moveSuccess == true ? "댐" : "싯빠이").build();
 // 귀찮은데 내일 테스트 해야지
 
     }
 
+    @PutMapping("detail")
+    @Operation(summary = "업체 상세정보 기입")
+    public ResultResponse<Integer> udtBusinessDetail(@RequestBody BusinessDetailPutReq p) {
+        int result = businessService.udtBusiness(p);
+        return ResultResponse.<Integer>builder()
+                .resultData(result)
+                .resultMessage(result == 0 ? "업체 정보 수정 실패" : "업체 정보 수정 성공")
+                .build();
+    }
 
     @DeleteMapping("businessPic")
     @Operation(summary = "업체 사진 삭제")
-    public ResultResponse<Integer> delBusinessPic(@Valid @ParameterObject @ModelAttribute BusinessPicReq p ) {
+    public ResultResponse<Integer> delBusinessPic(@Valid @ParameterObject @ModelAttribute BusinessPicReq p) {
         int result = businessService.delBusinessPic(p);
         return ResultResponse.<Integer>builder().resultData(result).resultMessage("해당 업체 사진 삭제").build();
     }
 
-    @PutMapping("pic")
-    @Operation(summary = "사진 유형 수정")
-    public ResultResponse<Integer> putBusinessPic(@Valid @ParameterObject @ModelAttribute BusinessGetOneReq p) {
-        int res = businessService.udtBusinessPics(p.getBusinessId());
-
-        return ResultResponse.<Integer>builder()
-                .resultMessage(res == 0? "업체사진 수정 실패":"업체 사진 수정 완료")
-                .resultData(res)
-                .build();
-    }
 
     @PutMapping("pic/thumbnail")
     @Operation(summary = "업체 사진 썸네일 설정")
-    public ResultResponse<Integer> setBusinessThumbnail(@Valid @ParameterObject @ModelAttribute BusinessPicReq p){
+    public ResultResponse<Integer> setBusinessThumbnail(@Valid @ParameterObject @ModelAttribute BusinessPicReq p) {
         int result = businessService.setBusinessThumbnail(p);
         return ResultResponse.<Integer>builder().resultData(result).resultMessage("댐").build();
     }
@@ -139,11 +119,12 @@ public class BusinessController {
     @PutMapping("state")
     @Operation(summary = "업체 유형 수정")
     public ResultResponse<Integer> putBusinessState(@Valid @ParameterObject @ModelAttribute BusinessStatePutReq p) {
+
         int res = businessService.udtBusinessState(p);
 
         return ResultResponse.<Integer>builder()
-                .resultMessage("업체 유형 수정 완료")
                 .resultData(res)
+                .resultMessage(String.format("%d업체 유형 %d로 수정 완료",p.getBusinessId(),p.getState()))
                 .build();
     }
 
@@ -172,9 +153,9 @@ public class BusinessController {
         BusinessOnePicsGetReq req = new BusinessOnePicsGetReq(p.getBusinessId());
         List<BusinessOnePicsGetRes> res = businessService.getBusinessOnePics(req);
 
-        return  ResultResponse.<List<BusinessOnePicsGetRes>>builder()
+        return ResultResponse.<List<BusinessOnePicsGetRes>>builder()
                 .resultData(res)
-                .resultMessage(res != null?"업체 사진 리스트 조회완":"업체 사진 리스트 조회 실패")
+                .resultMessage(res != null ? "업체 사진 리스트 조회완" : "업체 사진 리스트 조회 실패")
                 .build();
     }
 
@@ -185,59 +166,52 @@ public class BusinessController {
         List<BusinessGetMonthlyRes> res = (List<BusinessGetMonthlyRes>) businessService.getBusinessMonthly(req);
         return ResultResponse.<List<BusinessGetMonthlyRes>>builder()
                 .resultData(res)
-                .resultMessage(res != null? "업체의 월매출 조회완료":"꽝 다음기회에").build();
+                .resultMessage(res != null ? "업체의 월매출 조회완료" : "꽝 다음기회에").build();
     }
 
     @PostMapping("contents")
     @Operation(summary = "상품 타이틀 및 내용 수정")
-    public ResultResponse<BusinessContentsPostRes> postBusinessContents( @RequestBody BusinessContentsPostReq p){
+    public ResultResponse<BusinessContentsPostRes> postBusinessContents(@RequestBody BusinessContentsPostReq p) {
 
 //        BusinessContentsPostReq req = new BusinessContentsPostReq(p.getBusinessId());
         BusinessContentsPostRes res = businessService.postBusinessContents(p);
         return ResultResponse.<BusinessContentsPostRes>builder()
                 .resultData(res)
-                .resultMessage(res != null? "네":"아니요").build();
+                .resultMessage(res != null ? "네" : "아니요").build();
     }
 
     @GetMapping("serviceCount")
     @Operation(summary = "업체가 받은 주문 카운트")
-    public ResultResponse<Integer> getBusinessServiceCount(@Valid @ParameterObject @ModelAttribute BusinessGetInfoReq p) {
+    public ResultResponse<List<BusinessGetServiceRes>> getBusinessServiceCount(@Valid @ParameterObject @ModelAttribute BusinessGetInfoReq p) {
         //루키루키 나의루키루키뤀; 마치마치 느낌적인 느낌느낌
-        int res = businessService.getBusinessService(p);
-        return ResultResponse.<Integer>builder().resultData(res).resultMessage("네").build();
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    @PostMapping("phone")
-    @Operation(summary = "업체 전화번호 기입")
-    public ResultResponse<Integer> postBusinessPhone(BusinessPhonePostReq p) {
-        int result = businessService.insBusinessPhone(p);
-        return ResultResponse.<Integer>builder()
-                .resultMessage("전화번호 추가 완료")
-                .resultData(result)
-                .build();
+        BusinessGetInfoReq req = new BusinessGetInfoReq(p.getBusinessId());
+         List<BusinessGetServiceRes> res = (List<BusinessGetServiceRes>) businessService.getBusinessService(req);
+        return ResultResponse.<List<BusinessGetServiceRes>>builder().resultData(res).resultMessage("네").build();
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

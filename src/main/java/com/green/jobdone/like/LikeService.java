@@ -2,13 +2,15 @@ package com.green.jobdone.like;
 
 import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.config.security.AuthenticationFacade;
+import com.green.jobdone.entity.Business;
+import com.green.jobdone.entity.Like;
+import com.green.jobdone.entity.LikeIds;
+import com.green.jobdone.entity.User;
 import com.green.jobdone.like.model.LikeGetRes;
 import com.green.jobdone.like.model.LikePostReq;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -18,6 +20,7 @@ import java.util.List;
 public class LikeService {
     private final LikeMapper mapper;
     private final AuthenticationFacade authenticationFacade;
+    private final LikeRepository likeRepository;
 
     public int postLikeInfo(LikePostReq p) {
 
@@ -25,14 +28,37 @@ public class LikeService {
 
         p.setUserId(userId);
 
+        // User ENTITY 설정
+        User user=new User();
+        user.setUserId(userId);
 
-        int result = mapper.deleteLikeInfo(p);
+        //Business ENTITY 설정
+        Business business=Business.builder()
+                .businessId(p.getBusinessId())
+                .build();
+
+        // 복합키 LikeIds ENTITY 설정
+        LikeIds likeIds=new LikeIds();
+        likeIds.setUserId(userId);
+        likeIds.setBusinessId(p.getBusinessId());
+
+        //Like ENTITY 설정
+        Like like=new Like();
+        like.setLikeIds(likeIds);
+        like.setBusiness(business);
+        like.setUser(user);
+//        int result = mapper.deleteLikeInfo(p);
+
+        int result=likeRepository.deleteUser(userId);
 
         if (result == 1) {
             return 0;
         }
 
-        int result1 = mapper.postLikeInfo(p);
+        likeRepository.save(like);
+
+
+//        int result1 = mapper.postLikeInfo(p);
 
         return 1;
 
