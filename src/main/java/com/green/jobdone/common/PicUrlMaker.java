@@ -17,7 +17,7 @@ public class PicUrlMaker {
         return String.format("/pic/business/%d/%s", businessId, picName);
     }
     public static String makePicUrlPortfolio(long businessId, long portfolioId, String picName) {
-        return String.format("/pic/business/%d/portfolio/%d/pics/%s", businessId,portfolioId, picName);
+        return String.format("/pic/business/%d/portfolio/%d/%s", businessId,portfolioId, picName);
     }
     public static String makePicUrlBusiness(long businessId, String picName) {
         return String.format("/pic/business/%d/pics/%s", businessId, picName);
