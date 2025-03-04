@@ -1,5 +1,6 @@
 package com.green.jobdone.common;
 
+import com.green.jobdone.service.ServiceRepository;
 import com.green.jobdone.user.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -12,18 +13,20 @@ import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
-public class DataCleanUpService {
+public class ChangeDataDaseService {
+    private final ServiceRepository serviceRepository;
     @PersistenceContext
     private EntityManager em;
     private final UserRepository userRepository;
 
     @Scheduled(cron = "0 0 * * * *")
     @Transactional
-    public void deleteHour(){
+    public void dataHour(){
         String sql = "DELETE FROM business_pic WHERE createdAt < CURRENT_TIMESTAMP - INTERVAL 1 DAY AND state = 1";
         em.createNativeQuery(sql).executeUpdate();
+//        serviceRepository.updCompletedByDate(LocalDateTime.now().minusWeeks(1));
     }
-    
+
     @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void deleteDay(){

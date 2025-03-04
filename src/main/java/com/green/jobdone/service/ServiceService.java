@@ -262,7 +262,7 @@ public class ServiceService {
 //            dto.setServiceId(p.getServiceId());
 //            dto.setBusinessId(p.getBusinessId());
 //            return serviceMapper.payOrDoneCompleted(dto);
-            serviceRepository.doneCompleted(p.getServiceId());
+            serviceRepository.updCompleted(p.getServiceId(),7);
         }
 
 

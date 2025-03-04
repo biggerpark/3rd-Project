@@ -6,12 +6,15 @@ import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.common.exception.CommonErrorCode;
 import com.green.jobdone.common.exception.CustomException;
+import com.green.jobdone.common.exception.ServiceErrorCode;
 import com.green.jobdone.common.exception.UserErrorCode;
 import com.green.jobdone.config.jwt.JwtUser;
 import com.green.jobdone.config.jwt.UserRole;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.*;
 import com.green.jobdone.qa.model.*;
+import com.green.jobdone.service.ServiceRepository;
+import com.green.jobdone.service.model.Dto.ServiceQaDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,9 +37,10 @@ public class QaService {
     private final QaAnswerRepository qaAnswerRepository;
     private final QaPicRepository qaPicRepository;
     private final MyFileUtils myFileUtils;
+    private final ServiceRepository serviceRepository;
 
 
-    @Transactional
+    @Transactional(noRollbackFor = CustomException.class)
     public void insQa(QaReq p, List<MultipartFile> pics) {
         Long userId = authenticationFacade.getSignedUserId();
         User user = new User();
@@ -55,6 +60,26 @@ public class QaService {
                 .build();
         if (pics == null) {
             qaRepository.save(qa);
+        }
+        if(p.getQaReportReason().getCode()==1){
+            ServiceQaDto qaDto = serviceRepository.findQaDtoByServiceId(p.getQaTargetId());
+            if(qaDto==null){
+                throw new CustomException(ServiceErrorCode.FAIL_UPDATE_SERVICE);
+            }
+            if(qaDto.getDoneAt().isBefore(LocalDateTime.now().minusWeeks(1))){
+                serviceRepository.updCompleted(p.getQaTargetId(),13);
+                throw new CustomException(ServiceErrorCode.TIME_OVER);
+            }
+            switch (qaDto.getCompleted()){
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                    serviceRepository.updCompleted(p.getQaTargetId(),10);
+                    break;
+                default:
+                    throw new CustomException(ServiceErrorCode.INVALID_SERVICE_STATUS);
+            }
         }
 
         if (pics != null) {
