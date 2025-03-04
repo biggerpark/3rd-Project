@@ -1,6 +1,7 @@
 package com.green.jobdone.service;
 
 import com.green.jobdone.entity.Service;
+import com.green.jobdone.service.model.Dto.CancelDto;
 import com.green.jobdone.service.model.Dto.KakaoPayDto;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,6 +35,9 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
             "join s.product p join p.business b join b.user u" +
             " WHERE s.serviceId=:serviceId")
     Long providerUserIdByServiceId(Long serviceId);
+
+    @Query("select new com.green.jobdone.service.model.Dto.CancelDto(s.tid ,s.user.userId, s.totalPrice, s.completed) from Service s where s.serviceId =:serviceId")
+    CancelDto findCancelDtoByServiceId(@Param("serviceId") Long serviceId);
 
 
 //    @Query("SELECT a.user.userId, a.price, c.detailTypeName as productName, ifnull(a.tid,0) as tid" +

@@ -169,7 +169,9 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
                 throw new RuntimeException("JSON 데이터에 roomId 또는 flag가 없습니다.");
             }
             long roomId = jsonNode.get("roomId").asLong();
-            int flag = jsonNode.get("flag").asInt();
+//            int flag = jsonNode.get("flag").asInt();
+            String flag1 = jsonNode.get("flag").asText();
+            int flag = Integer.parseInt(flag1);
             String token = jsonNode.has("token") ? jsonNode.get("token").asText().trim() : null;
             String textMessage = jsonNode.has("message") ? jsonNode.get("message").asText().trim() : "";
             log.info("textMessage 확인: {}",textMessage);
