@@ -41,7 +41,7 @@
         <result property="pic" column="pic"/>
     </resultMap>
     <select id="selRoomChat" resultMap="selChat">
-        select distinct a.chatId, a.contents, a.flag, a.createdAt, c.name as userName, d.logo, d.businessName
+        select distinct a.chatId, a.contents as message, a.flag, a.createdAt, c.name as userName, d.logo, d.businessName
         , e.pic, e.chatPicId, d.businessId
         from chat a
         left join room b on a.roomId = b.roomId

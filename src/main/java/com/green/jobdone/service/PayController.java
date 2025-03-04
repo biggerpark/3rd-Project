@@ -1,6 +1,7 @@
 package com.green.jobdone.service;
 
 import com.green.jobdone.service.model.Dto.KakaoPayReq;
+import com.green.jobdone.service.model.KakaoPayCancelRes;
 import com.green.jobdone.service.model.KakaoPayRedayRes;
 import com.green.jobdone.service.model.KakaoPayRes;
 import io.swagger.v3.oas.annotations.Operation;
@@ -76,5 +77,10 @@ public class PayController {
     @GetMapping("/fail")
     public ResponseEntity<String> fail() {
         return new ResponseEntity<>("Payment failed.", HttpStatus.OK);
+    }
+    @PostMapping("/cancel_pay")
+    public KakaoPayCancelRes cancelKakaoPay(@RequestParam Long serviceId) {
+        KakaoPayCancelRes a = payService.cancelKakaoPay(serviceId);
+        return a;
     }
 }

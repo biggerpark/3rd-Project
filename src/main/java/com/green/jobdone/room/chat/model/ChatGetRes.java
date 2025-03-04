@@ -17,6 +17,6 @@ public class ChatGetRes {
     private long businessId;
     private String logo;
     private String createdAt;
-    private String contents;
+    private String message;
     private List<GetPicDto> pics;
 }

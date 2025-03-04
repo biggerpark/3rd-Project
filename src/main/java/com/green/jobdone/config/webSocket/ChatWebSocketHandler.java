@@ -53,6 +53,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         // WebSocket URI에서 roomId 추출
         String uri = session.getUri().toString();
         String[] uriParts = uri.split("/");
+//        String roomString = uriParts[uriParts.length - 1];
+//        if(roomString==null || roomString.trim().isEmpty()){
+//            return;
+//        } 여기보단 confug에서 하는것이 더 좋음
 
         // 마지막 부분이 roomId이므로, 이를 추출
         long roomId = Long.parseLong(uriParts[uriParts.length - 1]);
@@ -169,7 +173,9 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
                 throw new RuntimeException("JSON 데이터에 roomId 또는 flag가 없습니다.");
             }
             long roomId = jsonNode.get("roomId").asLong();
-            int flag = jsonNode.get("flag").asInt();
+//            int flag = jsonNode.get("flag").asInt();
+            String flag1 = jsonNode.get("flag").asText();
+            int flag = Integer.parseInt(flag1);
             String token = jsonNode.has("token") ? jsonNode.get("token").asText().trim() : null;
             String textMessage = jsonNode.has("message") ? jsonNode.get("message").asText().trim() : "";
             log.info("textMessage 확인: {}",textMessage);
