@@ -53,6 +53,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         // WebSocket URI에서 roomId 추출
         String uri = session.getUri().toString();
         String[] uriParts = uri.split("/");
+//        String roomString = uriParts[uriParts.length - 1];
+//        if(roomString==null || roomString.trim().isEmpty()){
+//            return;
+//        } 여기보단 confug에서 하는것이 더 좋음
 
         // 마지막 부분이 roomId이므로, 이를 추출
         long roomId = Long.parseLong(uriParts[uriParts.length - 1]);
