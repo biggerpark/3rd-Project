@@ -13,6 +13,7 @@ public enum CommonErrorCode implements ErrorCode {
                             , "서버 내부에서 에러가 발생하였습니다.")
     , INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "잘못된 파라미터입니다.")
     , NOT_EXIST_BUSINESS(HttpStatus.BAD_REQUEST, "등록되지 않은 업체입니다.")
+    , NOT_ANSWER(HttpStatus.BAD_REQUEST,"등록된 답변이 없습니다")
     ;
 
     private final HttpStatus httpStatus;

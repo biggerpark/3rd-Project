@@ -4,6 +4,7 @@ package com.green.jobdone.qa;
 import com.green.jobdone.admin.model.AdminUserInfoRes;
 import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.common.PicUrlMaker;
+import com.green.jobdone.common.exception.CommonErrorCode;
 import com.green.jobdone.common.exception.CustomException;
 import com.green.jobdone.common.exception.UserErrorCode;
 import com.green.jobdone.config.jwt.JwtUser;
@@ -86,9 +87,13 @@ public class QaService {
     @Transactional
     public List<QaRes> getQa(int page) {
         int offset = (page - 1) * 10;
+        JwtUser jwtUser = authenticationFacade.getSignedUser();
+        long signedUserId = authenticationFacade.getSignedUserId(); // 일반 유저일때 사용할 유저 pk
 
-        List<QaRes> res = qaMapper.getQa(offset);
+        boolean isAdmin = jwtUser.getRoles().contains(UserRole.ADMIN); // Admin 인지 판단하는것
 
+//        if(jwtUser.getRoles().contains(UserRole.ADMIN)){
+        List<QaRes> res = qaMapper.getQa(offset,isAdmin,signedUserId); // 관리자일때 가져오는 RES
 
         for (QaRes item : res) {
             String type = switch (item.getUserTypeDB()) {
@@ -102,14 +107,17 @@ public class QaService {
 
             item.setUserType(type);
         }
-
-
         return res;
+
     }
 
     @Transactional
     public QaDetailRes getQaDetail(long qaId) { // 문의상세내역 확인
         JwtUser jwtUser = authenticationFacade.getSignedUser(); // 관리자인지 일반유저인지 판단하기.
+        boolean isAdmin=jwtUser.getRoles().contains(UserRole.ADMIN);// 관리자인지 판단하는 boolean
+
+
+        long signedUserId = authenticationFacade.getSignedUserId(); // 유저일때 사용할 유저 pk, qaId 로 판단돼서 필요없을듯
 
         QaDetailRes res = qaMapper.getQaDetail(qaId);
 
@@ -121,7 +129,7 @@ public class QaService {
         }
         res.setPics(updatedPics);
 
-        if (jwtUser.getRoles().contains(UserRole.ADMIN)) { // 권한이 관리자가 있으면 qa state 를 진행중으로 바꿔주기
+        if (isAdmin) { // 권한이 관리자가 있으면 qa state 를 진행중으로 바꿔주기
             Qa qa = qaRepository.findById(qaId)
                     .orElseThrow(() -> new RuntimeException("해당 QA가 존재하지 않습니다."));
 
@@ -167,16 +175,27 @@ public class QaService {
         return 1;
     }
 
+    @Transactional
+    public QaAnswerRes getQaAnswer(long qaId){
 
-    public List<QaReportRes> getQaReport(int page) { // 신고내역 확인
-        int offset = (page - 1) * 10;
+        if(qaMapper.getQaAnswer(qaId)==null){
+            throw new CustomException(CommonErrorCode.NOT_ANSWER);
+        }
 
-
-        List<QaReportRes> res = qaMapper.getQaReport(offset);
-
-        return res;
+        return qaMapper.getQaAnswer(qaId);
 
     }
+
+
+//    public List<QaReportRes> getQaReport(int page) { // 신고내역 확인
+//        int offset = (page - 1) * 10;
+//
+//
+//        List<QaReportRes> res = qaMapper.getQaReport(offset);
+//
+//        return res;
+//
+//    }
 
 
 }

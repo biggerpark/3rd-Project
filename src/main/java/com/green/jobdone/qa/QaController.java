@@ -46,13 +46,13 @@ public class QaController {
 
     }
 
-    @GetMapping("detail")
-    @Operation(summary = "문의내역 상세 조회, 관리자가 조회")
-    public ResultResponse<QaDetailRes> getQaDetail(@RequestParam long qaId){
-        QaDetailRes result=qaService.getQaDetail(qaId);
+        @GetMapping("detail")
+        @Operation(summary = "문의내역 상세 조회, 관리자 및 유저가 조회, 관리자가 조회하면 qa 상태가 검토중으로 바뀜")
+        public ResultResponse<QaDetailRes> getQaDetail(@RequestParam long qaId){
+            QaDetailRes result=qaService.getQaDetail(qaId);
 
 
-        return ResultResponse.<QaDetailRes>builder()
+            return ResultResponse.<QaDetailRes>builder()
                 .resultMessage("문의 내역 상세 조회 완료")
                 .resultData(result)
                 .build();
@@ -71,19 +71,31 @@ public class QaController {
 
     }
 
+    @GetMapping("answer")
+    @Operation(summary = "관리자가 등록한 답변 확인, 유저가 확인")
+    public ResultResponse<QaAnswerRes> getQaAnswer(@RequestParam long qaId){
 
-    @GetMapping("report")
-    @Operation(summary = "신고내역조회, 관리자 및 유저도 조회,토큰받아서 role 로  구분할거임")
-    public ResultResponse<List<QaReportRes>> getQaReport(@RequestParam int page){
-        List<QaReportRes> result=qaService.getQaReport(page);
+        QaAnswerRes result=qaService.getQaAnswer(qaId);
 
-
-        return ResultResponse.<List<QaReportRes>>builder()
-                .resultMessage("신고내역조회 조회 완료")
+        return ResultResponse.<QaAnswerRes>builder()
+                .resultMessage("등록된 답변 확인 완료")
                 .resultData(result)
                 .build();
-
     }
+
+
+//    @GetMapping("report")
+//    @Operation(summary = "신고내역조회, 관리자 및 유저도 조회,토큰받아서 role 로  구분할거임")
+//    public ResultResponse<List<QaReportRes>> getQaReport(@RequestParam int page){
+//        List<QaReportRes> result=qaService.getQaReport(page);
+//
+//
+//        return ResultResponse.<List<QaReportRes>>builder()
+//                .resultMessage("신고내역조회 조회 완료")
+//                .resultData(result)
+//                .build();
+//
+//    }
 
 
 
