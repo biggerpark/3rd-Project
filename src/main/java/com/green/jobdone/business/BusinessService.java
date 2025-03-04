@@ -89,10 +89,10 @@ public class BusinessService {
         String logoFilePath = String.format("%s/%s", logoPath, savedLogoName);
 
         try {
-            if (paper != null)myFileUtils.transferTo(paper, paperFilePath);
-            if (logo != null)myFileUtils.transferTo(logo, logoFilePath);
+            if (paper != null) myFileUtils.transferTo(paper, paperFilePath);
+            if (logo != null) myFileUtils.transferTo(logo, logoFilePath);
         } catch (IOException e) {
-            log.error("error occurs:{}",e.getMessage());
+            log.error("error occurs:{}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 
         }
@@ -100,23 +100,21 @@ public class BusinessService {
         log.debug("Generated safeTel: {}", safeTel);
         log.debug("BusinessPostSignUpReq: {}", p.toString());
 
-        Business business = Business.builder()
-                .user(userRepository.findById(userId).orElse(null))
-                .detailType(detailTypeRepository.findById(p.getDetailTypeId()).orElse(null))
-                .businessNum(p.getBusinessNum())
-                .businessName(p.getBusinessName())
-                .address(p.getAddress())
-                .tel(p.getTel())
-                .safeTel(safeTel)
-                .logo(logoFilePath)
-                .paper(paperFilePath)
-                .build();
+        Business business = new Business();
+        business.setUser(userRepository.findById(userId).orElse(null));
+        business.setDetailType(detailTypeRepository.findById(p.getDetailTypeId()).orElse(null));
+        business.setBusinessNum(p.getBusinessNum());
+        business.setBusinessName(p.getBusinessName());
+        business.setAddress(p.getAddress());
+        business.setTel(p.getTel());
+        business.setSafeTel(safeTel);
+        business.setLogo(logoFilePath);
+        business.setPaper(paperFilePath);
         businessRepository.save(business);
         return business.getBusinessId();
     }
 
     //사업상세정보 기입 - 로고사진은 따로 뺄게요 ~~
-
 
 
     // 로고 수정
@@ -129,7 +127,6 @@ public class BusinessService {
         if (userId != signedUserId) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
         }
-
 
 
         Long businessId = p.getBusinessId();
@@ -213,14 +210,13 @@ public class BusinessService {
     }
 
 
-
     @Transactional
     public BusinessContentsPostRes postBusinessContents(BusinessContentsPostReq p) {
 
         long signedUserId = authenticationFacade.getSignedUserId();
 
         Business business = businessRepository.findById(p.getBusinessId())
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"너 누구냐"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "너 누구냐"));
 
         if (business.getUser().getUserId() != signedUserId) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다, 근데 너 누구냐");
@@ -231,9 +227,8 @@ public class BusinessService {
 
         businessRepository.updateBusinessContents(p);
 
-        return new BusinessContentsPostRes(business.getTitle(),business.getContents());
+        return new BusinessContentsPostRes(business.getTitle(), business.getContents());
     }
-
 
 
     @Transactional
@@ -241,7 +236,7 @@ public class BusinessService {
         long signedUserId = authenticationFacade.getSignedUserId();
 
         Business business = businessRepository.findById(businessId)
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"너 누구냐"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "너 누구냐"));
 
         if (business.getUser().getUserId() != signedUserId) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다, 근데 너 누구냐");
@@ -257,12 +252,12 @@ public class BusinessService {
             String savedPicName = myFileUtils.makeRandomFileName(pic);
             String filePath = String.format("%s/%s", tempPath, savedPicName);
 
-            String tempPicUrl = String.format("%s/pic/%s",docker,filePath);
+            String tempPicUrl = String.format("%s/pic/%s", docker, filePath);
 
 
-            try{
-                myFileUtils.transferTo(pic,filePath);
-            }catch (IOException e) {
+            try {
+                myFileUtils.transferTo(pic, filePath);
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
@@ -274,25 +269,25 @@ public class BusinessService {
             tempPicUrls.add(tempPicUrl);
         }
         businessPicRepository.saveAll(businessPicList);
-        return  BusinessPicPostRes.builder().businessId(businessId).pics(tempPicUrls).build();
+        return BusinessPicPostRes.builder().businessId(businessId).pics(tempPicUrls).build();
     }
 
     @Transactional
-    public boolean businessPicConfirm( long businessId) {
+    public boolean businessPicConfirm(long businessId) {
         long signedUserId = authenticationFacade.getSignedUserId();
 
         Business business = businessRepository.findById(businessId)
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"너 누구냐"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "너 누구냐"));
 
         if (business.getUser().getUserId() != signedUserId) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다, 근데 너 누구냐");
         }
 
-        String tempPath = String.format("business/%d/temp",  businessId);
-        String middlePath = String.format("business/%d/pics",  businessId);
+        String tempPath = String.format("business/%d/temp", businessId);
+        String middlePath = String.format("business/%d/pics", businessId);
         myFileUtils.makeFolders(middlePath);
 
-        boolean moveSuccess = myFileUtils.moveFolder(tempPath,middlePath);
+        boolean moveSuccess = myFileUtils.moveFolder(tempPath, middlePath);
 
         return moveSuccess;
     }
@@ -311,13 +306,12 @@ public class BusinessService {
     }
 
 
-
-
     @Transactional
     public int udtBusinessState(BusinessStatePutReq p) {
 
         int res = businessRepository.updateBusinessState(p);
-        Business business = Business.builder().state(p.getState()).build();
+        Business business = new Business();
+        business.setState(p.getState());
 
         return res;
     }
@@ -332,7 +326,7 @@ public class BusinessService {
     public Integer delBusinessPic(BusinessPicReq p) {
         //String uploadPath = myFileUtils.getUploadPath();
         String businessPicName = businessMapper.getBusinessPicName(p.getBusinessPicId());
-        String filePath = String.format("pic/business/%d/pics/%s",  p.getBusinessId(), businessPicName);
+        String filePath = String.format("pic/business/%d/pics/%s", p.getBusinessId(), businessPicName);
 
         log.info("Generated file path: {}", filePath);  // 경로 출력
 
@@ -376,8 +370,7 @@ public class BusinessService {
             res.setBusinessId(p.getBusinessId());
         }
 
-        String logo =PicUrlMaker.makePicUrlLogo(p.getBusinessId(), res.getLogo());
-
+        String logo = PicUrlMaker.makePicUrlLogo(p.getBusinessId(), res.getLogo());
 
 
         if (res != null && res.getLogo() != null) {
@@ -400,11 +393,8 @@ public class BusinessService {
     }
 
 
-
-
-
     @Transactional
-    public List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetInfoReq p){
+    public List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetInfoReq p) {
 
         long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
 

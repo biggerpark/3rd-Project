@@ -3,6 +3,7 @@ package com.green.jobdone.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,10 +12,10 @@ import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
 @Setter
+@Builder
+@AllArgsConstructor
+@DynamicUpdate
 public class Business extends UpdatedAt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) //auto_increment
@@ -82,4 +83,7 @@ public class Business extends UpdatedAt {
     private LocalDate approveAt;
 
 
+    public Business() {
+
+    }
 }

@@ -38,7 +38,7 @@ public class PortfolioService {
 
     // 포폴 만들기
     @Transactional
-    public PortfolioPostRes insPortfolio(List<MultipartFile> pics, PortfolioPostReq p){
+    public PortfolioPostRes insPortfolio(List<MultipartFile> pics, PortfolioPostReq p) {
 
         long signedUserId = authenticationFacade.getSignedUserId();
 
@@ -56,8 +56,8 @@ public class PortfolioService {
                 .contents(p.getContents())
                 .build(); // 일단 빌더로 적을거 다 적고
 
-        Portfolio savedPortfolio= portfolioRepository.save(portfolio);
-        Long portfolioId =savedPortfolio.getPortfolioId();
+        Portfolio savedPortfolio = portfolioRepository.save(portfolio);
+        Long portfolioId = savedPortfolio.getPortfolioId();
 
         String middlePath = String.format("pic/business/%d/portfolio/%d", p.getBusinessId(), portfolioId);
         myFileUtils.makeFolders(middlePath);
@@ -77,24 +77,28 @@ public class PortfolioService {
                 throw new RuntimeException(e);
             }
         }
-        List<PortfolioPic> portfolioPics = portfolioPicList.stream()
-                .map(item -> PortfolioPic.builder()
-                        .portfolio(savedPortfolio)
-                        .pic(item)
-                        .build())
-                .collect(Collectors.toList());
-
+        List<PortfolioPic> portfolioPics = new ArrayList<>(portfolioPicList.size());
+        for (String picName : portfolioPicList) {
+            PortfolioPic portfolioPic = new PortfolioPic();
+            portfolioPic.setPortfolio(portfolio);
+            portfolioPic.setPic(picName);
+            portfolioPics.add(portfolioPic);
+        }
         portfolioPicRepository.saveAll(portfolioPics);
 
 
-        return PortfolioPostRes.builder().portfolioId(portfolioId).pics(portfolioPicList).build();
+        return PortfolioPostRes.builder()
+                .portfolioId(portfolioId)
+                .pics(portfolioPicList)
+                .build();
 
     } //완
 
     // 사진등록은 존재이유가 없으니 지워버림
 
     //포폴 수정하기
-    public PortfolioPutRes udtPortfolio(List<MultipartFile> pics, PortfolioPutReq p){
+    @Transactional
+    public PortfolioPutRes udtPortfolio(List<MultipartFile> pics, PortfolioPutReq p) {
 
         long signedUserId = authenticationFacade.getSignedUserId();
 
@@ -104,29 +108,29 @@ public class PortfolioService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
         }
 
-        Business business = businessRepository.findById(p.getBusinessId()).orElse(null);
-        assert business != null;
+        Portfolio portfolio = portfolioRepository.findById(p.getPortfolioId()).orElse(null);
+        Business business = new Business();
         business.setBusinessId(p.getBusinessId());
-        Portfolio portfolio = Portfolio.builder()
-                .business(business)
-                .title(p.getTitle())
-                .price(p.getPrice())
-                .takingTime(p.getTakingTime())
-                .contents(p.getContents())
-                .build();
+        portfolio.setPortfolioId(p.getPortfolioId());
+        portfolio.setBusiness(business);
+        portfolio.setTitle(p.getTitle());
+        portfolio.setPrice(p.getPrice());
+        portfolio.setTakingTime(p.getTakingTime());
+        portfolio.setContents(p.getContents());
         portfolioRepository.save(portfolio);
 
         List<String> portfolioPicList = new ArrayList<>();
+
         long portfolioId = p.getPortfolioId();
         List<String> delPortfolioPicList = portfolioPicRepository.getPortfolioPicsByPortfolioId(portfolioId);
         for (String pic : delPortfolioPicList) {
-            String middlePath  = String.format("pic/business/%d/portfolio/%d/%s", p.getBusinessId(), portfolioId, pic);
+            String middlePath = String.format("pic/business/%d/portfolio/%d/%s", p.getBusinessId(), portfolioId, pic);
             myFileUtils.makeFolders(middlePath);
         }
 
-        int delPics = portfolioPicRepository.deletePortfolioPicByPortfolioPicId(portfolioId);
+        portfolioPicRepository.deletePortfolioPicByPortfolioPicId(portfolioId);
 
-        if (pics == null || pics.isEmpty()){
+        if (pics == null || pics.isEmpty()) {
             return PortfolioPutRes.builder()
                     .portfolioId(portfolioId)
                     .pics(portfolioPicList)
@@ -152,9 +156,9 @@ public class PortfolioService {
         }
         List<PortfolioPic> portfolioPics = new ArrayList<>(portfolioPicList.size());
         for (String item : portfolioPicList) {
-            PortfolioPic portfolioPic = PortfolioPic.builder()
-                    .portfolio(portfolio)
-                    .pic(item).build();
+            PortfolioPic portfolioPic = new PortfolioPic();
+            portfolioPic.setPortfolio(portfolio);
+            portfolioPic.setPic(item);
             portfolioPics.add(portfolioPic);
         }
         portfolioPicRepository.saveAll(portfolioPics);
@@ -164,41 +168,15 @@ public class PortfolioService {
                 .build();
     }
 
-    //포폴내용만 수정하기 <- 어차피 글이랑 사진 같이올리는데 같이 수정해야함 걍 더미코드
-    public PortfolioPutRes udtPortfolioContents( PortfolioPutReq p){
-
-        long signedUserId = authenticationFacade.getSignedUserId();
-
-        // 보안 챙겨주기
-        long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
-        if (userId != signedUserId) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
-        }
-
-        Business business = businessRepository.findById(p.getBusinessId()).orElse(null);
-        assert business != null;
-        business.setBusinessId(p.getBusinessId());
-        Portfolio portfolio = Portfolio.builder()
-                .business(business)
-                .title(p.getTitle())
-                .price(p.getPrice())
-                .takingTime(p.getTakingTime())
-                .contents(p.getContents())
-                .build();
-        portfolioRepository.save(portfolio);
-
-        return PortfolioPutRes.builder().portfolioId(p.getPortfolioId()).build();
-    }
-
     public void updPortfolioPicState(PortfolioPicStatePutReq p) {
-        if(p.getPortfolioId() == null && p.getPortfolioPicId() != null) {
+        if (p.getPortfolioId() == null && p.getPortfolioPicId() != null) {
             portfolioPicRepository.updateStateByPortfolioPicId(p.getPortfolioPicId());
         } else {
             portfolioPicRepository.updateStateByPortfolioId(p.getPortfolioId());
         }
     }
 
-    public int udtPortfolioThumbnail(PortfolioPicReq p){
+    public int udtPortfolioThumbnail(PortfolioPicReq p) {
         return portfolioMapper.udtPortfolioThumbnail(p);
     }
     // 이런건 괜히 손대면 귀찮아지니까 냅두자
@@ -218,6 +196,7 @@ public class PortfolioService {
         }
         return portfolioMapper.delPortfolioPic(p);
     }
+
     // 포폴 삭제 -> 사진폴더 통으로 날려버리기
     public void delPortfolio(PortfolioDelReq p) {
         long signedUserId = authenticationFacade.getSignedUserId();
@@ -228,8 +207,8 @@ public class PortfolioService {
         }
 
         Portfolio portfolio = portfolioRepository.findById(p.getPortfolioId()).orElse(null);
-        if (portfolio == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"naga");// rid eocndgka
+        if (portfolio == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "naga");// rid eocndgka
         }
         portfolioRepository.delete(portfolio);
 
@@ -239,11 +218,11 @@ public class PortfolioService {
 
 
     //포폴리스트 조회
-    public List<PortfolioListGetRes> getPortfolioList(PortfolioListGetReq p){
+    public List<PortfolioListGetRes> getPortfolioList(PortfolioListGetReq p) {
         List<PortfolioListGetRes> res = portfolioMapper.selAllPortfolioList(p);
 
         for (PortfolioListGetRes r : res) {
-            String picUrl = PicUrlMaker.makePicUrlPortfolio(r.getBusinessId(),r.getPortfolioId(),r.getIsThumbnail());
+            String picUrl = PicUrlMaker.makePicUrlPortfolio(r.getBusinessId(), r.getPortfolioId(), r.getIsThumbnail());
             r.setIsThumbnail(picUrl);
         }
 
@@ -257,7 +236,7 @@ public class PortfolioService {
             res = new PortfolioGetOneRes();
         }
 
-        if (p.getPortfolioId()>0){
+        if (p.getPortfolioId() > 0) {
             res.setPortfolioId(p.getPortfolioId());
         }
         return res;
@@ -266,21 +245,11 @@ public class PortfolioService {
     public List<PortfolioPicGetRes> getPortfolioPicList(PortfolioPicGetReq p) {
         List<PortfolioPicGetRes> res = portfolioMapper.getPortfolioPicList(p);
         for (PortfolioPicGetRes pic : res) {
-            String picUrl = PicUrlMaker.makePicUrlPortfolio(pic.getBusinessId(),pic.getPortfolioId(),pic.getPic());
+            String picUrl = PicUrlMaker.makePicUrlPortfolio(pic.getBusinessId(), pic.getPortfolioId(), pic.getPic());
             pic.setPic(picUrl);
         }
         return res;
     }
-
-
-
-
-
-
-
-
-
-
 
 
 }

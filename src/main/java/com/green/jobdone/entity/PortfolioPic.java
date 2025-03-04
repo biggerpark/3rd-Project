@@ -8,9 +8,8 @@ import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
+@ToString
 @Table(name = "portfolio_pic")
 public class PortfolioPic extends CreatedAt{
     @Id
@@ -28,5 +27,7 @@ public class PortfolioPic extends CreatedAt{
     @Column(nullable = false)
     @ColumnDefault("1")
     private int state;
+
+
 
 }
