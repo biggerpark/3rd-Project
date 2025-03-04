@@ -198,7 +198,6 @@
         IF(l.userId IS NULL, 0, 1) AS `like`,
         b.address,
         COUNT(distinct s.serviceId) AS serviceCount,
-        -- openingTime과 closingTime에서 초를 00으로 설정하여 시:분 형태로 출력
         DATE_FORMAT(b.openingTime, '%H:%i') AS openingTime,
         DATE_FORMAT(b.closingTime, '%H:%i') AS closingTime,
         b.busiCreatedAt,

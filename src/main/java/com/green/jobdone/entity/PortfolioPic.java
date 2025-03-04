@@ -1,16 +1,17 @@
 package com.green.jobdone.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
-@Setter
-@Table(name = "Portfolio_pic")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "portfolio_pic")
 public class PortfolioPic extends CreatedAt{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) //auto_increment
@@ -24,7 +25,8 @@ public class PortfolioPic extends CreatedAt{
     @Column(length = 50)
     private String pic;
 
-    @ColumnDefault("0")
+    @Column(nullable = false)
+    @ColumnDefault("1")
     private int state;
 
 }

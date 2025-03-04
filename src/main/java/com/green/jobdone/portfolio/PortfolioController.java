@@ -1,7 +1,5 @@
 package com.green.jobdone.portfolio;
 
-import com.green.jobdone.business.model.BusinessPicReq;
-import com.green.jobdone.business.model.get.BusinessGetOneReq;
 import com.green.jobdone.common.model.ResultResponse;
 import com.green.jobdone.portfolio.model.*;
 import com.green.jobdone.portfolio.model.get.*;
@@ -24,37 +22,27 @@ import java.util.List;
 public class PortfolioController {
     private final PortfolioService portfolioService;
 
-    @PostMapping("post")
-    public ResultResponse<Long> insPortfolio(PortfolioPostReq p) {
-        long res = portfolioService.insPortfolio(p);
-        return ResultResponse.<Long>builder()
-                .resultData(p.getPortfolioId())
-                .resultMessage(String.format("포트폴리오 pk는 %d",p.getPortfolioId())
-                ).build();
-    }
-
-    @PostMapping("portfolioPic")
-    @Operation(summary = "포폴사진등록")
-    public ResultResponse<PortfolioPicPostRes> postPortfolioPic(@RequestPart List<MultipartFile> pics,
-                                                                @RequestPart PortfolioPicPostReq p) {
-        PortfolioPicPostRes res = portfolioService.insPortfolioPic(pics,p.getBusinessId(),p.getPortfolioId());
-        return ResultResponse.<PortfolioPicPostRes>builder()
-                .resultMessage(res != null? "포트폴리오 사진 등록":"빠꾸먹음")
+    @PostMapping
+    public ResultResponse<PortfolioPostRes> insPortfolio(@RequestPart List<MultipartFile> pics
+            ,@Valid @RequestPart PortfolioPostReq p) {
+        PortfolioPostRes res = portfolioService.insPortfolio(pics,p);
+        return ResultResponse.<PortfolioPostRes>builder()
                 .resultData(res)
-                .build();
-
+                .resultMessage("옛다").build();
     }
 
-    @PutMapping("pic")
-    @Operation(summary = "포폴 사진 유형 수정")
-    public ResultResponse<Integer> putPortfolioPic(@Valid @ParameterObject @ModelAttribute PortfolioGetOneReq p) {
-        int res =portfolioService.udtPortfolioPics(p);
 
-        return ResultResponse.<Integer>builder()
-                .resultMessage(res == 0? "포폴 사진 수정 실패":"포폴 사진 수정 완료")
-                .resultData(res)
-                .build();
-    }
+
+//    @PutMapping("pic")
+//    @Operation(summary = "포폴 사진 유형 수정")
+//    public ResultResponse<Integer> putPortfolioPic(@Valid @ParameterObject @ModelAttribute PortfolioGetOneReq p) {
+//        int res =portfolioService.udtPortfolioPics(p);
+//
+//        return ResultResponse.<Integer>builder()
+//                .resultMessage(res == 0? "포폴 사진 수정 실패":"포폴 사진 수정 완료")
+//                .resultData(res)
+//                .build();
+//    }
 
     @PutMapping("pic/thumbnail")
     @Operation(summary = "포폴 썸네일 설정")
@@ -73,15 +61,21 @@ public class PortfolioController {
     @DeleteMapping("{portfolioId}")
     @Operation(summary = "포폴 삭제")
     public ResultResponse<Integer> delPortfolio(@Valid @ParameterObject @ModelAttribute PortfolioDelReq p) {
-        int res = portfolioService.delPortfolio(p);
-        return ResultResponse.<Integer>builder().resultData(res).resultMessage("포폴 삭제 완").build();
+        portfolioService.delPortfolio(p);
+        return ResultResponse.<Integer>builder().resultMessage("포폴 삭제 완").build();
+    }
+
+    @PutMapping("state")
+    @Operation(summary = "포폴 사진 상태값 업데이트")
+    public void putPortfolioPicState(@RequestBody PortfolioPicStatePutReq p) {
+        portfolioService.updPortfolioPicState(p);
     }
 
     @PutMapping
     @Operation(summary = "포폴 수정")
-    public ResultResponse<Integer> udtPortfolioPut(@Valid @ParameterObject @ModelAttribute PortfolioPutReq p) {
-        int res = portfolioService.udtPortfolio(p);
-        return ResultResponse.<Integer>builder().resultData(res).resultMessage(res > 0? "포폴 수정 완료": "포폴 수정 빠꾸").build();
+    public ResultResponse<PortfolioPutRes> udtPortfolioPut(@RequestPart(required = false) List<MultipartFile> pics, @Valid @RequestPart PortfolioPutReq p) {
+        PortfolioPutRes res = portfolioService.udtPortfolio(pics, p);
+        return ResultResponse.<PortfolioPutRes>builder().resultData(res).resultMessage(res != null? "포폴 수정 완료": "나가라").build();
     }
 
     @GetMapping
