@@ -173,7 +173,7 @@ public class PayService {
 //        if(res==0){
 //            throw new RuntimeException();
 //        }
-        serviceRepository.paidCompleted(serviceId);
+        serviceRepository.updCompleted(serviceId,6);
 
         // 카톡 메세지 보냄
         RestTemplate restTemplate = new RestTemplate();
