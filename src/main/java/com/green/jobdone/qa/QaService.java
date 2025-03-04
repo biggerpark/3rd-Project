@@ -40,7 +40,7 @@ public class QaService {
     private final ServiceRepository serviceRepository;
 
 
-    @Transactional
+    @Transactional(noRollbackFor = CustomException.class)
     public void insQa(QaReq p, List<MultipartFile> pics) {
         Long userId = authenticationFacade.getSignedUserId();
         User user = new User();
@@ -67,7 +67,7 @@ public class QaService {
                 throw new CustomException(ServiceErrorCode.FAIL_UPDATE_SERVICE);
             }
             if(qaDto.getDoneAt().isBefore(LocalDateTime.now().minusWeeks(1))){
-//                serviceRepository.updCompleted(p.getQaTargetId(),13); 트렌젝션으로 무의미
+                serviceRepository.updCompleted(p.getQaTargetId(),13);
                 throw new CustomException(ServiceErrorCode.TIME_OVER);
             }
             switch (qaDto.getCompleted()){
