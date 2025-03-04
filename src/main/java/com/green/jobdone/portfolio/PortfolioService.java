@@ -77,13 +77,19 @@ public class PortfolioService {
                 throw new RuntimeException(e);
             }
         }
-        List<PortfolioPic> portfolioPics = new ArrayList<>(portfolioPicList.size());
-        for (String picName : portfolioPicList) {
+        boolean isFirst = true; // 첫 번째 사진 여부를 체크할 변수
+
+        List<PortfolioPic> portfolioPics = new ArrayList<>();
+        for (String picName : portfolioPicList) { // 리스트를 순회하면서 사진 저장
             PortfolioPic portfolioPic = new PortfolioPic();
             portfolioPic.setPortfolio(portfolio);
             portfolioPic.setPic(picName);
+            portfolioPic.setState(isFirst ? 2 : 0); // 첫 번째 사진이면 2, 나머지는 0
             portfolioPics.add(portfolioPic);
+
+            isFirst = false; // 첫 번째 처리가 끝났으니 false로 변경
         }
+
         portfolioPicRepository.saveAll(portfolioPics);
 
 
