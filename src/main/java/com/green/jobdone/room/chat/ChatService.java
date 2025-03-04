@@ -140,6 +140,7 @@ public class ChatService {
                 picDto.setPic(PicUrlMaker.makePicUrlChat(roomId, chatId, picName));
             }
         }
+        log.info("res: {} ", res);
 
         return res;
     }

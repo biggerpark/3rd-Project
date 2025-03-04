@@ -27,7 +27,7 @@
     </insert>
     <resultMap id="selChat" type="com.green.jobdone.room.chat.model.ChatGetRes">
         <id property="chatId" column="chatId"/>
-        <result property="contents" column="contents"/>
+        <result property="message" column="message"/>
         <result property="flag" column="flag"/>
         <result property="createdAt" column="createdAt"/>
         <result property="userName" column="userName"/>
