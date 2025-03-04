@@ -59,7 +59,7 @@ public class PortfolioService {
         Portfolio savedPortfolio = portfolioRepository.save(portfolio);
         Long portfolioId = savedPortfolio.getPortfolioId();
 
-        String middlePath = String.format("pic/business/%d/portfolio/%d", p.getBusinessId(), portfolioId);
+        String middlePath = String.format("business/%d/portfolio/%d", p.getBusinessId(), portfolioId);
         myFileUtils.makeFolders(middlePath);
 
         List<String> portfolioPicList = new ArrayList<>(pics.size());
@@ -124,7 +124,7 @@ public class PortfolioService {
         long portfolioId = p.getPortfolioId();
         List<String> delPortfolioPicList = portfolioPicRepository.getPortfolioPicsByPortfolioId(portfolioId);
         for (String pic : delPortfolioPicList) {
-            String middlePath = String.format("pic/business/%d/portfolio/%d/%s", p.getBusinessId(), portfolioId, pic);
+            String middlePath = String.format("business/%d/portfolio/%d/%s", p.getBusinessId(), portfolioId, pic);
             myFileUtils.makeFolders(middlePath);
         }
 
@@ -137,7 +137,7 @@ public class PortfolioService {
                     .build();
         }
 
-        String middlePath = String.format("pic/business/%d/portfolio/%d", p.getBusinessId(), portfolioId);
+        String middlePath = String.format("business/%d/portfolio/%d", p.getBusinessId(), portfolioId);
         myFileUtils.makeFolders(middlePath);
 
         for (MultipartFile pic : pics) {
@@ -184,7 +184,7 @@ public class PortfolioService {
     //포폴사진삭제 -> 이것도 더미
     public int delPortfolioPic(PortfolioPicDelReq p) {
         String portfolioPicName = portfolioMapper.getPortfolioPicName(p.getPortfolioId());
-        String filePath = String.format("business/%d/portfolio/%d/pics/%s", p.getBusinessId(), p.getPortfolioId(), portfolioPicName);
+        String filePath = String.format("business/%d/portfolio/%d/%s", p.getBusinessId(), p.getPortfolioId(), portfolioPicName);
 
         log.info("Generated file path: {}", filePath);  // 경로 출력
 
