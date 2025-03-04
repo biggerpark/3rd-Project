@@ -219,7 +219,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             if(jsonData != null) {
                 map.put("pic",jsonData);
             }
-            map.put("contents",textMessage);
+            map.put("message",textMessage);
             ObjectMapper mapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(map);
             log.info("제발 찍혀주세요 {} ",json);
