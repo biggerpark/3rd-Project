@@ -84,6 +84,17 @@ public class QaController {
     }
 
 
+    @GetMapping("qaTypeId")
+    @Operation(summary = "문의/신고 등록시 나오는 문의 상세 정보들 확인")
+    public ResultResponse<List<QaTypeDetailRes>> getQaTypeDetail(@RequestParam long qaTypeId){
+        List<QaTypeDetailRes> result = qaService.getQaTypeDetail(qaTypeId);
+
+        return ResultResponse.<List<QaTypeDetailRes>>builder()
+                .resultMessage("문의 상세 정보들 확인 완료")
+                .resultData(result)
+                .build();
+    }
+
 //    @GetMapping("report")
 //    @Operation(summary = "신고내역조회, 관리자 및 유저도 조회,토큰받아서 role 로  구분할거임")
 //    public ResultResponse<List<QaReportRes>> getQaReport(@RequestParam int page){

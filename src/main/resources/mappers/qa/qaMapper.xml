@@ -55,6 +55,17 @@
         AND b.qaState='00103'
     </select>
 
+    <select id="getQaTypeDetail">
+        SELECT qaTypeDetailId,reason as qaDetailReason
+        FROM qa_type_detail
+        WHERE qaTypeId=#{qaTypeId}
+    </select>
+
+
+
+
+
+
 <!--    <select id="getQaReport">-->
 <!--        SELECT a.qaId,a.createdAt as qaCreatedAt, c.type as qaTypeName, b.reason as qaDetailTypeName, d.email as userEmail, a.qaState-->
 <!--        FROM qa a-->

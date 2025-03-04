@@ -201,13 +201,21 @@ public class QaService {
     }
 
     @Transactional
-    public QaAnswerRes getQaAnswer(long qaId){
+    public QaAnswerRes getQaAnswer(long qaId){ // 관리자가 답변한 문의 답변 확인
 
         if(qaMapper.getQaAnswer(qaId)==null){
             throw new CustomException(CommonErrorCode.NOT_ANSWER);
         }
 
         return qaMapper.getQaAnswer(qaId);
+
+    }
+
+
+    @Transactional
+    public List<QaTypeDetailRes> getQaTypeDetail(long qaTypeId) {
+
+        return qaMapper.getQaTypeDetail(qaTypeId);
 
     }
 
