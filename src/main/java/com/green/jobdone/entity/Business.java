@@ -82,9 +82,6 @@ public class Business extends UpdatedAt {
     private String rejectContents;
 
 
-    @Column
-    private LocalDate approveAt;
-
 
     public Business() {
 
