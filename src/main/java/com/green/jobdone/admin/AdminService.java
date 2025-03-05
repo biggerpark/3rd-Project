@@ -2,6 +2,7 @@ package com.green.jobdone.admin;
 
 import com.green.jobdone.admin.model.*;
 import com.green.jobdone.business.BusinessRepository;
+import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.entity.Business;
 import com.green.jobdone.service.ServiceRepository;
 import com.green.jobdone.visitor.VisitorCountRepository;
@@ -30,12 +31,20 @@ public class AdminService {
     private final VisitorCountRepository visitorCountRepository;
 
 
+
     public List<BusinessApplicationGetRes> getBusinessApplication(int page) {
 
         int offset = (page - 1) * 10;
 
-        return adminMapper.getBusinessApplication(offset);
+       List<BusinessApplicationGetRes> res=adminMapper.getBusinessApplication(offset);
 
+
+       for(BusinessApplicationGetRes res1:res){
+           String paperUrl=PicUrlMaker.makePicUrlPaper(res1.getBusinessId(),res1.getPaper());
+           res1.setPaper(paperUrl);
+       }
+
+       return res;
     }
 
     @Transactional

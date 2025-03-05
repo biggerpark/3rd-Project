@@ -95,6 +95,8 @@ public class QaController {
                 .build();
     }
 
+
+
 //    @GetMapping("report")
 //    @Operation(summary = "신고내역조회, 관리자 및 유저도 조회,토큰받아서 role 로  구분할거임")
 //    public ResultResponse<List<QaReportRes>> getQaReport(@RequestParam int page){
