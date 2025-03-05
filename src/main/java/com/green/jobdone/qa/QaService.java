@@ -53,6 +53,7 @@ public class QaService {
                         .build();
         Qa qa = Qa.builder()
                 .user(user)
+                .title(p.getTitle())
                 .qaTypeDetail(qaTypeDetail)
                 .contents(p.getContents())
                 .reportReason(p.getQaReportReason())

@@ -28,6 +28,9 @@ public class Qa extends CreatedAt {
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
+    @Column(length = 100)
+    private String title; // 문의 제목, 일반신고에서는 제목이 없음
+
     @Column(length = 3000, nullable = false)
     private String contents;
 

@@ -12,6 +12,8 @@ import lombok.ToString;
 public class QaReq {
     @Schema(description = "문의 관련 종류,환불 안의 상품불량에 해당되는 pk ", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long qaTypeDetailId;
+    @Schema(description = "문의 관련 제목",example = "로그인 관련 문의드립니다")
+    private String title;
     @Schema(description = "문의 관련 코멘트 ", example = "상품이 다 부서져서 왔어요", requiredMode = Schema.RequiredMode.REQUIRED)
     private String contents;
     @Schema(example = "SERVICE,COMMENT,REVIEW,CHAT,BUSINESS,USERREPORT 중 하나")
