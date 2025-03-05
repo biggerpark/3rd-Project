@@ -86,7 +86,7 @@
         k.startDate, k.endDate, k.mStartTime, k.mEndTime, d.businessNum, l.categoryName, d.tel as businessPhone,
         g.optionId, n.name as optionName, i.name as optionDetailName, i.contents, i.optionDetailId,
         a.pyeong, d.address as businessAddress, a.updatedAt, a.userId, a.paidAt, a.doneAt, a.totalPrice,
-        IFNULL(o.optionDetailPrice, i.price) AS optionDetailPrice, o.serviceOptionId, o.comment AS optionComment
+        o.optionDetailPrice , o.serviceOptionId, o.comment AS optionComment
         FROM service a
         LEFT JOIN user b ON a.userId = b.userId
         LEFT JOIN product c ON a.productId = c.productId
@@ -101,7 +101,7 @@
         LEFT JOIN (
         SELECT
         a.serviceOptionId,
-        a.price AS optionDetailPrice,
+        IFNULL(a.price, b.price) AS optionDetailPrice,
         a.optionDetailId, a.comment
         FROM service_option a
         LEFT JOIN option_detail b ON a.optionDetailId = b.optionDetailId
