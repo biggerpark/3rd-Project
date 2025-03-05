@@ -8,8 +8,6 @@ import lombok.ToString;
 @Setter
 @ToString
 public class AdminRatingInfoRes {
-    private Double totalAvgScore;
-    private Double avgScoreCleaning;
-    private Double avgScoreMoving;
-    private Double avgScoreCarWash;
+    private String categoryName;
+    private Double avgScore;
 }
