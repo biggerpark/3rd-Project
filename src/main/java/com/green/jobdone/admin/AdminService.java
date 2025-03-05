@@ -35,7 +35,6 @@ public class AdminService {
     private final DetailTypeRepository detailTypeRepository;
 
 
-
     public List<BusinessApplicationGetRes> getBusinessApplication(int page) {
 
         int offset = (page - 1) * 10;
