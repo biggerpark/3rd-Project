@@ -60,7 +60,7 @@ public class QaController {
     }
 
     @PostMapping("answer")
-    @Operation(summary = "문의 답변 , 관리자가 답변")
+    @Operation(summary = "문의 답변 , 관리자가 답변, 문의 state 00103 으로 바뀜")
     public ResultResponse<Integer> postQaAnswer(@RequestBody QaAnswerReq p){
         Integer res = qaService.postQaAnswer(p);
 
