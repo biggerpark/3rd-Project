@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -38,6 +39,7 @@ public class QaService {
     private final QaPicRepository qaPicRepository;
     private final MyFileUtils myFileUtils;
     private final ServiceRepository serviceRepository;
+    private final QaViewRepository qaViewRepository;
 
 
     @Transactional(noRollbackFor = CustomException.class)
@@ -219,6 +221,25 @@ public class QaService {
         return qaMapper.getQaTypeDetail(qaTypeId);
 
     }
+
+
+
+    @Transactional
+    public int postQaView(QaViewReq p) {
+        QaViewsIds id=QaViewsIds.builder()
+                .userId(p.getUserId())
+                .qaId(p.getQaId())
+                .build();
+
+
+
+
+
+
+
+
+    }
+
 
 
 //    public List<QaReportRes> getQaReport(int page) { // 신고내역 확인
