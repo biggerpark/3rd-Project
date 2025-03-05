@@ -10,7 +10,6 @@ import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.service.model.Dto.CancelDto;
 import com.green.jobdone.service.model.Dto.CompletedDto;
 import com.green.jobdone.service.model.Dto.KakaoPayDto;
-import com.green.jobdone.service.model.KakaoPayCancelReq;
 import com.green.jobdone.service.model.KakaoPayCancelRes;
 import com.green.jobdone.service.model.KakaoPayRedayRes;
 import com.green.jobdone.service.model.KakaoPayRes;
