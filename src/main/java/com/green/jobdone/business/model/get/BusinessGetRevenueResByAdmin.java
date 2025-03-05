@@ -7,10 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @Slf4j
-public class BusinessGetMonthlyRes {
-    private int year;
-    private int month;
+public class BusinessGetRevenueResByAdmin {
     private String BusinessName;
-    private int totalPrice;
-
+    private String detailTypeName;
+    private int totalRevenue;
+    private int thisMonthRevenue;
 }

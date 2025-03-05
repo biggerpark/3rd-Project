@@ -2,7 +2,6 @@ package com.green.jobdone.business;
 
 import com.green.jobdone.business.model.*;
 import com.green.jobdone.business.model.get.*;
-import com.green.jobdone.business.phone.BusinessPhonePostReq;
 import com.green.jobdone.business.pic.BusinessOnePicsGetReq;
 import com.green.jobdone.business.pic.BusinessOnePicsGetRes;
 import com.green.jobdone.business.pic.BusinessPicPostRes;
@@ -159,15 +158,6 @@ public class BusinessController {
                 .build();
     }
 
-    @GetMapping("monthly/{businessId}")
-    @Operation(summary = "업체의 월매출 조회하기")
-    public ResultResponse<List<BusinessGetMonthlyRes>> getBusinessMonthly(@Valid @ParameterObject @ModelAttribute BusinessGetOneReq p) {
-        BusinessGetInfoReq req = new BusinessGetInfoReq(p.getBusinessId());
-        List<BusinessGetMonthlyRes> res = (List<BusinessGetMonthlyRes>) businessService.getBusinessMonthly(req);
-        return ResultResponse.<List<BusinessGetMonthlyRes>>builder()
-                .resultData(res)
-                .resultMessage(res != null ? "업체의 월매출 조회완료" : "꽝 다음기회에").build();
-    }
 
     @PostMapping("contents")
     @Operation(summary = "상품 타이틀 및 내용 수정")
@@ -180,6 +170,24 @@ public class BusinessController {
                 .resultMessage(res != null ? "네" : "아니요").build();
     }
 
+    @GetMapping("revenue")
+    @Operation(summary = "업체의 월매출 조회하기")
+    public ResultResponse<List<BusinessGetRevenueRes>> getBusinessMonthly(@Valid @ParameterObject @ModelAttribute BusinessGetOneReq p) {
+        BusinessGetInfoReq req = new BusinessGetInfoReq(p.getBusinessId());
+        List<BusinessGetRevenueRes> res = (List<BusinessGetRevenueRes>) businessService.getBusinessMonthly(req);
+        return ResultResponse.<List<BusinessGetRevenueRes>>builder()
+                .resultData(res)
+                .resultMessage(res != null ? "업체의 월매출 조회완료" : "꽝 다음기회에").build();
+    }
+    @GetMapping("revenue/byAdmin")
+    @Operation(summary = "업체의 월매출 조회하기")
+    public ResultResponse<List<BusinessGetRevenueResByAdmin>> getBusinessRevenueList() {
+        List<BusinessGetRevenueResByAdmin> list = businessService.getBusinessRevenueByAdmins();
+        return ResultResponse.<List<BusinessGetRevenueResByAdmin>>builder()
+                .resultData(list)
+                .resultMessage(list != null ? "업체의 월매출 조회완료" : "꽝 다음기회에").build();
+    }
+
     @GetMapping("serviceCount")
     @Operation(summary = "업체가 받은 주문 카운트")
     public ResultResponse<List<BusinessGetServiceRes>> getBusinessServiceCount(@Valid @ParameterObject @ModelAttribute BusinessGetInfoReq p) {
@@ -187,6 +195,14 @@ public class BusinessController {
         BusinessGetInfoReq req = new BusinessGetInfoReq(p.getBusinessId());
          List<BusinessGetServiceRes> res = (List<BusinessGetServiceRes>) businessService.getBusinessService(req);
         return ResultResponse.<List<BusinessGetServiceRes>>builder().resultData(res).resultMessage("네").build();
+    }
+
+    @GetMapping("serviceCount/byAdmin")
+    @Operation(summary = "업체가 받은 주문 카운트")
+    public ResultResponse<List<BusinessGetServiceResByAdmin>> getBusinessServiceList() {
+        //루키루키 나의루키루키뤀; 마치마치 느낌적인 느낌느낌
+         List<BusinessGetServiceResByAdmin> list =  businessService.getBusinessServiceByAdmin();
+        return ResultResponse.<List<BusinessGetServiceResByAdmin>>builder().resultData(list).resultMessage(list != null? "네":"네니오").build();
     }
 }
 
