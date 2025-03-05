@@ -21,5 +21,5 @@ public class ServiceOption extends UpdatedAt{
     @JoinColumn(name = "optionDetailId", nullable = false)
     private OptionDetail optionDetail;
     @Column(length = 300) private String comment;
-    @Column private int price;
+    @Column private Integer price;
 }

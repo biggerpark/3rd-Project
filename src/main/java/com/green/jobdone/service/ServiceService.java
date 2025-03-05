@@ -75,18 +75,22 @@ public class ServiceService {
         serviceDetail.setStartDate(startDate);
         serviceDetail.setMStartTime(mStartTime);
         serviceDetailRepository.save(serviceDetail);
-//        for(PostOptionDto dto : p.getOptions()) {
-//            ServiceOption serviceOption = new ServiceOption();
-//            serviceOption.setService(service);
-//            OptionDetail optionDetail = optionDetailRepository.findBy(dto.getOptionDetailId()).orElse(null);
-//            serviceOption.setOptionDetail();
-//        }
+        List<ServiceOption> serviceOptions = new ArrayList<>();
+        for(PostOptionDto dto : p.getOptions()) {
+            ServiceOption serviceOption = new ServiceOption();
+            serviceOption.setService(service);
+            OptionDetail optionDetail = optionDetailRepository.findById(dto.getOptionDetailId()).orElse(null);
+            serviceOption.setOptionDetail(optionDetail);
+            serviceOptions.add(serviceOption);
+        }
+        serviceOptionRepository.saveAll(serviceOptions);
+
         p.setServiceId(serviceId);
         log.info("p: {}",p);
 //        int res1 = serviceMapper.insService(p);
 //        int res2 = serviceMapper.insServiceDetail(p);
-        int res = serviceMapper.insServiceOption(p);
-        return res;
+//        int res = serviceMapper.insServiceOption(p);
+        return 1;
 
     }
 

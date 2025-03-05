@@ -101,7 +101,7 @@
         LEFT JOIN (
         SELECT
         a.serviceOptionId,
-        IFNULL(a.price, b.price) AS optionDetailPrice,
+        a.price AS optionDetailPrice,
         a.optionDetailId, a.comment
         FROM service_option a
         LEFT JOIN option_detail b ON a.optionDetailId = b.optionDetailId

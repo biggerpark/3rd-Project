@@ -9,6 +9,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class KakaoPayCancelReq {
+    // 어쳐피 지금기준으로 바로 Map에 싸서 주므로 필요가 없었음
     private String cid;
     private String tid;
     @JsonProperty("cancel_amount")
