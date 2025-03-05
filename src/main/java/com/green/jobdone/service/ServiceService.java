@@ -281,7 +281,7 @@ public class ServiceService {
         Map<Integer, List<Integer>> businessAllowed = Map.of(
                 0, List.of(1, 5),
                 1, List.of(2),
-                2, List.of(5),
+                2, List.of(1, 5),
                 6, List.of(7)
         );
 

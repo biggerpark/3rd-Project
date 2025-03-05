@@ -1,13 +1,12 @@
 package com.green.jobdone.product;
 
 import com.green.jobdone.business.BusinessRepository;
+import com.green.jobdone.category.DetailTypeRepository;
 import com.green.jobdone.common.exception.CommonErrorCode;
 import com.green.jobdone.common.exception.CustomException;
 import com.green.jobdone.common.exception.ServiceErrorCode;
 import com.green.jobdone.config.security.AuthenticationFacade;
-import com.green.jobdone.entity.Option;
-import com.green.jobdone.entity.OptionDetail;
-import com.green.jobdone.entity.Product;
+import com.green.jobdone.entity.*;
 import com.green.jobdone.product.model.*;
 import com.green.jobdone.product.model.dto.OptionDto;
 import com.green.jobdone.product.model.dto.ProductOptionDetailDto;
@@ -32,23 +31,34 @@ public class ProductService {
     private final OptionRepository optionRepository;
     private final OptionDetailRepository optionDetailRepository;
     private final BusinessRepository businessRepository;
+    private final DetailTypeRepository detailTypeRepository;
 
     public int postProduct(ProductPostReq p) {
 
         long userId=authenticationFacade.getSignedUserId();
 
-        Long checkUserId=mapper.checkUserBusiness(p.getBusinessId());
+//        Long checkUserId=mapper.checkUserBusiness(p.getBusinessId());
+        Long checkUserId=businessRepository.findUserIdByBusinessId(p.getBusinessId());
 
         if(userId!=checkUserId){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
         }
 
 
-        Long businessId = mapper.checkBusinessProduct(p.getBusinessId());
-
+//        Long businessId = mapper.checkBusinessProduct(p.getBusinessId());
+        Long businessId = productRepository.findProductIdByBusinessId(p.getBusinessId());
+        // 명칭 productId가 맞음
+        Product product = new Product();
+        Business business = businessRepository.findById(p.getBusinessId()).orElse(null);
+        DetailType detailType = detailTypeRepository.findById(p.getDetailTypeId()).orElse(null);
         if (businessId == null || businessId == 0L) {
-            int result = mapper.postProduct(p);
-            return result;
+//            int result = mapper.postProduct(p);
+//            return result;
+            product.setBusiness(business);
+            product.setDetailType(detailType);
+            product.setPrice(p.getProductPrice());
+            productRepository.save(product);
+            return 1;
         } else {
 
             return 0;

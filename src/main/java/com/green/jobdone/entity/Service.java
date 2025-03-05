@@ -8,6 +8,8 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -39,4 +41,12 @@ public class Service extends UpdatedAt{
     @Column(columnDefinition = "DATETIME(0)") private LocalDateTime paidAt;
     @Column(columnDefinition = "DATETIME(0)") private LocalDateTime doneAt;
     @Column(nullable = false) @ColumnDefault("0") private int totalPrice;
+
+//    @OneToMany(mappedBy = "service_option", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<ServiceOption> serviceOptionList = new ArrayList<>();
+//
+//    public void addServiceOption(ServiceOption serviceOption) {
+//        serviceOptionList.add(serviceOption);
+//        serviceOption.setService(this);
+//    } 양방향이긴한데 이미 적용해둔게 있어서 나중에 생각
 }
