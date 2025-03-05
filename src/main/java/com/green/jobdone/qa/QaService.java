@@ -15,6 +15,7 @@ import com.green.jobdone.entity.*;
 import com.green.jobdone.qa.model.*;
 import com.green.jobdone.service.ServiceRepository;
 import com.green.jobdone.service.model.Dto.ServiceQaDto;
+import com.green.jobdone.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,7 @@ public class QaService {
     private final MyFileUtils myFileUtils;
     private final ServiceRepository serviceRepository;
     private final QaViewRepository qaViewRepository;
+    private final UserRepository userRepository;
 
 
     @Transactional(noRollbackFor = CustomException.class)
@@ -225,18 +227,41 @@ public class QaService {
 
 
     @Transactional
-    public int postQaView(QaViewReq p) {
-        QaViewsIds id=QaViewsIds.builder()
-                .userId(p.getUserId())
-                .qaId(p.getQaId())
-                .build();
+    public int postQaView(long qaId) {
+        long signedUserId = authenticationFacade.getSignedUserId();
 
 
 
+        Optional<QaView> qaViewOptional=qaViewRepository.findByQaViewsIds_QaIdAndQaViewsIds_UserId(qaId,signedUserId); // 복합키를 이용해서 QaView ENTITY 설정
+
+
+        if (qaViewOptional.isPresent()) {
+            QaView qaView = qaViewOptional.get();
+            if (qaView.canIncreaseViewCount()) {
+                qaView.increaseViewCount();
+                qaViewRepository.save(qaView);
+            }
+        } else { //본적 없는 userId 인 경우
+            QaViewsIds id = new QaViewsIds(qaId, signedUserId);
+            QaView newQaView = new QaView();
+            newQaView.setQaViewsIds(id);
+            newQaView.setViewCount(1);
+
+            // Qa 객체를 가져와서 설정
+            Qa qa = qaRepository.findById(qaId).orElseThrow(() -> new RuntimeException("Qa not found with id " + qaId));
+            User user = userRepository.findById(signedUserId).orElseThrow(() -> new RuntimeException("User not found with id " + signedUserId));
+
+            // 복합키 설정 및 QaView 객체에 연결
+            newQaView.setQa(qa);  // Qa 설정
+            newQaView.setUser(user);  // User 설정
 
 
 
+            qaViewRepository.save(newQaView);
+        }
 
+
+        return 1; // 성공 시 반환값
 
     }
 

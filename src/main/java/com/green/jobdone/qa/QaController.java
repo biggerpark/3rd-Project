@@ -96,6 +96,19 @@ public class QaController {
     }
 
 
+    @PostMapping("qaView")
+    @Operation(summary = "게시판에서 해당 문의를 눌렀을때 조회수 증가")
+    public ResultResponse<Integer> postQaView(@RequestParam long qaId){
+        Integer result = qaService.postQaView(qaId);
+
+        return ResultResponse.<Integer>builder()
+                .resultMessage("조회수 증가 성공")
+                .resultData(result)
+                .build();
+
+    }
+
+
 
 //    @GetMapping("report")
 //    @Operation(summary = "신고내역조회, 관리자 및 유저도 조회,토큰받아서 role 로  구분할거임")
