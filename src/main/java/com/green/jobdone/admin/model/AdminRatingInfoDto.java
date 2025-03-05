@@ -7,7 +7,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class AdminSalesInfoDto {
+public class AdminRatingInfoDto {
     private String categoryName;
-    private Integer totalPrice;
+    private Double avgScore;
+    private Double totalAvgScore;
 }
