@@ -282,15 +282,15 @@ public class ServiceService {
                 0, List.of(1, 5),
                 1, List.of(2),
                 2, List.of(1, 5),
+                3, List.of(4),
                 6, List.of(7)
         );
 
 
         Map<Integer, List<Integer>> userAllowed = Map.of(
-                0, List.of(1, 3, 5),
-                1, List.of(2),
-                2, List.of(1, 3, 5, 6),
-                3, List.of(4),
+                0, List.of(1, 3),
+                1, List.of(3),
+                2, List.of(3, 6),
                 7, List.of(8, 9)
         );
 

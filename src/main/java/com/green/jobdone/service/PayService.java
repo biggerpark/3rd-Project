@@ -55,6 +55,10 @@ public class PayService {
 
         log.info("serviceId : {}", serviceId);
         KakaoPayDto kakaoPayDto = serviceMapper.serviceInfo(serviceId);
+        int com = serviceRepository.completedByServiceId(serviceId);
+        if(com!=2){
+            throw new CustomException(ServiceErrorCode.FAIL_UPDATE_SERVICE);
+        }
         //요청할걸 담는 부분
         Map<String , Object> params = new HashMap<>();
         params.put("cid",kaKaoPay.getCid()); //
@@ -65,8 +69,8 @@ public class PayService {
         params.put("total_amount", kakaoPayDto.getPrice()); // 총 금액
         params.put("vat_amount", kakaoPayDto.getPrice()/10); // 부가세
         params.put("tax_free_amount", 0); // 비과세 금액
-        String server = domain.getServer();
-//        String server = "http://localhost:8080";
+//        String server = domain.getServer();
+        String server = "localhost:8080";
         String approval_url = String.format("http://%s/api/payment/success?service_id=%d", server,serviceId);
         params.put("approval_url", approval_url); // 결제 성공 시 이동할 URL
         params.put("cancel_url", "http://"+server+"/api/payment/cancel"); // 결제 취소 시 이동할 URL
@@ -153,6 +157,10 @@ public class PayService {
 //        String tid = "1";
 //        Long serviceId = null;
         KakaoPayDto kakaoPayDto = serviceMapper.serviceInfo(serviceId);
+        int com = serviceRepository.completedByServiceId(serviceId);
+        if(com!=2){
+            throw new CustomException(ServiceErrorCode.FAIL_UPDATE_SERVICE);
+        }
         log.info("kakaoPayDto: {}", kakaoPayDto);
 
         Map<String,String> params = new HashMap<>();
@@ -181,7 +189,8 @@ public class PayService {
                 requestEntity,KakaoPayRes.class);
         log.info("kakaoPayRedayRes: {}", kakaoPayRes);
 
-        String redirectUrl = String.format("%spaySuccess", domain.getServer());
+        String redirectUrl = String.format("http://%s/paySuccess", domain.getServer());
+        log.info("redirectUrl: {}",redirectUrl);
         return new RedirectView(redirectUrl);
         // 여기 만나서 바로 이동하는식
     }
