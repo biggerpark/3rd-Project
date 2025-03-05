@@ -50,6 +50,9 @@ public class Business extends UpdatedAt {
     @Column(nullable = false, name = "busiCreatedAt")
     private LocalDate busiCreatedAt;
 
+    @Column(name = "approveAt")
+    private LocalDate approveAt;
+
     @Column(name = "openingTime")
     private LocalTime openingTime;
 

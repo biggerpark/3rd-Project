@@ -2,6 +2,8 @@ package com.green.jobdone.admin;
 
 import com.green.jobdone.admin.model.*;
 import com.green.jobdone.business.BusinessRepository;
+import com.green.jobdone.category.CategoryRepository;
+import com.green.jobdone.category.DetailTypeRepository;
 import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.entity.Business;
 import com.green.jobdone.service.ServiceRepository;
@@ -29,7 +31,8 @@ public class AdminService {
     private final ServiceRepository serviceRepository;
     private final VisitorHistoryRepository visitorHistoryRepository;
     private final VisitorCountRepository visitorCountRepository;
-
+    private final CategoryRepository categoryRepository;
+    private final DetailTypeRepository detailTypeRepository;
 
 
     public List<BusinessApplicationGetRes> getBusinessApplication(int page) {
@@ -121,11 +124,13 @@ public class AdminService {
             YearMonth month = targetMonth.minusMonths(i);
             //lastDays.add(month.lengthOfMonth());
             res.setMonth(month.toString());
-            AdminSalesInfoDto adminSalesInfoDtos = adminMapper.getSalesInfo(month.toString(), month.lengthOfMonth());
-            res.setTotalSales((adminSalesInfoDtos.getTotalSales()*5)/100);
-            res.setCleaningSales((adminSalesInfoDtos.getCleaningSales()*5)/100);
-            res.setMovingSales((adminSalesInfoDtos.getMovingSales()*5)/100);
-            res.setCarWashSales((adminSalesInfoDtos.getCarWashSales()*5)/100);
+            List<AdminSalesInfoDto> adminSalesInfoDtos = adminMapper.getSalesInfo(month.toString(), month.lengthOfMonth());
+            res.setSalesInfoDtos(adminSalesInfoDtos);
+            int totalPrice = 0;
+            for (AdminSalesInfoDto item : adminSalesInfoDtos) {
+                totalPrice += item.getTotalPrice();
+            }
+            res.setTotalPrice(totalPrice);
             result.add(res);
         }
         return result;
@@ -152,27 +157,80 @@ public class AdminService {
         return result;
     }
 
-    public AdminCategoryInfoDto getAdminCategoryInfo() {
-        AdminCategoryInfoDto res = adminMapper.getCategoryInfo();
+//    public AdminCategoryInfoDto getAdminCategoryInfo() {
+//        AdminCategoryInfoDto res = adminMapper.getCategoryInfo();
+//
+//        // 카테고리별 비율 계산 (소수점 2자리 유지)
+//        res.setCleaningPercent(roundToTwoDecimal((res.getCleaningCount() / (double) res.getTotalCount()) * 100));
+//        res.setMovingPercent(roundToTwoDecimal((res.getMovingCount() / (double) res.getTotalCount()) * 100));
+//        res.setCarWashPercent(roundToTwoDecimal((res.getCarWashCount() / (double) res.getTotalCount()) * 100));
+//
+//        // 청소 서비스 상세 비율
+//        res.setCleaningPercent1(roundToTwoDecimal((res.getCleaningCount1() / (double) res.getCleaningCount()) * 100));
+//        res.setCleaningPercent2(roundToTwoDecimal((res.getCleaningCount2() / (double) res.getCleaningCount()) * 100));
+//        res.setCleaningPercent3(roundToTwoDecimal((res.getCleaningCount3() / (double) res.getCleaningCount()) * 100));
+//
+//        // 이사 서비스 상세 비율
+//        res.setMovingPercent4(roundToTwoDecimal((res.getMovingCount4() / (double) res.getMovingCount()) * 100));
+//        res.setMovingPercent5(roundToTwoDecimal((res.getMovingCount5() / (double) res.getMovingCount()) * 100));
+//
+//        // 세차 서비스 상세 비율
+//        res.setCarWashPercent6(roundToTwoDecimal((res.getCarWashCount6() / (double) res.getCarWashCount()) * 100));
+//        res.setCarWashPercent7(roundToTwoDecimal((res.getCarWashCount7() / (double) res.getCarWashCount()) * 100));
+//
+//        return res;
+//    }
 
-        // 카테고리별 비율 계산 (소수점 2자리 유지)
-        res.setCleaningPercent(roundToTwoDecimal((res.getCleaningCount() / (double) res.getTotalCount()) * 100));
-        res.setMovingPercent(roundToTwoDecimal((res.getMovingCount() / (double) res.getTotalCount()) * 100));
-        res.setCarWashPercent(roundToTwoDecimal((res.getCarWashCount() / (double) res.getTotalCount()) * 100));
+//    public List<AdminCategoryInfoRes> getAdminCategoryInfo2() {
+//        List<AdminCategoryInfoDto> categorys = adminMapper.getCategoryInfo();
+//        List<AdminCategoryInfoRes> res = new ArrayList<>();
+//        int totalCount = 0;
+//        for(AdminCategoryInfoDto item : categorys) {
+//            totalCount += item.get();
+//        }
+//        for(AdminCategoryInfoDto item : categorys) {
+//            AdminCategoryInfoRes categoryInfoDto = new AdminCategoryInfoRes();
+//            categoryInfoDto.setCategoryId(item.getCategoryId());
+//            categoryInfoDto.setCategoryName(item.getCategoryName());
+//            categoryInfoDto.setCategoryCount(item.getCategoryCount());
+//            categoryInfoDto.setCategoryPercent(item.getCategoryCount()/(double)totalCount);
+//            List<DetailType> detailTypes = detailTypeRepository.findByCategoryId(item.getCategoryId());
+//            List<AdminDetailTypeInfoDto> dto = new ArrayList<>();
+//            for (DetailType item2 : detailTypes) {
+//                AdminDetailTypeInfoDto detailTypeInfoDto = new AdminDetailTypeInfoDto();
+//                detailTypeInfoDto.setDetailTypeId(item2.getDetailTypeId());
+//                detailTypeInfoDto.setDetailTypeName(item2.getDetailTypeName());
+//                dto.add(detailTypeInfoDto);
+//            }
+//            categoryInfoDto.setDto(dto);
+//            res.add(categoryInfoDto);
+//        }
+//        return res;
+//    }
 
-        // 청소 서비스 상세 비율
-        res.setCleaningPercent1(roundToTwoDecimal((res.getCleaningCount1() / (double) res.getCleaningCount()) * 100));
-        res.setCleaningPercent2(roundToTwoDecimal((res.getCleaningCount2() / (double) res.getCleaningCount()) * 100));
-        res.setCleaningPercent3(roundToTwoDecimal((res.getCleaningCount3() / (double) res.getCleaningCount()) * 100));
+    public List<AdminCategoryInfoDto> getAdminCategoryInfo3() {
+        List<AdminCategoryInfoDto> res = adminMapper.getCategoryInfo();
+        log.info("res.size : {}", res.size());
 
-        // 이사 서비스 상세 비율
-        res.setMovingPercent4(roundToTwoDecimal((res.getMovingCount4() / (double) res.getMovingCount()) * 100));
-        res.setMovingPercent5(roundToTwoDecimal((res.getMovingCount5() / (double) res.getMovingCount()) * 100));
+        int totalcount = 0;
+        for (AdminCategoryInfoDto item : res) {
+            for(AdminDetailTypeInfoDto item2 : item.getDetailTypeCounts()){
+                totalcount += item2.getCount();
+            }
+        }
+        log.info("totalcount : {}", totalcount);
 
-        // 세차 서비스 상세 비율
-        res.setCarWashPercent6(roundToTwoDecimal((res.getCarWashCount6() / (double) res.getCarWashCount()) * 100));
-        res.setCarWashPercent7(roundToTwoDecimal((res.getCarWashCount7() / (double) res.getCarWashCount()) * 100));
-
+        for (AdminCategoryInfoDto item : res) {
+            int categorycount = 0;
+            for(AdminDetailTypeInfoDto item2 : item.getDetailTypeCounts()){
+                categorycount += item2.getCount();
+            }
+            for(AdminDetailTypeInfoDto item2 : item.getDetailTypeCounts()){
+                item2.setDetailTypePercent(roundToTwoDecimal((item2.getCount()/(double)categorycount) * 100));
+            }
+            item.setCategoryCount(categorycount);
+            item.setCategoryPercent(roundToTwoDecimal((categorycount/(double)totalcount) * 100));
+        }
         return res;
     }
 
@@ -187,17 +245,21 @@ public class AdminService {
         YearMonth beforeMonth = targetMonth.minusMonths(1);
         AdminMainStatsRes res = new AdminMainStatsRes();
         int lastDay = beforeMonth.lengthOfMonth();
-
-        AdminPaidInfoDto paidInfoDto = adminMapper.getPaidCount(beforeMonth.toString(), targetMonth.toString(), lastDay, today.toString());
-        int pastPaid = paidInfoDto.getPastPaidCount();
-        int nowPaid = paidInfoDto.getNowPaidCount();
+        AdminPaidInfoDto paidInfoDto = adminMapper.getPaidCount(beforeMonth.toString(), targetMonth.toString(), lastDay, today.toString(), today.getDayOfMonth());
+        double pastPaid = paidInfoDto.getPastPaidCount();
+        double nowPaid = paidInfoDto.getNowPaidCount();
         res.setGrowthRate(roundToTwoDecimal(((nowPaid - pastPaid) / (double)pastPaid) * 100 ) );
-        AdminRatingInfoRes adminRatingInfoRes = adminMapper.getRatingAverage();
-        res.setAverageRating(roundToTwoDecimal(adminRatingInfoRes.getTotalAvgScore()));
+        List<AdminRatingInfoDto> adminRatingInfoDtos = adminMapper.getRatingAverage();
+        List<AdminRatingInfoRes> adminRatingInfoRes = new ArrayList<>();
+        res.setTotalAvg(roundToTwoDecimal(adminRatingInfoDtos.get(0).getTotalAvgScore()));
+        for (AdminRatingInfoDto item : adminRatingInfoDtos) {
+            AdminRatingInfoRes result = new AdminRatingInfoRes();
+            result.setCategoryName(item.getCategoryName());
+            result.setAvgScore(roundToTwoDecimal(item.getAvgScore()));
+            adminRatingInfoRes.add(result);
+        }
+        res.setRatingInfoRes(adminRatingInfoRes);
         res.setCompeletedServiceCount(serviceRepository.getTotalCompletedInfo());
-        res.setCarWashAverageRating(roundToTwoDecimal(adminRatingInfoRes.getAvgScoreCarWash()));
-        res.setMovingAverageRating(roundToTwoDecimal(adminRatingInfoRes.getAvgScoreMoving()));
-        res.setCleaningAverageRating(roundToTwoDecimal(adminRatingInfoRes.getAvgScoreCleaning()));
         res.setNewCustomerCount(adminMapper.getUserIncrease(targetMonth.toString(), today.toString()));
         return res;
     }
@@ -214,12 +276,20 @@ public class AdminService {
         int yesterdayServiceCount = newServiceDto.getYesterdayServiceCount();
         res.setNewServiceCount(todayServiceCount);
         res.setNewServicePercent(roundToTwoDecimal(((todayServiceCount - yesterdayServiceCount) / (double)yesterdayServiceCount) * 100 ));
-        res.setNewBusinessCount(12);
-        res.setNewUserCount(21);
-        res.setNewUserPercent(12.5);
+        AdminNewUserInfoDto newUserInfoDto = adminMapper.getNewUserCount(today.toString(), today.minusDays(1).toString());
+        int todayUserCount = newUserInfoDto.getTodayNewUserCount();
+        int yesterdayUserCount = newUserInfoDto.getYesterdayNewUserCount();
+        res.setNewUserCount(todayUserCount);
+        res.setNewUserPercent(roundToTwoDecimal((todayUserCount - yesterdayUserCount) / (double)yesterdayUserCount) * 100);
+        AdminNewBusinessInfoDto newBusinessInfoDto = adminMapper.getNewBusinessCount(today.toString(), today.minusDays(1).toString());
+        int todayBusinessCount = newBusinessInfoDto.getTodayNewBusinessCount();
+        int yesterdayBusinessCount = newBusinessInfoDto.getYesterdayNewBusinessCount();
+        res.setNewBusinessCount(todayBusinessCount);
+        res.setNewBusinessCountThenYesterday(todayBusinessCount - yesterdayBusinessCount);
         res.setUnprocessedInquiries(15);
         return res;
     }
+
 
 
 

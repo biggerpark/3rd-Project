@@ -8,6 +8,6 @@ import lombok.ToString;
 @Setter
 @ToString
 public class AdminPaidInfoDto {
-    private Integer pastPaidCount;
-    private Integer nowPaidCount;
+    private Double pastPaidCount;
+    private Double nowPaidCount;
 }
