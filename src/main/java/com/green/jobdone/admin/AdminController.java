@@ -115,9 +115,9 @@ public class AdminController {
 
     @GetMapping("Statscategory")
     @Operation(summary = "관리자 통계) 카테고리 비율 조회")
-    public ResultResponse<AdminCategoryInfoDto> getAdminCategoryInfo() {
-        AdminCategoryInfoDto result = adminService.getAdminCategoryInfo();
-        return ResultResponse.<AdminCategoryInfoDto>builder()
+    public ResultResponse<List<AdminCategoryInfoDto>> getAdminCategoryInfo() {
+        List<AdminCategoryInfoDto> result = adminService.getAdminCategoryInfo3();
+        return ResultResponse.<List<AdminCategoryInfoDto>>builder()
                 .resultMessage("관리자 측 카테고리 조회 완료")
                 .resultData(result)
                 .build();

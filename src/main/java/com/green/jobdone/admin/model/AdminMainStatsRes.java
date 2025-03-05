@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @Getter
 @Setter
 @ToString
@@ -13,14 +15,10 @@ public class AdminMainStatsRes {
     private Double growthRate;
     @Schema(title = "이번달 신규고객 수")
     private Integer newCustomerCount;
-    @Schema(title = "총 전체 리뷰 별점 평균")
-    private Double averageRating;
-    @Schema(title = "청소 전체 리뷰 별점 평균")
-    private Double cleaningAverageRating;
-    @Schema(title = "이사 전체 리뷰 별점 평균")
-    private Double movingAverageRating;
-    @Schema(title = "세차 전체 리뷰 별점 평균")
-    private Double carWashAverageRating;
+    @Schema(title = "총 리뷰평점 평균")
+    private Double totalAvg;
+    @Schema(title = "분야 별 리뷰평점 평균")
+    private List<AdminRatingInfoRes> ratingInfoRes;
     @Schema(title = "총 거래량 수")
     private Integer compeletedServiceCount;
 
