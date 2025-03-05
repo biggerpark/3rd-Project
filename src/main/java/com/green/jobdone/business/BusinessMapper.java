@@ -35,10 +35,11 @@ public interface BusinessMapper {
     List<BusinessGetRes> selAllBusiness(BusinessGetReq p);
     BusinessGetOneRes selOneBusiness(long businessId);
 
-    List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetInfoReq p);
-
+    List<BusinessGetRevenueRes> getBusinessMonthly(BusinessGetInfoReq p);
+    List<BusinessGetRevenueResByAdmin> getBusinessRevenueList();
 
     List<BusinessGetServiceRes> countBusinessServices(BusinessGetInfoReq p);
+    List<BusinessGetServiceResByAdmin> countBusinessServicesList();
 
 
 

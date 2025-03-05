@@ -53,7 +53,7 @@
         insert into business_pic
         (businessId, pic)
         values
-        <foreach collection="pics" item="pic"  separator=",">
+        <foreach collection="pics" item="pic" separator=",">
             (#{businessId}, #{pic})
         </foreach>
     </insert>
@@ -91,7 +91,7 @@
     <update id="udtBusinessLogo">
         update business
 
-       set  logo = #{logo}
+        set logo = #{logo}
 
         where businessId = #{businessId}
     </update>
@@ -99,46 +99,47 @@
     <update id="udtBusinessPaper">
         update business
 
-       set paper = #{paper}
+        set paper = #{paper}
 
         where businessId = #{businessId}
     </update>
 
     <select id="selAllBusiness">
 
-    SELECT
-    b.businessId, b.businessName, b.title
-    , k.categoryId, k.categoryName
-    , d.detailTypeId, d.detailTypeName
-    , p.price
-    , COUNT(distinct s.serviceId) AS serviceCount
-    , COUNT(DISTINCT r.reviewId) AS reviewCount
-    , ROUND(COALESCE(AVG(r.score), 0), 2) AS scoreAvg
-    , IFNULL(l.userId, 0) AS `like`
-    , g.regionId, g.region
-    , c.pic
-    , b.lat, b.lng
-    , ROUND(6371000  * ACOS(COS(RADIANS(#{userLat})) * COS(RADIANS(b.lat)) * COS(RADIANS(b.lng) - RADIANS(#{userLng})) + SIN(RADIANS(#{userLat})) * SIN(RADIANS(b.lat)))) AS distance
+        SELECT
+        b.businessId, b.businessName, b.title
+        , k.categoryId, k.categoryName
+        , d.detailTypeId, d.detailTypeName
+        , p.price
+        , COUNT(distinct s.serviceId) AS serviceCount
+        , COUNT(DISTINCT r.reviewId) AS reviewCount
+        , ROUND(COALESCE(AVG(r.score), 0), 2) AS scoreAvg
+        , IFNULL(l.userId, 0) AS `like`
+        , g.regionId, g.region
+        , c.pic
+        , b.lat, b.lng
+        , ROUND(6371000 * ACOS(COS(RADIANS(#{userLat})) * COS(RADIANS(b.lat)) * COS(RADIANS(b.lng) -
+        RADIANS(#{userLng})) + SIN(RADIANS(#{userLat})) * SIN(RADIANS(b.lat)))) AS distance
 
-    FROM business b
-    LEFT JOIN detail_type d
-    ON d.detailTypeId= b.detailTypeId
-    LEFT JOIN category k
-    ON k.categoryId = d.categoryId
-    left JOIN product p
-    ON b.businessId = p.businessId
-    left JOIN service s
-    ON s.productId = p.productId
-    left JOIN review r
-    ON s.serviceId = r.serviceId
-    LEFT JOIN `like` l
-    ON l.businessId = b.businessId AND l.userId = #{signedUserId}
-    LEFT JOIN business_region br
-    ON br.businessId = b.businessId
-    LEFT JOIN region g
-    ON g.regionId = br.regionId
-    LEFT JOIN business_pic c
-    ON c.businessId = b.businessId AND c.state = 2
+        FROM business b
+        LEFT JOIN detail_type d
+        ON d.detailTypeId= b.detailTypeId
+        LEFT JOIN category k
+        ON k.categoryId = d.categoryId
+        left JOIN product p
+        ON b.businessId = p.businessId
+        left JOIN service s
+        ON s.productId = p.productId
+        left JOIN review r
+        ON s.serviceId = r.serviceId
+        LEFT JOIN `like` l
+        ON l.businessId = b.businessId AND l.userId = #{signedUserId}
+        LEFT JOIN business_region br
+        ON br.businessId = b.businessId
+        LEFT JOIN region g
+        ON g.regionId = br.regionId
+        LEFT JOIN business_pic c
+        ON c.businessId = b.businessId AND c.state = 2
 
         WHERE 1=1
         <if test="regionId != null">
@@ -179,10 +180,6 @@
     </select>
 
 
-
-
-
-
     <select id="selOneBusiness">
         SELECT
         p.productId,
@@ -220,7 +217,7 @@
     </select>
 
     <select id="getBusinessPicList">
-        select  p.businessId, p.businessPicId, p.pic
+        select p.businessId, p.businessPicId, p.pic
         from business_pic p
         where p.businessId = #{businessId} and p.state in(1,2)
     </select>
@@ -248,11 +245,49 @@
         ON s.productId = p.productId
         JOIN business b
         ON p.businessId = b.businessId
-        WHERE  b.businessId = #{businessId}
+        WHERE b.businessId = #{businessId}
         GROUP BY s.productId, YEAR(s.paidAt), MONTH(s.paidAt)
         ORDER BY s.productId ,year DESC, month DESC;
     </select>
 
+    <select id="getBusinessRevenueList">
+
+        SELECT
+        b.businessName,
+        d.detailTypeName,
+        SUM(s.price) AS totalRevenue,
+        SUM(CASE
+        WHEN YEAR(s.paidAt) = YEAR(NOW()) AND MONTH(s.paidAt) = MONTH(NOW())
+        THEN s.price
+        ELSE 0
+        END) AS thisMonthRevenue
+        FROM service s
+        JOIN product p ON s.productId = p.productId
+        JOIN business b ON p.businessId = b.businessId
+        JOIN detail_type d ON b.detailTypeId = d.detailTypeId
+      GROUP BY b.businessId
+
+    </select>
+
+    <select id="countBusinessServicesList">
+
+        SELECT
+        b.businessName,
+        d.detailTypeName,
+        COUNT(s.serviceId) AS totalServiceCount,
+        COUNT(CASE
+        WHEN YEAR(s.createdAt) = YEAR(NOW())
+        AND MONTH(s.createdAt) = MONTH(NOW())
+        THEN 1
+        ELSE NULL
+        END) AS thisMonthServiceCount
+        FROM service s
+        JOIN product p ON s.productId = p.productId
+        JOIN business b ON p.businessId = b.businessId
+        JOIN detail_type d ON b.detailTypeId = d.detailTypeId
+        WHERE s.completed >= 7
+        GROUP BY b.businessName, d.detailTypeName;
+    </select>
     <select id="countBusinessServices">
 
         SELECT
@@ -265,12 +300,9 @@
         JOIN business b ON p.businessId = b.businessId
         WHERE b.businessId = #{businessId}
         AND s.completed >= 7
-        GROUP BY  s.productId, YEAR(s.createdAt), MONTH(s.createdAt)
-        ORDER BY  s.productId, year DESC, month DESC;
+        GROUP BY s.productId, YEAR(s.createdAt), MONTH(s.createdAt)
+        ORDER BY s.productId, year DESC, month DESC;
     </select>
-
-
-
 
 
 </mapper>

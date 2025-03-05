@@ -2,10 +2,8 @@ package com.green.jobdone.business;
 
 import com.green.jobdone.business.model.*;
 import com.green.jobdone.business.model.get.*;
-import com.green.jobdone.business.phone.BusinessPhonePostReq;
 import com.green.jobdone.business.pic.BusinessOnePicsGetReq;
 import com.green.jobdone.business.pic.BusinessOnePicsGetRes;
-import com.green.jobdone.business.pic.BusinessPicDto;
 import com.green.jobdone.business.pic.BusinessPicPostRes;
 import com.green.jobdone.category.DetailTypeRepository;
 import com.green.jobdone.common.MyFileUtils;
@@ -14,9 +12,7 @@ import com.green.jobdone.common.model.Domain;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.Business;
 import com.green.jobdone.entity.BusinessPic;
-import com.green.jobdone.entity.User;
 import com.green.jobdone.user.UserRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,8 +73,8 @@ public class BusinessService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 등록된 사업자 번호입니다");
         }
 
-        String paperPath = String.format("pic/business/%d/paper", p.getBusinessId());
-        String logoPath = String.format("pic/business/%d/logo", p.getBusinessId());
+        String paperPath = String.format("business/%d/paper", p.getBusinessId());
+        String logoPath = String.format("business/%d/logo", p.getBusinessId());
         myFileUtils.makeFolders(paperPath);
         myFileUtils.makeFolders(logoPath);
 
@@ -182,7 +178,7 @@ public class BusinessService {
         }
 
         // 로고파일 저장 폴더 경로
-        String folderPath = String.format("pic/business/%d/paper", p.getBusinessId());
+        String folderPath = String.format("business/%d/paper", p.getBusinessId());
 
         // 기존 로고 폴더가 있다면 폴더 삭제
         myFileUtils.deleteFolder(folderPath, true); // true: 폴더 내 모든 파일 및 하위 폴더 삭제
@@ -394,7 +390,7 @@ public class BusinessService {
 
 
     @Transactional
-    public List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetInfoReq p) {
+    public List<BusinessGetRevenueRes> getBusinessMonthly(BusinessGetInfoReq p) {
 
         long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
 
@@ -404,6 +400,11 @@ public class BusinessService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
         }
         return businessMapper.getBusinessMonthly(p);
+    }
+    @Transactional
+    public List<BusinessGetRevenueResByAdmin> getBusinessRevenueByAdmins() {
+
+        return businessMapper.getBusinessRevenueList();
     }
 
     @Transactional
@@ -417,6 +418,11 @@ public class BusinessService {
         }
         return businessMapper.countBusinessServices(p); //이거 마저 해야해요
     }
+    @Transactional
+    public List<BusinessGetServiceResByAdmin> getBusinessServiceByAdmin() {
+        return businessMapper.countBusinessServicesList(); //이거 마저 해야해요
+    }
+
 }
 
 
