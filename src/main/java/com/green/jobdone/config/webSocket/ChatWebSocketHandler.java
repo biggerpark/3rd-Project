@@ -61,7 +61,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         // 마지막 부분이 roomId이므로, 이를 추출
         long roomId = Long.parseLong(uriParts[uriParts.length - 1]);
         session.setBinaryMessageSizeLimit(10*1024*1024);
-        roomSessions.computeIfAbsent(roomId, k -> new HashSet<>());
+        Set<WebSocketSession> sessionSet = roomSessions.computeIfAbsent(roomId, k -> new HashSet<>());
+        sessionSet.add(session);
+
         if(!sessions.contains(session)) {
             sessions.add(session);
         }
@@ -206,7 +208,6 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             }
 
             log.info("if문 잘 넘어갔나?");
-            Set<WebSocketSession> sessionSet = roomSessions.get(roomId);
 
             ChatPostReq chatPostReq = new ChatPostReq();
             chatPostReq.setRoomId(roomId);
@@ -227,6 +228,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
 //            String json = objectMapper.writeValueAsString(map);
 //            log.info("제발 찍혀주세요 {} ",json);
 
+            Set<WebSocketSession> sessionSet = roomSessions.get(roomId);
             if (sessionSet != null) {
                 log.info("세션점검 if문 정상 진입");
                 for (WebSocketSession webSocketSession : sessionSet) {
@@ -240,7 +242,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
                 }
             }
 
-
+//            session.sendMessage(new TextMessage("파일 업로드 및 메시지 저장 완료"));
 
         } catch (Exception e) {
             log.error("파일 업로드 및 메시지 처리 중 오류 발생", e);
