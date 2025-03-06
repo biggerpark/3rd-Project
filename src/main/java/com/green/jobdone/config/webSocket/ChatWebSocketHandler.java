@@ -60,6 +60,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
         // 마지막 부분이 roomId이므로, 이를 추출
         long roomId = Long.parseLong(uriParts[uriParts.length - 1]);
+        roomSessions.forEach((existingRoomId, sessionSet) -> {
+            sessionSet.remove(session); // 이미 다른 방에 연결된 세션을 제거
+        });
         session.setBinaryMessageSizeLimit(10*1024*1024);
         Set<WebSocketSession> sessionSet = roomSessions.computeIfAbsent(roomId, k -> new HashSet<>());
         sessionSet.add(session);
