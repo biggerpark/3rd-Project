@@ -81,7 +81,6 @@ public class AdminService {
         business.setApproveAt(today);
         business.setState(101); // 업체 상태를 수락완료로 바꿈
 
-
         return 1;
     }
 

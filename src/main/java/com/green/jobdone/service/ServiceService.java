@@ -201,15 +201,27 @@ public class ServiceService {
             for(Long etcId : delEtdByPk){
                 etcRepository.deleteById(etcId);
             }
+
             for(ServiceEtcDto dto : etcDto){
                 sum += dto.getEtcPrice();
-                Etc etc = Etc.builder()
-                        .service(service)
-                        .etcId(dto.getEtcId())
-                        .price(dto.getEtcPrice())
-                        .comment(dto.getEtcComment())
-                        .build();
-                etcList.add(etc);
+                if(dto.getEtcId()==null){
+//                    Etc etc = Etc.builder()
+//                            .service(service)
+//                            .etcId(dto.getEtcId())
+//                            .price(dto.getEtcPrice())
+//                            .comment(dto.getEtcComment())
+//                            .build();
+                    Etc etc = new Etc();
+                    etc.setService(service);
+                    etc.setPrice(dto.getEtcPrice());
+                    etc.setComment(dto.getEtcComment());
+                    etcList.add(etc);
+                } else {
+                    Etc etc = etcRepository.findById(dto.getEtcId()).orElse(null);
+                    etc.setPrice(dto.getEtcPrice());
+                    etc.setComment(dto.getEtcComment());
+                    etcList.add(etc);
+                }
             }
         }
 
