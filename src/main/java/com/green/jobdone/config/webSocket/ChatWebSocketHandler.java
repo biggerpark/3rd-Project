@@ -215,21 +215,21 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             // jsondata가 아니라 사진 url으로 내용 변경
             log.info("jsonData 어케 나옴: "+jsonData);
             // string 으로넘어옴
-            Map<String ,String> map = new HashMap<>();
-            if(jsonData != null) {
-                map.put("pic",jsonData);
-            }
-            map.put("message",textMessage);
-            ObjectMapper mapper = new ObjectMapper();
-            String json = objectMapper.writeValueAsString(map);
-            log.info("제발 찍혀주세요 {} ",json);
+//            Map<String ,String> map = new HashMap<>();
+//            if(jsonData != null) {
+//                map.put("pic",jsonData);
+//            }
+//            map.put("message",textMessage);
+//            ObjectMapper mapper = new ObjectMapper();
+//            String json = objectMapper.writeValueAsString(map);
+//            log.info("제발 찍혀주세요 {} ",json);
 
             if (sessionSet != null) {
                 for (WebSocketSession webSocketSession : sessionSet) {
                     if (webSocketSession.isOpen()) {
 //                        webSocketSession.sendMessage(new TextMessage(jsonData));
-                        webSocketSession.sendMessage(new TextMessage(textMessage));
-                        webSocketSession.sendMessage(new TextMessage(json));
+//                        webSocketSession.sendMessage(new TextMessage(textMessage));
+                        webSocketSession.sendMessage(new TextMessage(jsonData));
                     }
                 }
             }

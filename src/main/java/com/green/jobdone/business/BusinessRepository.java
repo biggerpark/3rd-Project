@@ -54,4 +54,8 @@ public interface BusinessRepository extends JpaRepository<Business, Long> {
     @Query("update Business set logo=:#{#p.logo} where businessId=:#{#p.businessId}")
     Integer updateBusinessLogo(@Param("p") BusinessLogoPatchReq p);
 
+    @Query("select b.logo from Business b where b.businessId =:businessId")
+    String findBusinessLogoByBusinessId(@Param("businessId") Long businessId);
+
+
 }
