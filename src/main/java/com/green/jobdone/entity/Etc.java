@@ -5,9 +5,7 @@ import lombok.*;
 
 @Entity
 @Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Setter
 @ToString
 public class Etc extends UpdatedAt{
     @Id
