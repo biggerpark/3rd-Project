@@ -15,6 +15,7 @@ import com.green.jobdone.entity.*;
 import com.green.jobdone.qa.model.*;
 import com.green.jobdone.service.ServiceRepository;
 import com.green.jobdone.service.model.Dto.ServiceQaDto;
+import com.green.jobdone.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -38,6 +40,8 @@ public class QaService {
     private final QaPicRepository qaPicRepository;
     private final MyFileUtils myFileUtils;
     private final ServiceRepository serviceRepository;
+    private final QaViewRepository qaViewRepository;
+    private final UserRepository userRepository;
 
 
     @Transactional(noRollbackFor = CustomException.class)
@@ -219,6 +223,63 @@ public class QaService {
         return qaMapper.getQaTypeDetail(qaTypeId);
 
     }
+
+
+
+    @Transactional
+    public QaDetailRes getQaBoardDetail(long qaId) {
+        long signedUserId = authenticationFacade.getSignedUserId();
+
+
+
+
+        Optional<QaView> qaViewOptional=qaViewRepository.findByQaViewsIds_QaIdAndQaViewsIds_UserId(qaId,signedUserId); // 복합키를 이용해서 QaView ENTITY 설정
+
+        if (qaViewOptional.isPresent()) {
+            QaView qaView = qaViewOptional.get();
+            if (qaView.canIncreaseViewCount()) {
+                qaView.increaseViewCount();
+                qaViewRepository.save(qaView);
+            }
+        } else { //본적 없는 userId 인 경우
+            QaViewsIds id = new QaViewsIds(qaId, signedUserId);
+            QaView newQaView = new QaView();
+            newQaView.setQaViewsIds(id);
+            newQaView.setViewCount(1);
+
+            // Qa 객체를 가져와서 설정
+            Qa qa = qaRepository.findById(qaId).orElseThrow(() -> new RuntimeException("Qa not found with id " + qaId));
+            User user = userRepository.findById(signedUserId).orElseThrow(() -> new RuntimeException("User not found with id " + signedUserId));
+
+            // 복합키 설정 및 QaView 객체에 연결
+            newQaView.setQa(qa);  // Qa 설정
+            newQaView.setUser(user);  // User 설정
+
+            qaViewRepository.save(newQaView);
+        }
+        // 위 로직은 DB 에 userId,qaId 집어넣고 조회수 증가시켜주는 로직
+
+
+        QaDetailRes result=qaMapper.getQaDetail(qaId);
+
+        List<String> updatedPics = new ArrayList<>();
+        for (String item : result.getPics()) {
+            item = PicUrlMaker.makePicQa(qaId, item);
+            updatedPics.add(item);
+        }
+        result.setPics(updatedPics);
+
+
+        return result; // 성공 시 반환값
+
+    }
+
+    @Transactional
+    public List<QaBoardRes> getQaBoard() {
+
+        return qaMapper.getQaBoard();
+    }
+
 
 
 //    public List<QaReportRes> getQaReport(int page) { // 신고내역 확인

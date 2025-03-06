@@ -31,6 +31,7 @@
 
     <resultMap id="qaPicDetail" type="com.green.jobdone.qa.model.QaDetailRes">
         <result property="contents" column="contents"/>
+        <result property="title" column="title"/>
         <collection property="pics" column="pic" resultMap="qaPicDetails"/>
     </resultMap>
 
@@ -39,12 +40,13 @@
     </resultMap>
 
     <select id="getQaDetail" resultMap="qaPicDetail">
-        SELECT a.contents, b.pic
+        SELECT a.contents, b.pic, a.title
         FROM qa a
         LEFT JOIN qa_pic b
         ON a.qaId=b.qaId
         WHERE a.qaId=#{qaId}
     </select>
+
 
     <select id="getQaAnswer">
         SELECT a.answer,a.qaAnswerId
@@ -62,7 +64,16 @@
     </select>
 
 
-
+    <select id="getQaBoard">
+        SELECT a.title,c.name as userName,a.createdAt,SUM(b.viewCount) as qaView,a.qaId
+        FROM qa a
+        LEFT JOIN qa_view b
+        on a.qaId=b.qaId
+        LEFT JOIN user c
+        on a.userId=c.userId
+        GROUP BY b.qaId
+        ORDER BY a.qaId DESC
+    </select>
 
 
 

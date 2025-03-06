@@ -35,7 +35,7 @@ public class QaController {
 
 
     @GetMapping
-    @Operation(summary = "문의사항 조회,관리자 및 유저 조회, 같은 api 사용, 토큰에 따라 보내는 데이터 틀려짐")
+    @Operation(summary = "문의사항 조회,관리자 및 유저 조회, 같은 api 사용, 토큰에 따라 보내는 데이터 틀려짐, 관리자는 모든 유저 문의 보여지고, 유저는 해당 유저가 문의한 글만 보여짐")
     public ResultResponse<List<QaRes>> getQa(@RequestParam int page){
         List<QaRes> res = qaService.getQa(page);
 
@@ -47,7 +47,7 @@ public class QaController {
     }
 
         @GetMapping("detail")
-        @Operation(summary = "문의내역 상세 조회, 관리자 및 유저가 조회, 관리자가 조회하면 qa 상태가 검토중으로 바뀜")
+        @Operation(summary = "문의내역 상세 조회, 관리자 및 유저가 조회, 관리자가 조회하면 qa 상태가 '검토중' 으로 바뀜, 유저/업체는 마이페이지에서 조회할때 사용할 api, 즉 여기서는 문의 게시글 조회수가 증가 안됨")
         public ResultResponse<QaDetailRes> getQaDetail(@RequestParam long qaId){
             QaDetailRes result=qaService.getQaDetail(qaId);
 
@@ -60,7 +60,7 @@ public class QaController {
     }
 
     @PostMapping("answer")
-    @Operation(summary = "문의 답변 , 관리자가 답변, 문의 state 00103 으로 바뀜")
+    @Operation(summary = "문의 답변 , 관리자가 답변, qa 상태가 '답변완료' 으로 바뀜")
     public ResultResponse<Integer> postQaAnswer(@RequestBody QaAnswerReq p){
         Integer res = qaService.postQaAnswer(p);
 
@@ -93,6 +93,32 @@ public class QaController {
                 .resultMessage("문의 상세 정보들 확인 완료")
                 .resultData(result)
                 .build();
+    }
+
+
+    @GetMapping("qaBoardDetail")
+    @Operation(summary = "게시판에서 해당 문의를 눌렀을때 게시글 상세 조회 및 조회수 증가")
+    public ResultResponse<QaDetailRes> getQaBoardDetail(@RequestParam long qaId){
+        QaDetailRes result = qaService.getQaBoardDetail(qaId);
+
+        return ResultResponse.<QaDetailRes>builder()
+                .resultMessage("게시판 게시글 상세 조회 및 조회수 증가 성공")
+                .resultData(result)
+                .build();
+
+    }
+
+    @GetMapping("qaBoard")
+    @Operation(summary = "게시판에서 모든 문의글 조회 완료")
+    public ResultResponse<List<QaBoardRes>> getQaBoard(){
+
+        List<QaBoardRes> result = qaService.getQaBoard();
+
+        return ResultResponse.< List<QaBoardRes>>builder()
+                .resultMessage("게시판 모든 문의글 조회 완료")
+                .resultData(result)
+                .build();
+
     }
 
 
