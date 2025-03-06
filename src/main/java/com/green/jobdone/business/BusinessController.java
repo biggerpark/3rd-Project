@@ -146,6 +146,12 @@ public class BusinessController {
                 .build();
     }
 
+    @GetMapping("/kakaoMap")
+    public ResultResponse<BusinessGetResMap> selBusinessListMap(@Valid @ParameterObject @ModelAttribute BusinessGetReq p) {
+        BusinessGetResMap res = businessService.getBusinessListMap(p);
+        return ResultResponse.<BusinessGetResMap>builder().resultData(res).build();
+    }
+
     @GetMapping("pic/{businessId}")
     @Operation(summary = "한 업체의 사진 리스트")
     public ResultResponse<List<BusinessOnePicsGetRes>> getBusinessPicList(@Valid @ParameterObject @ModelAttribute BusinessGetOneReq p) {
