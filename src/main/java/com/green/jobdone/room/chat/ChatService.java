@@ -14,6 +14,7 @@ import com.green.jobdone.entity.Room;
 import com.green.jobdone.room.RoomRepository;
 import com.green.jobdone.room.RoomService;
 import com.green.jobdone.room.chat.model.*;
+import com.green.jobdone.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class ChatService {
     private final RoomRepository roomRepository;
     private final ChatPicRepository chatPicRepository;
     private final BusinessRepository businessRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public String insChat(String token ,MultipartFile pic, ChatPostReq p){
@@ -47,9 +49,13 @@ public class ChatService {
         log.info("토큰값: {}",token);
         Room room = roomRepository.findById(p.getRoomId()).orElseThrow(() -> new CustomException(ChatErrorCode.MISSING_ROOM));
         Long userId = room.getUser().getUserId();
+        Long businessId = room.getBusiness().getBusinessId();
 //        if(userId!=authenticationFacade.getSignedUserId()|| !room.getBusiness().getBusinessId().equals(businessRepository.findBusinessIdByUserId(userId))){
 //            throw new CustomException(ChatErrorCode.FAIL_TO_REG);
 //        } //인증처리 나중에 복구해볼 생각 ㄱ
+//        String logo = businessRepository.findBusinessLogoByBusinessId(businessId);
+        String logo = PicUrlMaker.makePicUrlLogo(businessId,businessRepository.findBusinessLogoByBusinessId(businessId));
+        String userPic = PicUrlMaker.makePicUserUrl(userId,userRepository.getUserPicByUserId(userId));
         Chat chat = new Chat();
         chat.setRoom(room);
         chat.setFlag(p.getFlag());
@@ -60,13 +66,15 @@ public class ChatService {
         Map<String ,Object> resJson = new HashMap<>();
         resJson.put("flag",p.getFlag());
         resJson.put("message",p.getContents());
+        resJson.put("userPic",userPic);
+        resJson.put("logo",logo);
         if(pic==null){
-            return null;
-//            try {
-//                return objectMapper.writeValueAsString(resJson);
-//            } catch (JsonProcessingException e) {
-//                throw new RuntimeException(e);
-//            }
+//            return null;
+            try {
+                return objectMapper.writeValueAsString(resJson);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         Long chatId = chat.getChatId();
@@ -91,14 +99,13 @@ public class ChatService {
 //        chatPicDto.setPic(fileName);
 //        int res2 = chatMapper.insChatPic(chatPicDto);
         String picUrl = String.format("/pic/%s",folderPath);
-
         resJson.put("pic",picUrl);
-//        try {
-//            return objectMapper.writeValueAsString(resJson);
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException(e);
-//        }
-        return picUrl;
+        try {
+            return objectMapper.writeValueAsString(resJson);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+//        return picUrl;
     }
 
     public Long insertChat(ChatPostReq p){
