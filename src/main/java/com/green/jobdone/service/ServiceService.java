@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -190,16 +191,26 @@ public class ServiceService {
         service.setAddComment(p.getAddComment());
         service.setPyeong(p.getPyeong());
         // update시 set으로 null 지정시 기존값을 변경하지 않음
+
         List<Etc> etcList = new ArrayList<>();
-        for(ServiceEtcDto dto : etcDto){
-            sum += dto.getEtcPrice();
-            Etc etc = Etc.builder()
-                    .service(service)
-                    .etcId(p.getEtc().get(i++).getEtcId())
-                    .price(dto.getEtcPrice())
-                    .comment(dto.getEtcComment())
-                    .build();
-            etcList.add(etc);
+        if(etcDto !=null){
+            List<Long> etcIds = Optional.ofNullable(etcRepository.findEtcIdsByServiceId(p.getServiceId()))
+                    .orElse(Collections.emptyList());
+            List<Long> newEtcIds = etcDto.stream().map(ServiceEtcDto::getEtcId).filter(Objects::nonNull).toList();
+            List<Long> delEtdByPk = etcIds.stream().filter(id -> !newEtcIds.contains(id)).toList();
+            for(Long etcId : delEtdByPk){
+                etcRepository.deleteById(etcId);
+            }
+            for(ServiceEtcDto dto : etcDto){
+                sum += dto.getEtcPrice();
+                Etc etc = Etc.builder()
+                        .service(service)
+                        .etcId(dto.getEtcId())
+                        .price(dto.getEtcPrice())
+                        .comment(dto.getEtcComment())
+                        .build();
+                etcList.add(etc);
+            }
         }
 
         if(sum!=0){
@@ -228,7 +239,9 @@ public class ServiceService {
 
         serviceRepository.save(service);
         serviceDetailRepository.save(serviceDetail);
-        etcRepository.saveAll(etcList);
+        if(!etcList.isEmpty()){
+            etcRepository.saveAll(etcList);
+        }
 
 //        int res1 = serviceMapper.updService(p);
 //        int res2 = serviceMapper.updServiceDetail(p);
@@ -282,15 +295,15 @@ public class ServiceService {
                 0, List.of(1, 5),
                 1, List.of(2),
                 2, List.of(1, 5),
+                3, List.of(4),
                 6, List.of(7)
         );
 
 
         Map<Integer, List<Integer>> userAllowed = Map.of(
-                0, List.of(1, 3, 5),
-                1, List.of(2),
-                2, List.of(1, 3, 5, 6),
-                3, List.of(4),
+                0, List.of(1, 3),
+                1, List.of(3),
+                2, List.of(3, 6),
                 7, List.of(8, 9)
         );
 

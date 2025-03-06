@@ -28,4 +28,5 @@ public interface ServiceMapper {
     KakaoPayDto serviceInfo(Long serviceId);
     int payOrDoneCompleted(CompletedDto dto);
     void saveTid(Long serviceId, String tid);
+    List<Long> findEtcId(Long serviceId);
 }
