@@ -5,8 +5,11 @@ import com.green.jobdone.business.BusinessRepository;
 import com.green.jobdone.category.CategoryRepository;
 import com.green.jobdone.category.DetailTypeRepository;
 import com.green.jobdone.common.PicUrlMaker;
+import com.green.jobdone.config.jwt.UserRole;
 import com.green.jobdone.entity.Business;
+import com.green.jobdone.entity.User;
 import com.green.jobdone.service.ServiceRepository;
+import com.green.jobdone.user.UserRepository;
 import com.green.jobdone.visitor.VisitorCountRepository;
 import com.green.jobdone.visitor.VisitorHistoryRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -14,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.netty.udp.UdpServer;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -33,6 +37,7 @@ public class AdminService {
     private final VisitorCountRepository visitorCountRepository;
     private final CategoryRepository categoryRepository;
     private final DetailTypeRepository detailTypeRepository;
+    private final UserRepository userRepository;
 
 
     public List<BusinessApplicationGetRes> getBusinessApplication(int page) {
@@ -67,13 +72,20 @@ public class AdminService {
     }
 
 
-    @Transactional
+    @Transactional // 업체승인 하면 user type 사장으로 바뀌고, business state 도 바뀜
     public int postBusinessApprove(long businessId) {
         Business business = businessRepository.findById(businessId) // 프론트에서 받은 해당 pk를 통해 업체 정보를 entity 에 담음
                 .orElseThrow(() -> new EntityNotFoundException("해당 업체를 찾을 수 없습니다."));
 
 
         LocalDate today = LocalDate.now();
+
+        Optional<User> user=userRepository.findById(business.getUser().getUserId());
+
+        User user1=user.get();
+        user1.setRole(UserRole.PRESIDENT);
+        userRepository.save(user1);
+
 
 
         business.setApproveAt(today);
