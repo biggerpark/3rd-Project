@@ -240,7 +240,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
                 }
             }
 
-            session.sendMessage(new TextMessage("파일 업로드 및 메시지 저장 완료"));
+
 
         } catch (Exception e) {
             log.error("파일 업로드 및 메시지 처리 중 오류 발생", e);
