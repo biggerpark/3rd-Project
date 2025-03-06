@@ -127,8 +127,11 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             Set<WebSocketSession> sessionSet = roomSessions.get(roomId);
             log.info("sessionSet: " + sessionSet);
             if (sessionSet != null) {
+                log.info("if문 정상 진입1");
                 for (WebSocketSession webSocketSession : sessionSet) {
+                    log.info("채팅 보내는 for문 정상 진입");
                     if (webSocketSession.isOpen()) {
+                    log.info("채팅 보내는 if문 정상 진입");
                         webSocketSession.sendMessage(new TextMessage("새 메시지: " + message.getPayload()));
                     }
                 }
@@ -225,8 +228,11 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
 //            log.info("제발 찍혀주세요 {} ",json);
 
             if (sessionSet != null) {
+                log.info("세션점검 if문 정상 진입");
                 for (WebSocketSession webSocketSession : sessionSet) {
+                        log.info("채팅 보내는 for문 정상 진입");
                     if (webSocketSession.isOpen()) {
+                        log.info("채팅 보내는 if문 정상 진입");
 //                        webSocketSession.sendMessage(new TextMessage(jsonData));
 //                        webSocketSession.sendMessage(new TextMessage(textMessage));
                         webSocketSession.sendMessage(new TextMessage(jsonData));
