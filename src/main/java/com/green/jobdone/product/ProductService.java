@@ -226,12 +226,12 @@ public class ProductService {
         }
 //        List<Option> optionList = new ArrayList<>(p.getOptions().size());
         // 업체id로 옵션 조회 >> 옵션 조회후 새로 받은 옵션중 중복 이름이 있으면 에러 던짐 contains()
-        List<String> optionName = optionRepository.findOptionNameByBusinessId(businessRepository.findBusinessIdByUserId(userId));
+//        List<String> optionName = optionRepository.findOptionNameByBusinessId(businessRepository.findBusinessIdByUserId(userId));
         if(p.getOptions()!=null && !p.getOptions().isEmpty()) {
             for (OptionDto ol : p.getOptions()) {
-                if(optionName.contains(ol.getOptionName())){
-                    throw new CustomException(ServiceErrorCode.FAIL_UPDATE_SERVICE);
-                }
+//                if(optionName.contains(ol.getOptionName())){
+//                    throw new CustomException(ServiceErrorCode.FAIL_UPDATE_SERVICE);
+//                }
                 Option option = new Option();
                 if (ol.getOptionId() != null && ol.getOptionId() != 0) {
                     option = optionRepository.findById(ol.getOptionId()).orElseGet(Option::new);
