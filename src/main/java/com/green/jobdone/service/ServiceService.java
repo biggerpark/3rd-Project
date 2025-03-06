@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -193,11 +194,18 @@ public class ServiceService {
 
         List<Etc> etcList = new ArrayList<>();
         if(etcDto !=null){
+            List<Long> etcIds = Optional.ofNullable(etcRepository.findEtcIdsByServiceId(p.getServiceId()))
+                    .orElse(Collections.emptyList());
+            List<Long> newEtcIds = etcDto.stream().map(ServiceEtcDto::getEtcId).filter(Objects::nonNull).toList();
+            List<Long> delEtdByPk = etcIds.stream().filter(id -> !newEtcIds.contains(id)).toList();
+            for(Long etcId : delEtdByPk){
+                etcRepository.deleteById(etcId);
+            }
             for(ServiceEtcDto dto : etcDto){
                 sum += dto.getEtcPrice();
                 Etc etc = Etc.builder()
                         .service(service)
-                        .etcId(p.getEtc().get(i++).getEtcId())
+                        .etcId(dto.getEtcId())
                         .price(dto.getEtcPrice())
                         .comment(dto.getEtcComment())
                         .build();

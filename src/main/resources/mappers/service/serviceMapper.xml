@@ -274,4 +274,10 @@
         </if>
         where serviceId = #{serviceId}
     </update>
+
+    <select id="findEtcId">
+        select etdId
+        from etc
+        where serviceId = #{serviceId}
+    </select>
 </mapper>
