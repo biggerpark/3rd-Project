@@ -107,7 +107,7 @@
     <select id="selAllBusiness">
 
         SELECT
-        b.businessId, b.businessName, b.title
+        b.businessId, b.businessName, b.title, b.logo
         , k.categoryId, k.categoryName
         , d.detailTypeId, d.detailTypeName
         , p.price

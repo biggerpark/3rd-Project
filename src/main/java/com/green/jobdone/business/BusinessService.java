@@ -354,6 +354,25 @@ public class BusinessService {
         return res;
     }
 
+    //카카오맵 적용해서 업체조회하기
+    @Transactional
+    public BusinessGetResMap getBusinessListMap(BusinessGetReq p) {
+        BusinessGetResMap res = new BusinessGetResMap();
+        List<BusinessGetRes> businessList = businessMapper.selAllBusiness(p);
+
+        for (BusinessGetRes business : businessList) {
+       //로고 url을 생성하고 business객체의 logo필드에 설정
+        String logo = PicUrlMaker.makePicUrlLogo(business.getBusinessId(), business.getLogo());
+        business.setLogo(logo); // 만들어진 로고 경로를 업체 객체에 설정
+        }
+
+        //결과값 설정
+        res.setBusinessList(businessList);
+        res.setUserLat(p.getUserLat());
+        res.setUserLng(p.getUserLng());
+
+        return res;
+    }
     // 2. 단일업체 조회
     @Transactional
     public BusinessGetOneRes getBusinessOne(BusinessGetOneReq p) {
