@@ -202,14 +202,19 @@ public class ServiceService {
                 etcRepository.deleteById(etcId);
             }
             for(ServiceEtcDto dto : etcDto){
-                sum += dto.getEtcPrice();
-                Etc etc = Etc.builder()
-                        .service(service)
-                        .etcId(dto.getEtcId())
-                        .price(dto.getEtcPrice())
-                        .comment(dto.getEtcComment())
-                        .build();
-                etcList.add(etc);
+                if(dto.getEtcId()==null){
+                    sum += dto.getEtcPrice();
+                    Etc etc = Etc.builder()
+                            .service(service)
+                            .etcId(dto.getEtcId())
+                            .price(dto.getEtcPrice())
+                            .comment(dto.getEtcComment())
+                            .build();
+                    etcList.add(etc);
+                } else {
+                    Etc etc = etcRepository.findById(dto.getEtcId()).orElse(null);
+                    etcList.add(etc);
+                }
             }
         }
 
