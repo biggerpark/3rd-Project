@@ -12,5 +12,6 @@ public interface QaMapper {
 //    List<QaReportRes> getQaReport(int offset);
     QaAnswerRes getQaAnswer(long qaId);
     List<QaTypeDetailRes> getQaTypeDetail(long qaTypeId);
+    List<QaBoardRes> getQaBoard();
 
 }

@@ -227,13 +227,13 @@ public class QaService {
 
 
     @Transactional
-    public int postQaView(long qaId) {
+    public QaDetailRes getQaBoardDetail(long qaId) {
         long signedUserId = authenticationFacade.getSignedUserId();
 
 
 
-        Optional<QaView> qaViewOptional=qaViewRepository.findByQaViewsIds_QaIdAndQaViewsIds_UserId(qaId,signedUserId); // 복합키를 이용해서 QaView ENTITY 설정
 
+        Optional<QaView> qaViewOptional=qaViewRepository.findByQaViewsIds_QaIdAndQaViewsIds_UserId(qaId,signedUserId); // 복합키를 이용해서 QaView ENTITY 설정
 
         if (qaViewOptional.isPresent()) {
             QaView qaView = qaViewOptional.get();
@@ -255,14 +255,29 @@ public class QaService {
             newQaView.setQa(qa);  // Qa 설정
             newQaView.setUser(user);  // User 설정
 
-
-
             qaViewRepository.save(newQaView);
         }
+        // 위 로직은 DB 에 userId,qaId 집어넣고 조회수 증가시켜주는 로직
 
 
-        return 1; // 성공 시 반환값
+        QaDetailRes result=qaMapper.getQaDetail(qaId);
 
+        List<String> updatedPics = new ArrayList<>();
+        for (String item : result.getPics()) {
+            item = PicUrlMaker.makePicQa(qaId, item);
+            updatedPics.add(item);
+        }
+        result.setPics(updatedPics);
+
+
+        return result; // 성공 시 반환값
+
+    }
+
+    @Transactional
+    public List<QaBoardRes> getQaBoard() {
+
+        return qaMapper.getQaBoard();
     }
 
 
