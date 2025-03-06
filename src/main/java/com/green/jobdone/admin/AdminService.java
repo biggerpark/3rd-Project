@@ -67,13 +67,15 @@ public class AdminService {
     }
 
 
-    @Transactional
+    @Transactional // 업체승인 하면 user type 사장으로 바뀌고, business state 도 바뀜
     public int postBusinessApprove(long businessId) {
         Business business = businessRepository.findById(businessId) // 프론트에서 받은 해당 pk를 통해 업체 정보를 entity 에 담음
                 .orElseThrow(() -> new EntityNotFoundException("해당 업체를 찾을 수 없습니다."));
 
 
         LocalDate today = LocalDate.now();
+
+
 
 
         business.setApproveAt(today);
