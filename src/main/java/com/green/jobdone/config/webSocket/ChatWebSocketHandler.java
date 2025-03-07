@@ -150,6 +150,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
                 roomSessions.remove(roomId); // 세션이 모두 끊어지면 방을 삭제할 수 있음
             }
         }
+        log.info("현재 방 {}에 연결된 세션 목록: {}", roomId, roomSessions.get(roomId));
 //        log.info("WebSocket connection closed in roomId: " + roomId);
     }
 
