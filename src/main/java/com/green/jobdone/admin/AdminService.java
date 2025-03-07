@@ -157,57 +157,6 @@ public class AdminService {
         return result;
     }
 
-//    public AdminCategoryInfoDto getAdminCategoryInfo() {
-//        AdminCategoryInfoDto res = adminMapper.getCategoryInfo();
-//
-//        // 카테고리별 비율 계산 (소수점 2자리 유지)
-//        res.setCleaningPercent(roundToTwoDecimal((res.getCleaningCount() / (double) res.getTotalCount()) * 100));
-//        res.setMovingPercent(roundToTwoDecimal((res.getMovingCount() / (double) res.getTotalCount()) * 100));
-//        res.setCarWashPercent(roundToTwoDecimal((res.getCarWashCount() / (double) res.getTotalCount()) * 100));
-//
-//        // 청소 서비스 상세 비율
-//        res.setCleaningPercent1(roundToTwoDecimal((res.getCleaningCount1() / (double) res.getCleaningCount()) * 100));
-//        res.setCleaningPercent2(roundToTwoDecimal((res.getCleaningCount2() / (double) res.getCleaningCount()) * 100));
-//        res.setCleaningPercent3(roundToTwoDecimal((res.getCleaningCount3() / (double) res.getCleaningCount()) * 100));
-//
-//        // 이사 서비스 상세 비율
-//        res.setMovingPercent4(roundToTwoDecimal((res.getMovingCount4() / (double) res.getMovingCount()) * 100));
-//        res.setMovingPercent5(roundToTwoDecimal((res.getMovingCount5() / (double) res.getMovingCount()) * 100));
-//
-//        // 세차 서비스 상세 비율
-//        res.setCarWashPercent6(roundToTwoDecimal((res.getCarWashCount6() / (double) res.getCarWashCount()) * 100));
-//        res.setCarWashPercent7(roundToTwoDecimal((res.getCarWashCount7() / (double) res.getCarWashCount()) * 100));
-//
-//        return res;
-//    }
-
-//    public List<AdminCategoryInfoRes> getAdminCategoryInfo2() {
-//        List<AdminCategoryInfoDto> categorys = adminMapper.getCategoryInfo();
-//        List<AdminCategoryInfoRes> res = new ArrayList<>();
-//        int totalCount = 0;
-//        for(AdminCategoryInfoDto item : categorys) {
-//            totalCount += item.get();
-//        }
-//        for(AdminCategoryInfoDto item : categorys) {
-//            AdminCategoryInfoRes categoryInfoDto = new AdminCategoryInfoRes();
-//            categoryInfoDto.setCategoryId(item.getCategoryId());
-//            categoryInfoDto.setCategoryName(item.getCategoryName());
-//            categoryInfoDto.setCategoryCount(item.getCategoryCount());
-//            categoryInfoDto.setCategoryPercent(item.getCategoryCount()/(double)totalCount);
-//            List<DetailType> detailTypes = detailTypeRepository.findByCategoryId(item.getCategoryId());
-//            List<AdminDetailTypeInfoDto> dto = new ArrayList<>();
-//            for (DetailType item2 : detailTypes) {
-//                AdminDetailTypeInfoDto detailTypeInfoDto = new AdminDetailTypeInfoDto();
-//                detailTypeInfoDto.setDetailTypeId(item2.getDetailTypeId());
-//                detailTypeInfoDto.setDetailTypeName(item2.getDetailTypeName());
-//                dto.add(detailTypeInfoDto);
-//            }
-//            categoryInfoDto.setDto(dto);
-//            res.add(categoryInfoDto);
-//        }
-//        return res;
-//    }
-
     public List<AdminCategoryInfoDto> getAdminCategoryInfo3() {
         List<AdminCategoryInfoDto> res = adminMapper.getCategoryInfo();
         log.info("res.size : {}", res.size());
@@ -286,7 +235,9 @@ public class AdminService {
         int yesterdayBusinessCount = newBusinessInfoDto.getYesterdayNewBusinessCount();
         res.setNewBusinessCount(todayBusinessCount);
         res.setNewBusinessCountThenYesterday(todayBusinessCount - yesterdayBusinessCount);
-        res.setUnprocessedInquiries(15);
+        AdminUnprocessedInquiriesInfoDto unprocessedInquiriesInfoDto = adminMapper.getUnprocessedInquiries(today.toString());
+        res.setUnprocessedInquiries(unprocessedInquiriesInfoDto.getTotalUnprocessedInquiries());
+        res.setIncreaseUnprocessedInquiries(unprocessedInquiriesInfoDto.getTodayUnprocessedInquiries());
         return res;
     }
 

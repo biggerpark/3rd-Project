@@ -19,6 +19,8 @@ public class AdminDashBoardInfoRes {
     private Double newUserPercent;
     @Schema(title = "미처리 문의 건수")
     private Integer unprocessedInquiries;
+    @Schema(title = "오늘 증가된 미처리 문의 건수")
+    private Integer increaseUnprocessedInquiries;
     @Schema(title = "당일 신규 등록 업체 수")
     private Integer newBusinessCount;
     @Schema(title = "어제 대비 신규 등록 업체 증가 수")
