@@ -3,12 +3,15 @@ package com.green.jobdone.config.webSocket;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.messaging.simp.stomp.StompCommand;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import java.util.Map;
 
 public class ChatRoomCheckInterceptor implements HandshakeInterceptor {
+    private final StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.create(StompCommand.CONNECT);
     @Override
     public boolean beforeHandshake(ServerHttpRequest req, ServerHttpResponse res, WebSocketHandler wsh, Map<String, Object> attributes) throws Exception {
         String uri = req.getURI().toString();
