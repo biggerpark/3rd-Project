@@ -164,4 +164,11 @@
         FROM Business b
     </select>
 
+    <select id="getUnprocessedInquiries">
+        SELECT COUNT(q.qaId) AS totalUnprocessedInquiries,
+        COUNT(CASE WHEN q.createdAt BETWEEN '${today} 00:00:00' AND '${today} 23:59:59' THEN q.qaId END) AS todayUnprocessedInquiries
+        FROM qa q
+        WHERE q.qaState = '00101'
+    </select>
+
 </mapper>

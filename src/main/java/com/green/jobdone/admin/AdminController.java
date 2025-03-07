@@ -83,7 +83,7 @@ public class AdminController {
                 .build();
     }
 
-    @GetMapping("StatesDashBoard")
+    @GetMapping("statesDashBoard")
     @Operation(summary = "관리자 통계) 대쉬보드 정보 조회")
     public ResultResponse<AdminDashBoardInfoRes> getAdminDashBoardInfo() {
         AdminDashBoardInfoRes result = adminService.getAdminDashBoardInfo();
@@ -93,7 +93,7 @@ public class AdminController {
                 .build();
     }
 
-    @GetMapping("Statssales")
+    @GetMapping("statsSales")
     @Operation(summary = "관리자 통계) 근 6개월 총매출 조회")
     public ResultResponse<List<AdminSalesInfoRes>> getAdminSalesInfo() {
         List<AdminSalesInfoRes> result = adminService.getAdminSalesInfo();
@@ -103,7 +103,7 @@ public class AdminController {
                 .build();
     }
 
-    @GetMapping("Statsvisitor")
+    @GetMapping("statsVisitor")
     @Operation(summary = "관리자 통계) 일주일 방문자 수 조회")
     public ResultResponse<List<AdminVisitorInfoRes>> getAdminVisitorInfo() {
         List<AdminVisitorInfoRes> result = adminService.getAdminVisitorInfo();
@@ -113,7 +113,7 @@ public class AdminController {
                 .build();
     }
 
-    @GetMapping("Statscategory")
+    @GetMapping("statsCategory")
     @Operation(summary = "관리자 통계) 카테고리 비율 조회")
     public ResultResponse<List<AdminCategoryInfoDto>> getAdminCategoryInfo() {
         List<AdminCategoryInfoDto> result = adminService.getAdminCategoryInfo3();
@@ -123,7 +123,7 @@ public class AdminController {
                 .build();
     }
 
-    @GetMapping("StatsMain")
+    @GetMapping("statsMain")
     @Operation(summary = "관리자 통계) 주요 통계 조회")
     public ResultResponse<AdminMainStatsRes> getAdminMainStatsInfo() {
         AdminMainStatsRes result = adminService.getAdminMainStatsInfo();
@@ -133,7 +133,7 @@ public class AdminController {
                 .build();
     }
 
-    @GetMapping("StatsNewBusiness")
+    @GetMapping("statsNewBusiness")
     @Operation(summary = "관리자 통계) 신규 등록 업체 조회")
     public ResultResponse<List<AdminNewBusinessInfoRes>> getAdminNewBusinessInfo() {
         List<AdminNewBusinessInfoRes> result = adminService.getAdminNewBusinessInfo();
@@ -142,16 +142,4 @@ public class AdminController {
                 .resultData(result)
                 .build();
     }
-
-
-
-
-
-
-
-
-
-
-
-
 }
