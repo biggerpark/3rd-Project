@@ -2,21 +2,13 @@ package com.green.jobdone.config.webSocket;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.common.exception.ChatErrorCode;
 import com.green.jobdone.common.exception.CustomException;
 import com.green.jobdone.config.security.AuthenticationFacade;
-import com.green.jobdone.room.chat.ChatMapper;
 import com.green.jobdone.room.chat.ChatService;
-import com.green.jobdone.room.chat.model.ChatPicDto;
 import com.green.jobdone.room.chat.model.ChatPostReq;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
 
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.socket.BinaryMessage;
@@ -24,12 +16,8 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -40,8 +28,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final AuthenticationFacade authenticationFacade;
     private ObjectMapper objectMapper = new ObjectMapper();
     private final ChatService chatService;
-    private static final Logger logger = LoggerFactory.getLogger(ChatWebSocketHandler.class);
-    private final List<WebSocketSession> sessions = new ArrayList<>();
     private final Map<Long, Set<WebSocketSession>> roomSessions = new HashMap<>();
     public ChatWebSocketHandler(ChatService chatService, AuthenticationFacade authenticationFacade) {
         this.chatService = chatService;
@@ -49,20 +35,14 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        // /chat/{roomId} 식으로 나옴 지금은
-        // WebSocket URI에서 roomId 추출
-        String uri = session.getUri().toString();
-        String[] uriParts = uri.split("/");
-//        String roomString = uriParts[uriParts.length - 1];
-//        if(roomString==null || roomString.trim().isEmpty()){
-//            return;
-//        } 여기보단 confug에서 하는것이 더 좋음
 
-        // 마지막 부분이 roomId이므로, 이를 추출
-        long roomId = Long.parseLong(uriParts[uriParts.length - 1]);
+        String uri = session.getUri().toString();
+        String[] uriParts = uri.split("/");// 마지막 부분이 roomId이므로, 이를 추출
+
+        Long roomId = Long.parseLong(uriParts[uriParts.length - 1]);
         log.info("현재 방 {}에 연결된 세션 목록: {}", roomId, roomSessions.get(roomId));
         roomSessions.forEach((existingRoomId, sessionSet) -> {
-            if(sessionSet!=null) {
+            if(sessionSet!=null && sessionSet.contains(session)) {
                 sessionSet.remove(session); // 이미 다른 방에 연결된 세션을 제거
                 log.info("세션 {}를 방 {}에서 제거", session.getId(), existingRoomId);
             }
@@ -72,17 +52,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         if (!sessionSet.contains(session)) {
             sessionSet.add(session);  // 중복 세션을 방지
         }
-
-//        if(!sessions.contains(session)) {
-//            sessions.add(session);
-//        } 이거때문에 중복세션 나온거같음
-
-
+        log.info("Room ID: " + roomId);
 //        String token = authenticationFacade.getToken();
 //        log.info("토큰값 잘 저장되는거 맞아?? :{} ", token);
 //        session.getAttributes().put("token", token);
         // 추출된 roomId를 사용하여 채팅방 설정 등 처리
-        log.info("Room ID: " + roomId);
     }
 
 //    @Override
@@ -161,19 +135,17 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         String uri = session.getUri().toString();
         String[] uriParts = uri.split("/");
-
-        // 마지막 부분에서 roomId 추출
         long roomId = Long.parseLong(uriParts[uriParts.length - 1]);
-
         // 해당 roomId에 대한 세션 목록에서 제거
         Set<WebSocketSession> sessionSet = roomSessions.get(roomId);
         if (sessionSet != null) {
             sessionSet.remove(session);
+            log.info("세션방 제거 되는거 맞아? : "+roomId);
             if (sessionSet.isEmpty()) {
                 roomSessions.remove(roomId); // 세션이 모두 끊어지면 방을 삭제할 수 있음
             }
         }
-        log.info("WebSocket connection closed in roomId: " + roomId);
+//        log.info("WebSocket connection closed in roomId: " + roomId);
     }
 
     @Override
