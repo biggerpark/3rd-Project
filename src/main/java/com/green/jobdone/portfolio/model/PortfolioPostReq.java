@@ -27,4 +27,9 @@ public class PortfolioPostReq {
 
     @Schema(title = "포폴내용", requiredMode = Schema.RequiredMode.REQUIRED)
     private String contents;
+
+    @Schema(title = "유튜브url", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private String youtubeUrl;
+
+
 }
