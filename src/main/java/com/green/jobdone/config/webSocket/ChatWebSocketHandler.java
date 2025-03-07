@@ -61,15 +61,21 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         // 마지막 부분이 roomId이므로, 이를 추출
         long roomId = Long.parseLong(uriParts[uriParts.length - 1]);
         roomSessions.forEach((existingRoomId, sessionSet) -> {
-            sessionSet.remove(session); // 이미 다른 방에 연결된 세션을 제거
+            if(sessionSet!=null) {
+                sessionSet.remove(session); // 이미 다른 방에 연결된 세션을 제거
+            }
         });
         session.setBinaryMessageSizeLimit(10*1024*1024);
         Set<WebSocketSession> sessionSet = roomSessions.computeIfAbsent(roomId, k -> new HashSet<>());
-        sessionSet.add(session);
-
-        if(!sessions.contains(session)) {
-            sessions.add(session);
+        if (!sessionSet.contains(session)) {
+            sessionSet.add(session);  // 중복 세션을 방지
         }
+
+//        if(!sessions.contains(session)) {
+//            sessions.add(session);
+//        } 이거때문에 중복세션 나온거같음
+
+
 //        String token = authenticationFacade.getToken();
 //        log.info("토큰값 잘 저장되는거 맞아?? :{} ", token);
 //        session.getAttributes().put("token", token);
