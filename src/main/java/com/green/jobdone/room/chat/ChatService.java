@@ -137,15 +137,18 @@ public class ChatService {
         for (ChatGetRes chat : res) {
             long chatId = chat.getChatId();
             long businessId = chat.getBusinessId();
-            List<GetPicDto> a = chat.getPics();
+//            List<GetPicDto> a = chat.getPics();
             chat.setLogo(PicUrlMaker.makePicUrlLogo(businessId , logo));
-
-            if (a == null) {continue;}
-
-            for (GetPicDto picDto : a) {
-                String picName = picDto.getPic();
-                picDto.setPic(PicUrlMaker.makePicUrlChat(roomId, chatId, picName));
+            if(chat.getPic()!=null){
+                chat.setPic(PicUrlMaker.makePicUrlChat(roomId,chatId,chat.getPic()));
             }
+
+//            if (a == null) {continue;}
+//
+//            for (GetPicDto picDto : a) {
+//                String picName = picDto.getPic();
+//                picDto.setPic(PicUrlMaker.makePicUrlChat(roomId, chatId, picName));
+//            }
         }
 //        log.info("res: {} ", res); 로그 너무 보여
 
