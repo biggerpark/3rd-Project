@@ -20,6 +20,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Slf4j
@@ -29,7 +30,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private ObjectMapper objectMapper = new ObjectMapper();
     private final ChatService chatService;
     private final Set<WebSocketSession> sessions = new HashSet<>();
-    private final Map<Long, Set<WebSocketSession>> roomSessions = new HashMap<>();
+    private final Map<Long, Set<WebSocketSession>> roomSessions = new ConcurrentHashMap<>();
     public ChatWebSocketHandler(ChatService chatService, AuthenticationFacade authenticationFacade) {
         this.chatService = chatService;
         this.authenticationFacade = authenticationFacade;
