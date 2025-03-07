@@ -182,8 +182,9 @@ public class PortfolioService {
 
     public void updPortfolioPicState(PortfolioPicStatePutReq p) {
         if (p.getPortfolioId() == null && p.getPortfolioPicId() != null) {
+            //사진pk만 들어오면 0이나 2로 되어있다가 1로 바뀜
             portfolioPicRepository.updateStateByPortfolioPicId(p.getPortfolioPicId());
-        } else {
+        } else {// 아니면 리뷰나 pk가 들어왔을때
             portfolioPicRepository.updateStateByPortfolioId(p.getPortfolioId());
         }
     }
