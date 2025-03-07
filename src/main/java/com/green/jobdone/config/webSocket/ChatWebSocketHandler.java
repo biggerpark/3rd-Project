@@ -37,12 +37,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-
-        String uri = session.getUri().toString();
-        String[] uriParts = uri.split("/");// 마지막 부분이 roomId이므로, 이를 추출
-
-        Long roomId = Long.parseLong(uriParts[uriParts.length - 1]);
+        long roomId = getRoomIdByUri(session.getUri().toString());
         log.info("현재 방 {}에 연결된 세션 목록: {}", roomId, roomSessions.get(roomId));
+
         roomSessions.forEach((existingRoomId, sessionSet) -> {
             if(sessionSet!=null && sessionSet.contains(session)) {
                 sessionSet.remove(session); // 이미 다른 방에 연결된 세션을 제거
@@ -59,10 +56,26 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         }
 
         log.info("Room ID: " + roomId);
-//        String token = authenticationFacade.getToken();
-//        log.info("토큰값 잘 저장되는거 맞아?? :{} ", token);
-//        session.getAttributes().put("token", token);
-        // 추출된 roomId를 사용하여 채팅방 설정 등 처리
+
+    }
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        long roomId = getRoomIdByUri(session.getUri().toString());
+        // 해당 roomId에 대한 세션 목록에서 제거
+        Set<WebSocketSession> sessionSet = roomSessions.get(roomId);
+        if (sessionSet != null) {
+            boolean aa = sessionSet.remove(session);
+            log.info("삭제되는거 맞음?? : {}, {}",aa, roomId);
+            if (sessionSet.isEmpty()) {
+                roomSessions.remove(roomId); // 세션이 모두 끊어지면 방을 삭제할 수 있음
+            }
+        }
+        log.info("현재 방 {}에 연결된 세션 목록: {}", roomId, roomSessions.get(roomId));
+    }
+
+    private long getRoomIdByUri(String uri){
+        String[] uriParts = uri.split("/");
+        return Long.parseLong(uriParts[uriParts.length - 1]);
     }
 
 //    @Override
@@ -137,23 +150,6 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
 }
 
 
-    @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        String uri = session.getUri().toString();
-        String[] uriParts = uri.split("/");
-        long roomId = Long.parseLong(uriParts[uriParts.length - 1]);
-        // 해당 roomId에 대한 세션 목록에서 제거
-        Set<WebSocketSession> sessionSet = roomSessions.get(roomId);
-        if (sessionSet != null) {
-            sessionSet.remove(session);
-            log.info("세션방 제거 되는거 맞아? : "+roomId);
-            if (sessionSet.isEmpty()) {
-                roomSessions.remove(roomId); // 세션이 모두 끊어지면 방을 삭제할 수 있음
-            }
-        }
-        log.info("현재 방 {}에 연결된 세션 목록: {}", roomId, roomSessions.get(roomId));
-//        log.info("WebSocket connection closed in roomId: " + roomId);
-    }
 
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
