@@ -148,6 +148,7 @@
         <if test="searchName!=null">
             and b.name like '%${searchName}%'
         </if>
+        group by a.serviceId
         order by a.serviceId desc
     </select>
 
