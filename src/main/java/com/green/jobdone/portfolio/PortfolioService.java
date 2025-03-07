@@ -10,6 +10,7 @@ import com.green.jobdone.entity.Portfolio;
 import com.green.jobdone.entity.PortfolioPic;
 import com.green.jobdone.portfolio.model.*;
 import com.green.jobdone.portfolio.model.get.*;
+import com.green.jobdone.youtube.YoutubeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -34,7 +34,7 @@ public class PortfolioService {
     private final MyFileUtils myFileUtils;
     private final AuthenticationFacade authenticationFacade; //인증받은 유저가 이용 할 수 있게.
     private final PortfolioPicRepository portfolioPicRepository;
-
+    private final YoutubeService youtubeService;
 
     // 포폴 만들기
     @Transactional
@@ -47,6 +47,9 @@ public class PortfolioService {
         if (userId != signedUserId) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
         }
+        String youtubeUrl = p.getYoutubeUrl();
+        String youtubeId = youtubeService.extractVideoId(youtubeUrl);
+
 
         Portfolio portfolio = Portfolio.builder()
                 .business(businessRepository.findById(p.getBusinessId()).orElse(null))
@@ -54,6 +57,8 @@ public class PortfolioService {
                 .price(p.getPrice())
                 .takingTime(p.getTakingTime())
                 .contents(p.getContents())
+                .youtubeUrl(youtubeUrl)
+                .youtubeId(youtubeId)
                 .build(); // 일단 빌더로 적을거 다 적고
 
         Portfolio savedPortfolio = portfolioRepository.save(portfolio);
@@ -95,6 +100,7 @@ public class PortfolioService {
 
         return PortfolioPostRes.builder()
                 .portfolioId(portfolioId)
+                .youtubeId(youtubeId)
                 .pics(portfolioPicList)
                 .build();
 
