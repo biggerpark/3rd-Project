@@ -28,6 +28,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final AuthenticationFacade authenticationFacade;
     private ObjectMapper objectMapper = new ObjectMapper();
     private final ChatService chatService;
+    private final Set<WebSocketSession> sessions = new HashSet<>();
     private final Map<Long, Set<WebSocketSession>> roomSessions = new HashMap<>();
     public ChatWebSocketHandler(ChatService chatService, AuthenticationFacade authenticationFacade) {
         this.chatService = chatService;
@@ -51,7 +52,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         Set<WebSocketSession> sessionSet = roomSessions.computeIfAbsent(roomId, k -> new HashSet<>());
         if (!sessionSet.contains(session)) {
             sessionSet.add(session);  // 중복 세션을 방지
+            log.info("세션 {}가 방 {}에 추가됨", session.getId(), roomId);
+        } else {
+            log.info("세션 {}는 이미 방 {}에 존재함", session.getId(), roomId);
         }
+
         log.info("Room ID: " + roomId);
 //        String token = authenticationFacade.getToken();
 //        log.info("토큰값 잘 저장되는거 맞아?? :{} ", token);
