@@ -20,5 +20,7 @@ public class ChatGetRes {
     private String logo;
     private String createdAt;
     private String message;
-    private List<GetPicDto> pics;
+    private String pic;
+    private Long chatPicId;
+//    private List<GetPicDto> pics;
 }

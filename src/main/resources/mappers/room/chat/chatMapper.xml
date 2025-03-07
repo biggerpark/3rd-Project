@@ -34,12 +34,14 @@
         <result property="logo" column="logo"/>
         <result property="businessName" column="businessName"/>
         <result property="businessId" column="businessId"/>
-        <collection property="pics" resultMap="chatPic"/>
-    </resultMap>
-    <resultMap id="chatPic" type="com.green.jobdone.room.chat.model.GetPicDto">
-        <id property="chatPicId" column="chatPicId"/>
         <result property="pic" column="pic"/>
+        <result property="chatPicId" column="chatPicId"/>
+<!--        <collection property="pics" resultMap="chatPic"/>-->
     </resultMap>
+<!--    <resultMap id="chatPic" type="com.green.jobdone.room.chat.model.GetPicDto">-->
+<!--        <id property="chatPicId" column="chatPicId"/>-->
+<!--        <result property="pic" column="pic"/>-->
+<!--    </resultMap>-->
     <select id="selRoomChat" resultMap="selChat">
         select distinct a.chatId, a.contents as message, a.flag, a.createdAt, c.name as userName, d.logo, d.businessName
         , e.pic, e.chatPicId, d.businessId
