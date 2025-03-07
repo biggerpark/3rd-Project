@@ -147,7 +147,7 @@ public class ChatService {
                 picDto.setPic(PicUrlMaker.makePicUrlChat(roomId, chatId, picName));
             }
         }
-        log.info("res: {} ", res);
+//        log.info("res: {} ", res); 로그 너무 보여
 
         return res;
     }

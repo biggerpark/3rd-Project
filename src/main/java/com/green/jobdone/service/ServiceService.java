@@ -148,8 +148,9 @@ public class ServiceService {
         if(p.getServiceId()==0){
             return null;
         }
-
-        if(businessId==null && userId==null || res.getUserId()!=userId) {
+        //업체가 null 이면서 userid도 null   || res. get유저 아이디가 다르다면?
+        // res 의 유저 id가 service 제공받는사람의 userId임
+        if((businessId==null && userId==null) || (res.getBusiUserId()!=userId && businessId!=null) || (res.getUserId()!=userId &&   businessId==null)) {
             res.setUserName("");
             res.setUserPhone("");
             res.setAddress("");

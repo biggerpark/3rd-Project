@@ -15,6 +15,8 @@ public class ServiceGetOneRes {
     private long serviceId;
     @JsonIgnore
     private long userId;
+    @JsonIgnore
+    private long busiUserId;
     private String userName;
     private String userPhone;
     private String businessName;
