@@ -60,9 +60,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
         // 마지막 부분이 roomId이므로, 이를 추출
         long roomId = Long.parseLong(uriParts[uriParts.length - 1]);
+        log.info("현재 방 {}에 연결된 세션 목록: {}", roomId, roomSessions.get(roomId));
         roomSessions.forEach((existingRoomId, sessionSet) -> {
             if(sessionSet!=null) {
                 sessionSet.remove(session); // 이미 다른 방에 연결된 세션을 제거
+                log.info("세션 {}를 방 {}에서 제거", session.getId(), existingRoomId);
             }
         });
         session.setBinaryMessageSizeLimit(10*1024*1024);
