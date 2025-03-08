@@ -11,6 +11,7 @@ import com.green.jobdone.entity.PortfolioPic;
 import com.green.jobdone.portfolio.model.*;
 import com.green.jobdone.portfolio.model.get.*;
 import com.green.jobdone.youtube.YoutubeService;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,7 @@ public class PortfolioService {
     private final AuthenticationFacade authenticationFacade; //인증받은 유저가 이용 할 수 있게.
     private final PortfolioPicRepository portfolioPicRepository;
     private final YoutubeService youtubeService;
+    private final EntityManager entityManager;
 
     // 포폴 만들기
     @Transactional
@@ -120,16 +122,31 @@ public class PortfolioService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
         }
 
-        Portfolio portfolio = portfolioRepository.findById(p.getPortfolioId()).orElse(null);
-        Business business = new Business();
-        business.setBusinessId(p.getBusinessId());
-        portfolio.setPortfolioId(p.getPortfolioId());
-        portfolio.setBusiness(business);
-        portfolio.setTitle(p.getTitle());
-        portfolio.setPrice(p.getPrice());
-        portfolio.setTakingTime(p.getTakingTime());
-        portfolio.setContents(p.getContents());
-        portfolioRepository.save(portfolio);
+
+        Portfolio portfolio = entityManager.find(Portfolio.class, p.getPortfolioId());
+        if (portfolio == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "포폴을 찾을수 없습니다.");
+        }
+        // 변경된 내용만 업데이트
+        if (p.getTitle() != null) portfolio.setTitle(p.getTitle());
+        if (p.getPrice() != null) portfolio.setPrice(p.getPrice());
+        if (p.getTakingTime() != null) portfolio.setTakingTime(p.getTakingTime());
+        if (p.getContents() != null) portfolio.setContents(p.getContents());
+
+        // YouTube URL 처리
+        if (p.getYoutubeUrl() != null) {
+            String youtubeId = youtubeService.extractVideoId(p.getYoutubeUrl());
+            if (youtubeId != null) {
+                portfolio.setYoutubeUrl(p.getYoutubeUrl());
+                portfolio.setYoutubeId(youtubeId);
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "유효하지 않은 유튜브 URL입니다.");
+            }
+        }
+
+        entityManager.flush();
+
+
 
         List<String> portfolioPicList = new ArrayList<>();
 
@@ -145,6 +162,7 @@ public class PortfolioService {
         if (pics == null || pics.isEmpty()) {
             return PortfolioPutRes.builder()
                     .portfolioId(portfolioId)
+                    .youtubeId(portfolio.getYoutubeId())
                     .pics(portfolioPicList)
                     .build();
         }
@@ -176,6 +194,7 @@ public class PortfolioService {
         portfolioPicRepository.saveAll(portfolioPics);
         return PortfolioPutRes.builder()
                 .portfolioId(portfolioId)
+                .youtubeId(portfolio.getYoutubeId())
                 .pics(portfolioPicList)
                 .build();
     }
