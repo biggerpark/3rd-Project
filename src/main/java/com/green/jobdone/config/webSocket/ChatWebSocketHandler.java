@@ -70,7 +70,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         // 해당 roomId에 대한 세션 목록에서 제거
 
         roomSessions.forEach((roomId, sessionSet) -> {
-            if (sessionSet != null && sessionSet.remove(session)) {
+            if (sessionSet != null) {
+                sessionSet.clear();
                 log.info("세션 {}가 방 {}에서 제거됨", session.getId(), roomId);
                 if (sessionSet.isEmpty()) {
                     roomSessions.remove(roomId);
