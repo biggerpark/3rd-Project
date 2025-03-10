@@ -142,6 +142,7 @@ public class ChatService {
             long businessId = chat.getBusinessId();
 //            List<GetPicDto> a = chat.getPics();
             chat.setLogo(PicUrlMaker.makePicUrlLogo(businessId , logo));
+            chat.setLogo2(PicUrlMaker.makePicUserUrl(chat.getUserId(),chat.getLogo2()));
             if(chat.getPic()!=null){
                 chat.setPic(PicUrlMaker.makePicUrlChat(roomId,chatId,chat.getPic()));
             }
