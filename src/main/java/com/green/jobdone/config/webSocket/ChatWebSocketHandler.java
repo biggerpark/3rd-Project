@@ -58,7 +58,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 log.info("세션 {}는 이미 다른 방에 연결되어 있음. 방: {}", session.getId(), entry.getKey());
                 log.info("모든방 {} ",roomSessions);
                 isAlreadyConnected = true;
-                roomSessions.remove(entry.getKey());
                 break; // for문 바로 탈출
             }
         }
@@ -170,7 +169,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
                     log.info("채팅 보내는 for문 정상 진입");
                     if (webSocketSession.isOpen()) {
                     log.info("채팅 보내는 if문 정상 진입");
-                        webSocketSession.sendMessage(new TextMessage("새 메시지: " + message.getPayload()));
+//                        webSocketSession.sendMessage(new TextMessage("새 메시지: " + message.getPayload()));
                     }
                 }
                         log.info("req확인: {}", req);
@@ -255,7 +254,11 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
                         log.info("채팅 보내는 if문 정상 진입");
 //                        webSocketSession.sendMessage(new TextMessage(jsonData));
 //                        webSocketSession.sendMessage(new TextMessage(textMessage));
-                        webSocketSession.sendMessage(new TextMessage(jsonData));
+                        if (webSocketSession.getId().equals(session.getId())) {
+                            // sessionId가 동일하면 메시지를 전송
+                            webSocketSession.sendMessage(new TextMessage(jsonData));
+                            log.info("메세지 전송부분");
+                        }
                     }
                 }
             }
@@ -264,11 +267,11 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
 
         } catch (Exception e) {
             log.error("파일 업로드 및 메시지 처리 중 오류 발생", e);
-            try {
-                session.sendMessage(new TextMessage("파일 업로드 및 메시지 처리 실패: " + e.getMessage()));
-            } catch (IOException ex) {
-                log.error("웹소켓 응답 전송 중 오류 발생", ex);
-            }
+//            try {
+//                session.sendMessage(new TextMessage("파일 업로드 및 메시지 처리 실패: " + e.getMessage()));
+//            } catch (IOException ex) {
+//                log.error("웹소켓 응답 전송 중 오류 발생", ex);
+//            } 설마?
         }
     }
 
