@@ -71,7 +71,7 @@
         on a.qaId=b.qaId
         LEFT JOIN user c
         on a.userId=c.userId
-        GROUP BY b.qaId
+        GROUP BY a.qaId
         ORDER BY a.qaId DESC
     </select>
 
