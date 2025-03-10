@@ -40,25 +40,28 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         long roomId = getRoomIdByUri(session.getUri().toString());
         log.info("현재 방 {}에 연결된 세션 목록: {}", roomId, roomSessions.get(roomId));
 
-        roomSessions.forEach((existingRoomId, sessionSet) -> {
-            if(sessionSet!=null){
-            log.info("여기 들어가긴함? : {}, {}", existingRoomId, sessionSet.contains(session));
-                } else{
-                log.info("sessionSet이 null이라 안들어가지");
-            }
-
-            if(sessionSet!=null && sessionSet.contains(session)) {
-                sessionSet.remove(session); // 이미 다른 방에 연결된 세션을 제거
-                log.info("세션 {}를 방 {}에서 제거", session.getId(), existingRoomId);
-            }
-        });
+//        roomSessions.forEach((existingRoomId, sessionSet) -> {
+//            if(sessionSet!=null){
+//            log.info("여기 들어가긴함? : {}, {}", existingRoomId, sessionSet.contains(session));
+//                } else{
+//                log.info("sessionSet이 null이라 안들어가지");
+//            }
+//
+//            if(sessionSet!=null && sessionSet.contains(session)) {
+//                sessionSet.remove(session); // 이미 다른 방에 연결된 세션을 제거
+//                log.info("세션 {}를 방 {}에서 제거", session.getId(), existingRoomId);
+//            }
+//        }); 어쳐피 첫방 들어갈땐 안나오는게 정상임 closed 때 다 지웠으니
+        Set<WebSocketSession> existingSessions = roomSessions.get(roomId);
+        if (existingSessions != null && existingSessions.contains(session)) {
+            log.info("세션 {}는 이미 방 {}에 연결됨", session.getId(), roomId);
+            return; // 이미 연결되어 있으면 추가하지 않음
+        }
         session.setBinaryMessageSizeLimit(10*1024*1024);
         Set<WebSocketSession> sessionSet = roomSessions.computeIfAbsent(roomId, k -> new HashSet<>());
         if (!sessionSet.contains(session)) {
             sessionSet.add(session);  // 중복 세션을 방지
             log.info("세션 {}가 방 {}에 추가됨", session.getId(), roomId);
-        } else {
-            log.info("세션 {}는 이미 방 {}에 존재함", session.getId(), roomId);
         }
 
         log.info("Room ID: " + roomId);

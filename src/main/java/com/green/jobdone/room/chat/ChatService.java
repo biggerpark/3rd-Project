@@ -132,6 +132,9 @@ public class ChatService {
 
     public List<ChatGetRes> selRoomChat(ChatGetReq p){
         List<ChatGetRes> res = chatMapper.selRoomChat(p);
+        if(res.isEmpty()){
+            return res;
+        }
         String logo = res.get(0).getLogo();
         long roomId = p.getRoomId();
         for (ChatGetRes chat : res) {
