@@ -41,6 +41,12 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         log.info("현재 방 {}에 연결된 세션 목록: {}", roomId, roomSessions.get(roomId));
 
         roomSessions.forEach((existingRoomId, sessionSet) -> {
+            if(sessionSet!=null){
+            log.info("여기 들어가긴함? : {}, {}", existingRoomId, sessionSet.contains(session));
+                } else{
+                log.info("sessionSet이 null이라 안들어가지");
+            }
+
             if(sessionSet!=null && sessionSet.contains(session)) {
                 sessionSet.remove(session); // 이미 다른 방에 연결된 세션을 제거
                 log.info("세션 {}를 방 {}에서 제거", session.getId(), existingRoomId);
