@@ -142,4 +142,18 @@ public class AdminController {
                 .resultData(result)
                 .build();
     }
+
+    @PatchMapping("adminAllow")
+    @Operation(summary = "이메일을 입력하여 관리자가 관리자 권한 부여,화면은 따로 안만들거고 서버 자체적으로 특정 이메일 지정할때 쓸 api")
+    public ResultResponse<Integer> patchAdminAllow(@RequestBody AdminAllowReq p){
+        Integer result = adminService.patchAdminAllow(p);
+
+        return ResultResponse.<Integer> builder()
+                .resultMessage("관리자 권한 부여 완료")
+                .resultData(result)
+                .build();
+
+
+    }
+
 }
