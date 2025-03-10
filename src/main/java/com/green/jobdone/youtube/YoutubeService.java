@@ -30,8 +30,8 @@ public class YoutubeService {
 
         if (youtubeUrl != null && youtubeUrl.contains("v=")) {
             String[] split = youtubeUrl.split("v="); // v=를 기준으로 문자열을 나눈다
-            String videoId = split[1];
-            int ampersandIndex = videoId.indexOf('&');
+            String videoId = split[1];//아이디 부분 추출 ㅇㅇ
+            int ampersandIndex = videoId.indexOf('&'); //만약 &있으면 그것도 잘라내야함
             if (ampersandIndex != -1) {
                 videoId = videoId.substring(0, ampersandIndex);
             }
