@@ -169,7 +169,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
                     log.info("채팅 보내는 for문 정상 진입");
                     if (webSocketSession.isOpen()) {
                     log.info("채팅 보내는 if문 정상 진입");
-                        webSocketSession.sendMessage(new TextMessage("새 메시지: " + message.getPayload()));
+//                        webSocketSession.sendMessage(new TextMessage("새 메시지: " + message.getPayload()));
                     }
                 }
                         log.info("req확인: {}", req);
