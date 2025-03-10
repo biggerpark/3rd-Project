@@ -30,6 +30,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private ObjectMapper objectMapper = new ObjectMapper();
     private final ChatService chatService;
     private final Set<WebSocketSession> sessions = new HashSet<>();
+    private final Map<WebSocketSession, Long> sessionRoomMap = new HashMap<>();
     private final Map<Long, Set<WebSocketSession>> roomSessions = new ConcurrentHashMap<>();
     public ChatWebSocketHandler(ChatService chatService, AuthenticationFacade authenticationFacade) {
         this.chatService = chatService;
@@ -40,30 +41,26 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         long roomId = getRoomIdByUri(session.getUri().toString());
         log.info("현재 방 {}에 연결된 세션 목록: {}", roomId, roomSessions.get(roomId));
 
-//        roomSessions.forEach((existingRoomId, sessionSet) -> {
-//            if(sessionSet!=null){
-//            log.info("여기 들어가긴함? : {}, {}", existingRoomId, sessionSet.contains(session));
-//                } else{
-//                log.info("sessionSet이 null이라 안들어가지");
+//        if (sessionRoomMap.containsKey(session)) {
+//            long currentRoomId = sessionRoomMap.get(session);
+//            if (currentRoomId != roomId) {
+//                log.info("세션 {}는 이미 방 {}에 연결되어 있음, 방 {}에 연결할 수 없습니다.", session.getId(), currentRoomId, roomId);
+//                return; // 다른 방으로 재연결을 차단
 //            }
-//
-//            if(sessionSet!=null && sessionSet.contains(session)) {
-//                sessionSet.remove(session); // 이미 다른 방에 연결된 세션을 제거
-//                log.info("세션 {}를 방 {}에서 제거", session.getId(), existingRoomId);
+//        }
+
+//        boolean isAlreadyConnected = false;
+//        for (Map.Entry<Long, Set<WebSocketSession>> entry : roomSessions.entrySet()) {
+//            if (entry.getValue() != null && !entry.getValue().isEmpty()) {
+//                log.info("세션 {}는 이미 다른 방에 연결되어 있음. 방: {}", session.getId(), entry.getKey());
+//                log.info("모든방 {} ",roomSessions);
+//                isAlreadyConnected = true;
+//                break; // for문 바로 탈출
 //            }
-//        }); 어쳐피 첫방 들어갈땐 안나오는게 정상임 closed 때 다 지웠으니
-        boolean isAlreadyConnected = false;
-        for (Map.Entry<Long, Set<WebSocketSession>> entry : roomSessions.entrySet()) {
-            if (entry.getValue() != null && !entry.getValue().isEmpty()) {
-                log.info("세션 {}는 이미 다른 방에 연결되어 있음. 방: {}", session.getId(), entry.getKey());
-                log.info("모든방 {} ",roomSessions);
-                isAlreadyConnected = true;
-                break; // for문 바로 탈출
-            }
-        }
-        if (isAlreadyConnected) {
-            return; // 위에서 방이 있으면 true로 변했을거니 중복방 생성 x 될듯?
-        }
+//        }
+//        if (isAlreadyConnected) {
+//            return; // 위에서 방이 있으면 true로 변했을거니 중복방 생성 x 될듯?
+//        }
 
         session.setBinaryMessageSizeLimit(10*1024*1024);
         Set<WebSocketSession> sessionSet = roomSessions.computeIfAbsent(roomId, k -> new HashSet<>());
@@ -82,8 +79,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
         roomSessions.forEach((roomId, sessionSet) -> {
             if (sessionSet != null) {
-                sessionSet.clear();
-                log.info("세션 {}가 방 {}에서 제거됨", session.getId(), roomId);
+                sessionSet.remove(session);
+                log.info("남은 세션: {}", roomSessions);
+
+                // 세션 목록이 비면 방 삭제
                 if (sessionSet.isEmpty()) {
                     roomSessions.remove(roomId);
                     log.info("방 {}가 비어 삭제됨", roomId);
@@ -254,11 +253,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
                         log.info("채팅 보내는 if문 정상 진입");
 //                        webSocketSession.sendMessage(new TextMessage(jsonData));
 //                        webSocketSession.sendMessage(new TextMessage(textMessage));
-                        if (webSocketSession.getId().equals(session.getId())) {
-                            // sessionId가 동일하면 메시지를 전송
                             webSocketSession.sendMessage(new TextMessage(jsonData));
-                            log.info("메세지 전송부분");
-                        }
                     }
                 }
             }
