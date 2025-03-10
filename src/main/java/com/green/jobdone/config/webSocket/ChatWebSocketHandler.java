@@ -56,7 +56,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         for (Map.Entry<Long, Set<WebSocketSession>> entry : roomSessions.entrySet()) {
             if (entry.getValue() != null && !entry.getValue().isEmpty()) {
                 log.info("세션 {}는 이미 다른 방에 연결되어 있음. 방: {}", session.getId(), entry.getKey());
+                log.info("모든방 {} ",roomSessions);
                 isAlreadyConnected = true;
+                roomSessions.remove(entry.getKey());
                 break; // for문 바로 탈출
             }
         }
