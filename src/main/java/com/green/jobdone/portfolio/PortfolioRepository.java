@@ -32,7 +32,7 @@ public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
 
     @Modifying
     @Query("update Portfolio  p set p.thumbnail=:#{#p.thumbnail} where p.portfolioId=:#{#p.portfolioId}")
-    Integer updatePortfolioThumbnail(@Param("p") PortfolioPatchThumbnailReq p);
+    Integer patchPortfolioThumbnail(@Param("p") PortfolioPatchThumbnailReq p);
 
 
 }

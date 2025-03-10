@@ -257,7 +257,7 @@ public class PortfolioService {
         p.setBusinessId(businessId);
         p.setPortfolioId(p.getPortfolioId());
         p.setThumbnail(savedThumbName);
-        return portfolioRepository.updatePortfolioThumbnail(p);
+        return portfolioRepository.patchPortfolioThumbnail(p);
     }
 
 
