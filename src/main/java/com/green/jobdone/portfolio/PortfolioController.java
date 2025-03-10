@@ -24,8 +24,9 @@ public class PortfolioController {
 
     @PostMapping
     public ResultResponse<PortfolioPostRes> insPortfolio(@RequestPart List<MultipartFile> pics
+                                                         ,@RequestPart(required = false) MultipartFile thumb
             ,@Valid @RequestPart PortfolioPostReq p) {
-        PortfolioPostRes res = portfolioService.insPortfolio(pics,p);
+        PortfolioPostRes res = portfolioService.insPortfolio(pics,thumb,p);
         return ResultResponse.<PortfolioPostRes>builder()
                 .resultData(res)
                 .resultMessage("옛다").build();

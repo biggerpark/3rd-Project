@@ -40,7 +40,7 @@ public class PortfolioService {
 
     // 포폴 만들기
     @Transactional
-    public PortfolioPostRes insPortfolio(List<MultipartFile> pics, PortfolioPostReq p) {
+    public PortfolioPostRes insPortfolio(List<MultipartFile> pics, MultipartFile thumbnail, PortfolioPostReq p) {
 
         long signedUserId = authenticationFacade.getSignedUserId();
 
@@ -52,6 +52,21 @@ public class PortfolioService {
         String youtubeUrl = p.getYoutubeUrl();
         String youtubeId = youtubeService.extractVideoId(youtubeUrl);
 
+        String thumbPath = String.format("business/%d/portfolio/%d/thumbnail", p.getBusinessId(), p.getPortfolioId());
+        myFileUtils.makeFolders(thumbPath);
+
+        String savedThumbName = (thumbnail != null && !thumbnail.isEmpty()) ? myFileUtils.makeRandomFileName(thumbnail) : null;
+        String thumbnailFilePath = String.format("%s/%s",thumbPath,savedThumbName);
+
+        try {
+            if (thumbnail != null && !thumbnail.isEmpty()) {
+                myFileUtils.transferTo(thumbnail,thumbnailFilePath);
+            }
+        }catch (IOException e) {
+            log.error("error occurs:{}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+
+        }
 
         Portfolio portfolio = Portfolio.builder()
                 .business(businessRepository.findById(p.getBusinessId()).orElse(null))
@@ -59,6 +74,7 @@ public class PortfolioService {
                 .price(p.getPrice())
                 .takingTime(p.getTakingTime())
                 .contents(p.getContents())
+                .thumbnail(thumbnailFilePath)
                 .youtubeUrl(youtubeUrl)
                 .youtubeId(youtubeId)
                 .build(); // 일단 빌더로 적을거 다 적고
@@ -84,17 +100,13 @@ public class PortfolioService {
                 throw new RuntimeException(e);
             }
         }
-        boolean isFirst = true; // 첫 번째 사진 여부를 체크할 변수
 
         List<PortfolioPic> portfolioPics = new ArrayList<>();
         for (String picName : portfolioPicList) { // 리스트를 순회하면서 사진 저장
             PortfolioPic portfolioPic = new PortfolioPic();
             portfolioPic.setPortfolio(portfolio);
             portfolioPic.setPic(picName);
-            portfolioPic.setState(isFirst ? 2 : 0); // 첫 번째 사진이면 2, 나머지는 0
             portfolioPics.add(portfolioPic);
-
-            isFirst = false; // 첫 번째 처리가 끝났으니 false로 변경
         }
 
         portfolioPicRepository.saveAll(portfolioPics);
@@ -102,6 +114,7 @@ public class PortfolioService {
 
         return PortfolioPostRes.builder()
                 .portfolioId(portfolioId)
+                .thumbnail(thumbnailFilePath)
                 .youtubeId(youtubeId)
                 .pics(portfolioPicList)
                 .build();
@@ -208,6 +221,46 @@ public class PortfolioService {
         }
     }
 
+    @Transactional
+    public int patchPortfolioThumbnail(PortfolioPatchThumbnailReq p, MultipartFile thumbnail) {
+
+        long signedUserId = authenticationFacade.getSignedUserId();
+
+        long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
+        if (userId != signedUserId) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
+        }
+
+
+        Long businessId = p.getBusinessId();
+        // 누락 파일 처리
+        if (thumbnail == null || thumbnail.isEmpty()) {
+            return 0;
+        }
+        String thumbPath = String.format("business/%d/portfolio/%d/thumbnail", p.getBusinessId(), p.getPortfolioId());
+        myFileUtils.makeFolders(thumbPath);
+
+        String savedThumbName = (thumbnail != null && !thumbnail.isEmpty()) ? myFileUtils.makeRandomFileName(thumbnail) : null;
+        String thumbnailFilePath = String.format("%s/%s",thumbPath,savedThumbName);
+
+        try {
+            if (thumbnail != null && !thumbnail.isEmpty()) {
+                myFileUtils.transferTo(thumbnail,thumbnailFilePath);
+            }
+        }catch (IOException e) {
+            log.error("error occurs:{}", e.getMessage());
+            return 0;
+        }
+
+        // DB에 로고 수정 정보 업데이트
+
+        p.setBusinessId(businessId);
+        p.setPortfolioId(p.getPortfolioId());
+        p.setThumbnail(savedThumbName);
+        return portfolioRepository.updatePortfolioThumbnail(p);
+    }
+
+
     public int udtPortfolioThumbnail(PortfolioPicReq p) {
         return portfolioRepository.updatePortfolioThumbnail(p.getPortfolioPicId(),p.getPortfolioId());
     }
@@ -254,8 +307,8 @@ public class PortfolioService {
         List<PortfolioListGetRes> res = portfolioMapper.selAllPortfolioList(p);
 
         for (PortfolioListGetRes r : res) {
-            String picUrl = PicUrlMaker.makePicUrlPortfolio(r.getBusinessId(), r.getPortfolioId(), r.getIsThumbnail());
-            r.setIsThumbnail(picUrl);
+            String picUrl = PicUrlMaker.makePicUrlPortfolioThumb(r.getBusinessId(), r.getPortfolioId(), r.getThumbnail());
+            r.setThumbnail(picUrl);
         }
 
         return res;

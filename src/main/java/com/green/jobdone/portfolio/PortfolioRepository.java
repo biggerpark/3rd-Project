@@ -1,6 +1,8 @@
 package com.green.jobdone.portfolio;
 
+import com.green.jobdone.business.model.BusinessLogoPatchReq;
 import com.green.jobdone.entity.Portfolio;
+import com.green.jobdone.portfolio.model.PortfolioPatchThumbnailReq;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -27,6 +29,10 @@ public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
     int updatePortfolioThumbnail(@Param("portfolioPicId") Long portfolioPicId,
                                  @Param("portfolioId") Long portfolioId);
 
+
+    @Modifying
+    @Query("update Portfolio  p set p.thumbnail=:#{#p.thumbnail} where p.portfolioId=:#{#p.portfolioId}")
+    Integer updatePortfolioThumbnail(@Param("p") PortfolioPatchThumbnailReq p);
 
 
 }
