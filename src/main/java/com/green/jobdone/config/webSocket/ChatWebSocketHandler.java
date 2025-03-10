@@ -254,7 +254,11 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
                         log.info("채팅 보내는 if문 정상 진입");
 //                        webSocketSession.sendMessage(new TextMessage(jsonData));
 //                        webSocketSession.sendMessage(new TextMessage(textMessage));
-                        webSocketSession.sendMessage(new TextMessage(jsonData));
+                        if (webSocketSession.getId().equals(session.getId())) {
+                            // sessionId가 동일하면 메시지를 전송
+                            webSocketSession.sendMessage(new TextMessage(jsonData));
+                            log.info("메세지 전송부분");
+                        }
                     }
                 }
             }
