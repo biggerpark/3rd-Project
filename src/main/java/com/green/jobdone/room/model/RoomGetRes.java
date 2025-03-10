@@ -15,6 +15,7 @@ public class RoomGetRes {
     private String title;
     private String logo;
     private String pic;
+    private String userName;
     @JsonIgnore
     private long userId;
     @JsonIgnore
