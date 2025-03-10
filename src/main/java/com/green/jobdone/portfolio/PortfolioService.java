@@ -209,7 +209,7 @@ public class PortfolioService {
     }
 
     public int udtPortfolioThumbnail(PortfolioPicReq p) {
-        return portfolioMapper.udtPortfolioThumbnail(p);
+        return portfolioRepository.updatePortfolioThumbnail(p.getPortfolioPicId(),p.getPortfolioId());
     }
     // 이런건 괜히 손대면 귀찮아지니까 냅두자
 
@@ -240,7 +240,7 @@ public class PortfolioService {
 
         Portfolio portfolio = portfolioRepository.findById(p.getPortfolioId()).orElse(null);
         if (portfolio == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "naga");// rid eocndgka
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "naga");// rid eocndgka 대층강
         }
         portfolioRepository.delete(portfolio);
 

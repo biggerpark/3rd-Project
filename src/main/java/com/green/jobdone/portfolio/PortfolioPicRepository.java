@@ -27,4 +27,6 @@ public interface PortfolioPicRepository extends JpaRepository<PortfolioPic, Inte
     @Transactional
     @Query("delete from PortfolioPic p where p.portfolio.portfolioId =:portfolioId and p.state = 1")
     int deletePortfolioPicByPortfolioPicId(@Param("portfolioId") Long portfolioId);
+
+
 }
