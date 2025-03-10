@@ -18,6 +18,9 @@ youtube:
   api:
     key: ${YOUTUBE.API_KEY}
 
+weather:
+  api:
+    key: ${WEATHER.API_KEY}
 
 upstage:
   api:
