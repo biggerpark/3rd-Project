@@ -14,7 +14,7 @@
 
     <select id="selRoom">
         SELECT a.roomId, ifnull(c.createdAt,a.createdAt) AS roomCreatedAt, a.businessId, a.userId,
-        b.title, b.businessName, c.chatId, a.serviceId,
+        b.title, b.businessName, c.chatId, a.serviceId, e.name as userName,
         IF(d.pic IS NOT NULL, '사진', c.contents) AS recentlyChat, b.logo, e.pic
         FROM room a
         LEFT JOIN business b ON a.businessId = b.businessId
