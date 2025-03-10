@@ -66,7 +66,7 @@ public class ChatService {
         Map<String ,Object> resJson = new HashMap<>();
         resJson.put("flag",p.getFlag());
         resJson.put("message",p.getContents());
-        resJson.put("userPic",userPic);
+        resJson.put("logo2",userPic);
         resJson.put("logo",logo);
         if(pic==null){
 //            return null;
