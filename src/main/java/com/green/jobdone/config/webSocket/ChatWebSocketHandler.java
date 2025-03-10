@@ -60,18 +60,31 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        long roomId = getRoomIdByUri(session.getUri().toString());
+        long roomId2 = getRoomIdByUri(session.getUri().toString());
         // 해당 roomId에 대한 세션 목록에서 제거
-        Set<WebSocketSession> sessionSet = roomSessions.get(roomId);
-        if (sessionSet != null) {
-            boolean aa = sessionSet.remove(session);
-            log.info("삭제되는거 맞음?? : {}, {}",aa, roomId);
-            if (sessionSet.isEmpty()) {
-                roomSessions.remove(roomId); // 세션이 모두 끊어지면 방을 삭제할 수 있음
+
+        roomSessions.forEach((roomId, sessionSet) -> {
+            if (sessionSet != null && sessionSet.remove(session)) {
+                log.info("세션 {}가 방 {}에서 제거됨", session.getId(), roomId);
+                if (sessionSet.isEmpty()) {
+                    roomSessions.remove(roomId);
+                    log.info("방 {}가 비어 삭제됨", roomId);
+                }
             }
-        }
-        log.info("현재 방 {}에 연결된 세션 목록: {}", roomId, roomSessions.get(roomId));
+        });
+
+        log.info("모든 방의 현재 세션 상태: {}", roomSessions);
     }
+//        Set<WebSocketSession> sessionSet = roomSessions.get(roomId);
+//        if (sessionSet != null) {
+//            boolean aa = sessionSet.remove(session);
+//            log.info("삭제되는거 맞음?? : {}, {}",aa, roomId);
+//            if (sessionSet.isEmpty()) {
+//                roomSessions.remove(roomId); // 세션이 모두 끊어지면 방을 삭제할 수 있음
+//            }
+//        }
+//        log.info("현재 방 {}에 연결된 세션 목록: {}", roomId, roomSessions.get(roomId));
+//    }
 
     private long getRoomIdByUri(String uri){
         String[] uriParts = uri.split("/");
