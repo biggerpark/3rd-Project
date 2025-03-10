@@ -52,11 +52,18 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 //                log.info("세션 {}를 방 {}에서 제거", session.getId(), existingRoomId);
 //            }
 //        }); 어쳐피 첫방 들어갈땐 안나오는게 정상임 closed 때 다 지웠으니
-        Set<WebSocketSession> existingSessions = roomSessions.get(roomId);
-        if (existingSessions != null && existingSessions.contains(session)) {
-            log.info("세션 {}는 이미 방 {}에 연결됨", session.getId(), roomId);
-            return; // 이미 연결되어 있으면 추가하지 않음
+        boolean isAlreadyConnected = false;
+        for (Map.Entry<Long, Set<WebSocketSession>> entry : roomSessions.entrySet()) {
+            if (entry.getValue() != null && !entry.getValue().isEmpty()) {
+                log.info("세션 {}는 이미 다른 방에 연결되어 있음. 방: {}", session.getId(), entry.getKey());
+                isAlreadyConnected = true;
+                break; // for문 바로 탈출
+            }
         }
+        if (isAlreadyConnected) {
+            return; // 위에서 방이 있으면 true로 변했을거니 중복방 생성 x 될듯?
+        }
+
         session.setBinaryMessageSizeLimit(10*1024*1024);
         Set<WebSocketSession> sessionSet = roomSessions.computeIfAbsent(roomId, k -> new HashSet<>());
         if (!sessionSet.contains(session)) {
