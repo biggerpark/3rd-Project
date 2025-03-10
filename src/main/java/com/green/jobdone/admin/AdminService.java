@@ -6,6 +6,7 @@ import com.green.jobdone.category.CategoryRepository;
 import com.green.jobdone.category.DetailTypeRepository;
 import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.config.jwt.UserRole;
+import com.green.jobdone.entity.Admin;
 import com.green.jobdone.entity.Business;
 import com.green.jobdone.entity.User;
 import com.green.jobdone.service.ServiceRepository;
@@ -251,6 +252,32 @@ public class AdminService {
         res.setIncreaseUnprocessedInquiries(unprocessedInquiriesInfoDto.getTodayUnprocessedInquiries());
         return res;
     }
+
+
+
+    @Transactional
+    public int patchAdminAllow(AdminAllowReq p){
+
+        User user=userRepository.findByEmail(p.getEmail()); // email 을 통해 User entity 객체 생성
+
+        user.setRole(UserRole.ADMIN);
+
+
+        Admin admin=Admin.builder()
+                .aId(user.getEmail())
+                .aPw(user.getUpw())
+                .phone(user.getPhone())
+                .name(user.getName())
+                .role(UserRole.ADMIN)
+                .build();
+
+
+        adminRepository.save(admin);
+
+
+        return 1;
+    }
+
 
 
 

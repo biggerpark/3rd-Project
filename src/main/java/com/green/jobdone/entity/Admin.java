@@ -3,15 +3,16 @@ package com.green.jobdone.entity;
 import com.green.jobdone.config.converter.UserRoleConverter;
 import com.green.jobdone.config.jwt.UserRole;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
 @Setter
 @ToString
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Admin  extends UpdatedAt{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // auto_increment 속성이 들어감.
