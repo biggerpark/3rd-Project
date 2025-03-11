@@ -288,11 +288,11 @@ public class ServiceService {
         p.setUserId(0);
 
         if(p.getCompleted()==7){
-//            CompletedDto dto = new CompletedDto();
-//            dto.setServiceId(p.getServiceId());
-//            dto.setBusinessId(p.getBusinessId());
-//            return serviceMapper.payOrDoneCompleted(dto);
-            serviceRepository.updCompleted(p.getServiceId(),7);
+            CompletedDto dto = new CompletedDto();
+            dto.setServiceId(p.getServiceId());
+            dto.setBusinessId(p.getBusinessId());
+            return serviceMapper.payOrDoneCompleted(dto);
+//            serviceRepository.updateServiceStatus(p.getServiceId(),7);
         }
 
 
