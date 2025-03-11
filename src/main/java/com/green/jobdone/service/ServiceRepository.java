@@ -47,7 +47,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
     @Query("select new com.green.jobdone.service.model.Dto.CancelDto(s.tid ,s.user.userId, s.totalPrice, s.completed) from Service s where s.serviceId =:serviceId")
     CancelDto findCancelDtoByServiceId(@Param("serviceId") Long serviceId);
 
-    @Query("select new com.green.jobdone.service.model.Dto.ServiceQaDto(s.completed, s.doneAt) from Service s where s.serviceId =:serviceId")
+    @Query("select new com.green.jobdone.service.model.Dto.ServiceQaDto(s.completed, s.doneAt, s.paidAt) from Service s where s.serviceId =:serviceId")
     ServiceQaDto findQaDtoByServiceId(@Param("serviceId") Long serviceId);
 
 

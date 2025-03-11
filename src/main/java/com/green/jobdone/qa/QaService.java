@@ -68,23 +68,19 @@ public class QaService {
         }
         if(p.getQaReportReason().getCode()==1){
             ServiceQaDto qaDto = serviceRepository.findQaDtoByServiceId(p.getQaTargetId());
-            if(qaDto==null || qaDto.getDoneAt()==null){
+            if(qaDto==null || qaDto.getCompleted()<6){
                 throw new CustomException(ServiceErrorCode.FAIL_UPDATE_SERVICE);
             }
+            if(qaDto.getDoneAt()==null){
+                updCompleted(qaDto.getCompleted(), p.getQaTargetId());
+                return;
+            }
+
             if(qaDto.getDoneAt().isBefore(LocalDateTime.now().minusWeeks(1))){
                 serviceRepository.updCompleted(p.getQaTargetId(),13);
                 throw new CustomException(ServiceErrorCode.TIME_OVER);
             }
-            switch (qaDto.getCompleted()){
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                    serviceRepository.updCompleted(p.getQaTargetId(),10);
-                    break;
-                default:
-                    throw new CustomException(ServiceErrorCode.INVALID_SERVICE_STATUS);
-            }
+            updCompleted(qaDto.getCompleted(), p.getQaTargetId());
         }
 
         if (pics != null) {
@@ -111,6 +107,17 @@ public class QaService {
             }
 
 
+        }
+    }
+    private void updCompleted(int completed, Long targetId){
+        switch (completed){
+            case 7:
+            case 8:
+            case 9:
+                serviceRepository.updCompleted(targetId,10);
+                break;
+            default:
+                throw new CustomException(ServiceErrorCode.INVALID_SERVICE_STATUS);
         }
     }
 
