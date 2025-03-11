@@ -18,5 +18,5 @@ public interface UserMapper {
     int deleteUser(UserInfoDelReq p);
     int updatePassword(UserPwPatchReq p);
     int updatePasswordThEmail(UserPwPatchReq p);
-    List<UserUuidDto> getUuidCheck();
+//    List<UserUuidDto> getUuidCheck();
 }

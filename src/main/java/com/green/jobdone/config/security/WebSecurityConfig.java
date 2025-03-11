@@ -97,6 +97,11 @@ public class WebSecurityConfig {
                                 //카카오페이쪽
                                 .requestMatchers("/api/payment/**").permitAll()
 
+                                //문의쪽
+                                .requestMatchers(HttpMethod.DELETE,"/api/qa").hasRole(
+                                        UserRole.ADMIN.name()
+                                )
+
                                 //스웨거쪽
                                 .requestMatchers("/chat/**").permitAll()
                                 .requestMatchers("/api/swagger-ui/**", "/api/v3/api-docs/**").permitAll()

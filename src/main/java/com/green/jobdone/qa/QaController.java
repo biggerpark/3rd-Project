@@ -36,8 +36,8 @@ public class QaController {
 
     @GetMapping
     @Operation(summary = "문의사항 조회,관리자 및 유저 조회, 같은 api 사용, 토큰에 따라 보내는 데이터 틀려짐, 관리자는 모든 유저 문의 보여지고, 유저는 해당 유저가 문의한 글만 보여짐")
-    public ResultResponse<List<QaRes>> getQa(@RequestParam int page){
-        List<QaRes> res = qaService.getQa(page);
+    public ResultResponse<List<QaRes>> getQa(){
+        List<QaRes> res = qaService.getQa();
 
         return ResultResponse.<List<QaRes>>builder()
                 .resultMessage("문의사항 조회 완료")
@@ -118,7 +118,17 @@ public class QaController {
                 .resultMessage("게시판 모든 문의글 조회 완료")
                 .resultData(result)
                 .build();
+    }
 
+    @DeleteMapping
+    @Operation(summary = "관리자/ 문의 및 신고내역 확인에서 해당 문의를 삭제할 수 있음")
+    public ResultResponse<Integer> deleteQa(@RequestParam long qaId){
+        Integer res = qaService.deleteQa(qaId);
+
+        return ResultResponse.<Integer>builder()
+                .resultMessage("문의 삭제 완료")
+                .resultData(res)
+                .build();
     }
 
 

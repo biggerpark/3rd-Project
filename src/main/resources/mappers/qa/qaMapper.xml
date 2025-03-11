@@ -22,7 +22,6 @@
             WHERE b.userId=#{signedUserId}
         </if>
         ORDER BY a.qaId DESC
-        LIMIT 10 OFFSET #{offset}
     </select>
 
 

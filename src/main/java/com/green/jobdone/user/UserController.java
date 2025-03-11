@@ -146,15 +146,15 @@ public class UserController {
 
     }
 
-    @GetMapping("uuidTest")
-    public ResultResponse<Integer> getUuidCheck(){
-        int result = service.getUuidCheck();
-
-        return ResultResponse.<Integer>builder()
-                .resultMessage("uuidTest 완료")
-                .resultData(result)
-                .build();
-    }
+//    @GetMapping("uuidTest")
+//    public ResultResponse<Integer> getUuidCheck(){
+//        int result = service.getUuidCheck();
+//
+//        return ResultResponse.<Integer>builder()
+//                .resultMessage("uuidTest 완료")
+//                .resultData(result)
+//                .build();
+//    }
 
 
 }

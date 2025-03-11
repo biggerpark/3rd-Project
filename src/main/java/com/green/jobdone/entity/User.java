@@ -44,8 +44,8 @@ public class User extends UpdatedAt {
     @Column(length = 11, nullable = false)
     private String phone;
 
-    @Column(length = 50)
-    private String uuid;
+//    @Column(length = 50)
+//    private String uuid;
 
 //    @Column(nullable = false)
 //    @ColumnDefault("100")

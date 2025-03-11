@@ -70,7 +70,7 @@ public class UserService {
         user.setUpw(hashedPassword);
         user.setName(p.getName());
         user.setPic(savedPicName);
-        user.setUuid( UUID.randomUUID().toString().replace("-", "")); // UUID 설정
+//        user.setUuid( UUID.randomUUID().toString().replace("-", "")); // UUID 설정
         user.setPhone(p.getPhone());
 
         user.setRole(UserRole.USER);
@@ -90,9 +90,9 @@ public class UserService {
         // 저장 위치 만든다.
         // middlePath = user/${userId}
         // filePath = user/${userId}/${savedPicName}
-//        long userId = user.getUserId(); //userId를 insert 후에 얻을 수 있다.
-        String uuid=user.getUuid();
-        String middlePath = String.format("uuid/%d", uuid);
+        long userId = user.getUserId(); //userId를 insert 후에 얻을 수 있다.
+//        String uuid=user.getUuid();
+        String middlePath = String.format("user/%d", userId);
         myFileUtils.makeFolders(middlePath);
         log.info("middlePath: {}", middlePath);
         String filePath = String.format("%s/%s", middlePath, savedPicName);
@@ -188,8 +188,8 @@ public class UserService {
         } else if(profile.equals(profile3)){
             res.setPic(res.getPic());
         } else {
-//                res.setPic(PicUrlMaker.makePicUserUrl(userId, res.getPic()));
-            res.setPic(PicUrlMaker.makePicUserUuidUrl(res.getUuid(),res.getPic()));
+                res.setPic(PicUrlMaker.makePicUserUrl(userId, res.getPic()));
+//            res.setPic(PicUrlMaker.makePicUserUuidUrl(res.getUuid(),res.getPic()));
         }
 
 
@@ -255,8 +255,8 @@ public class UserService {
 
         int result=userRepository.updateUserInfo(user);
 
-//        String middlePath = String.format("user/%d", userId);
-        String middlePath = String.format("%s/%s",UUID.randomUUID().toString().replace("-", ""),savedPicName);
+        String middlePath = String.format("user/%d", userId);
+//        String middlePath = String.format("%s/%s",UUID.randomUUID().toString().replace("-", ""),savedPicName);
 
 
         myFileUtils.deleteFolder(middlePath,true);
@@ -364,19 +364,19 @@ public class UserService {
         }
     }
 
-    @Transactional
-    public int getUuidCheck(){
-        List<UserUuidDto> list=userMapper.getUuidCheck();
-
-        for(UserUuidDto str:list){
-            if(str.getUuid()==null){
-                Optional<User> optionalUser=userRepository.findById(str.getUserId());
-                User user=optionalUser.get();
-                user.setUuid(UUID.randomUUID().toString().replace("-", ""));
-                userRepository.save(user);
-            }
-        }
-        return 1;
-    }
+//    @Transactional
+//    public int getUuidCheck(){
+//        List<UserUuidDto> list=userMapper.getUuidCheck();
+//
+//        for(UserUuidDto str:list){
+//            if(str.getUuid()==null){
+//                Optional<User> optionalUser=userRepository.findById(str.getUserId());
+//                User user=optionalUser.get();
+//                user.setUuid(UUID.randomUUID().toString().replace("-", ""));
+//                userRepository.save(user);
+//            }
+//        }
+//        return 1;
+//    }
 
 }
