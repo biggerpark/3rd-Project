@@ -13,4 +13,5 @@ public class QaBoardRes {
     private String createdAt;
     private int qaView;
     private long qaId;
+    private String reason;
 }
