@@ -7,12 +7,12 @@ import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.common.exception.ChatErrorCode;
 import com.green.jobdone.common.exception.CustomException;
+import com.green.jobdone.config.jwt.TokenProvider;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.Chat;
 import com.green.jobdone.entity.ChatPic;
 import com.green.jobdone.entity.Room;
 import com.green.jobdone.room.RoomRepository;
-import com.green.jobdone.room.RoomService;
 import com.green.jobdone.room.chat.model.*;
 import com.green.jobdone.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,21 +38,29 @@ public class ChatService {
     private final ChatPicRepository chatPicRepository;
     private final BusinessRepository businessRepository;
     private final UserRepository userRepository;
+    private final TokenProvider tokenProvider;
 
     @Transactional
-    public String insChat(String token ,MultipartFile pic, ChatPostReq p){
+    public String insChat(MultipartFile pic, ChatPostReq p){
 //        long userId = authenticationFacade.getSignedUserId();
 //        UserIdRoom userIdRoom = chatMapper.checkUserId(p.getRoomId());
 //        if(userId!=userIdRoom.getUserId()||userId!=userIdRoom.getBuid()){
 //            throw new CustomException(ChatErrorCode.FAIL_TO_REG);
 //        } // 채팅 인증 처리가 필요할때 사용용도
-        log.info("토큰값: {}",token);
+//        Long signedUserId = null;
+//        if(token!=null){
+//            JwtUser jwtUser = tokenProvider.getJwtUserFromToken(token);
+//            signedUserId = jwtUser.getSignedUserId();
+//        } else {
+//        }  이거 생각해보니 웹 소켓 접속할때 차단이 맞음 why? 아니면 실시간 채팅 염탐가능
+
+//        log.info("토큰값: {}",token);
         Room room = roomRepository.findById(p.getRoomId()).orElseThrow(() -> new CustomException(ChatErrorCode.MISSING_ROOM));
         Long userId = room.getUser().getUserId();
         Long businessId = room.getBusiness().getBusinessId();
-//        if(userId!=authenticationFacade.getSignedUserId()|| !room.getBusiness().getBusinessId().equals(businessRepository.findBusinessIdByUserId(userId))){
+//        if(!userId.equals(signedUserId) || !room.getBusiness().getBusinessId().equals(signedUserId)){
 //            throw new CustomException(ChatErrorCode.FAIL_TO_REG);
-//        } //인증처리 나중에 복구해볼 생각 ㄱ
+//        } //인증처리 나중에 복구해볼 생각 ㄱ 이거 생각해보니 웹 소켓 접속할때 차단이 맞음 why? 아니면 실시간 채팅 염탐가능
 //        String logo = businessRepository.findBusinessLogoByBusinessId(businessId);
         String logo = PicUrlMaker.makePicUrlLogo(businessId,businessRepository.findBusinessLogoByBusinessId(businessId));
         String userPic = PicUrlMaker.makePicUserUrl(userId,userRepository.getUserPicByUserId(userId));
@@ -115,7 +123,7 @@ public class ChatService {
             int res = chatMapper.insChat(p);
             return p.getChatId();
         } else {
-            throw new CustomException(ChatErrorCode.FAIL_TO_REG);
+            throw new CustomException(ChatErrorCode.FAIL_TO_CONNECT);
         }
     }
     public int insChatPic(List<MultipartFile> pics) {
