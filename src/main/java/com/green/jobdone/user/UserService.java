@@ -21,9 +21,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -40,6 +43,7 @@ public class UserService {
     private final AuthenticationFacade authenticationFacade;
     private final JwtConst jwtConst;
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
 
     public int postUserSignUp(UserSignUpReq p, MultipartFile pic) {
@@ -185,6 +189,9 @@ public class UserService {
         } else {
                 res.setPic(PicUrlMaker.makePicUserUrl(userId, res.getPic()));
         }
+
+
+
 
         return res;
 
@@ -352,6 +359,21 @@ public class UserService {
                     .result(0)
                     .build();
         }
+    }
+
+    @Transactional
+    public int getUuidCheck(){
+        List<UserUuidDto> list=userMapper.getUuidCheck();
+
+        for(UserUuidDto str:list){
+            if(str.getUuid()==null){
+                Optional<User> optionalUser=userRepository.findById(str.getUserId());
+                User user=optionalUser.get();
+                user.setUuid(UUID.randomUUID().toString().replace("-", ""));
+                userRepository.save(user);
+            }
+        }
+        return 1;
     }
 
 }
