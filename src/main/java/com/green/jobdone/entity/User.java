@@ -44,6 +44,9 @@ public class User extends UpdatedAt {
     @Column(length = 11, nullable = false)
     private String phone;
 
+    @Column(length = 50)
+    private String uuid;
+
 //    @Column(nullable = false)
 //    @ColumnDefault("100")
 //    private int type; // 디폴트값으로 100으로 설정
