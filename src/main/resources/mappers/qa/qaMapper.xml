@@ -65,12 +65,14 @@
 
 
     <select id="getQaBoard">
-        SELECT a.title,c.name as userName,a.createdAt,SUM(b.viewCount) as qaView,a.qaId
+        SELECT a.title,c.name as userName,a.createdAt,SUM(b.viewCount) as qaView,a.qaId, d.reason
         FROM qa a
         LEFT JOIN qa_view b
         on a.qaId=b.qaId
         LEFT JOIN user c
         on a.userId=c.userId
+        LEFT JOIN qa_type_detail d
+        on a.qaTypeDetailId=d.qaTypeDetailId
         GROUP BY a.qaId
         ORDER BY a.qaId DESC
     </select>
