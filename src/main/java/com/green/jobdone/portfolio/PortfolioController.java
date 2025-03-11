@@ -108,4 +108,17 @@ public class PortfolioController {
         return ResultResponse.<List<PortfolioPicGetRes>>builder().resultData(res).resultMessage(res != null? "포폴 사진 조회 완" : "포폴 사진 조회 싯빠이").build();
     }
 
+//    @PatchMapping("thumbnail")
+//    @Operation(summary = "썸네일수정")
+//    public ResultResponse<Integer> patchPortfolioThumbnail(@Valid @RequestPart PortfolioPatchThumbnailReq p, @RequestPart MultipartFile thumbnail ) {
+//        int result = portfolioService.patchPortfolioThumbnail(p, thumbnail);
+//
+//        return ResultResponse.<Integer>builder()
+//
+//                .resultMessage("포폴 썸네일 사진 수정 완료")
+//                .resultData(result)
+//                .build();
+//    }
+
+
 }
