@@ -176,11 +176,11 @@ public class PayService {
         CompletedDto dto = new CompletedDto();
         dto.setServiceId(serviceId);
 
-//        int res = serviceMapper.payOrDoneCompleted(dto);
-//        if(res==0){
-//            throw new RuntimeException();
-//        }
-        serviceRepository.updCompleted(serviceId,6);
+        int res = serviceMapper.payOrDoneCompleted(dto);
+        if(res==0){
+            throw new RuntimeException();
+        }
+//        serviceRepository.updateServiceStatus(serviceId,6);
 
         // 카톡 메세지 보냄
         RestTemplate restTemplate = new RestTemplate();

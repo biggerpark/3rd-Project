@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -58,4 +59,14 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
 
     @Query("SELECT COUNT(s.serviceId) FROM Service s WHERE s.completed >= 6")
     int getTotalCompletedInfo();
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Service s SET s.completed = CASE " +
+            "WHEN :businessId IS NULL THEN 6 " +
+            "ELSE 7 END, " +
+            "s.paidAt = CASE WHEN :businessId IS NULL AND s.paidAt IS NULL THEN CURRENT_TIMESTAMP ELSE s.paidAt END, " +
+            "s.doneAt = CASE WHEN :businessId IS NOT NULL AND s.doneAt IS NULL THEN CURRENT_TIMESTAMP ELSE s.doneAt END " +
+            "WHERE s.serviceId = :serviceId")
+    void updateServiceStatus(@Param("serviceId") Long serviceId, @Param("businessId") Long businessId);
 }
