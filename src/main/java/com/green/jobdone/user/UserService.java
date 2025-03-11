@@ -90,8 +90,9 @@ public class UserService {
         // 저장 위치 만든다.
         // middlePath = user/${userId}
         // filePath = user/${userId}/${savedPicName}
-        long userId = user.getUserId(); //userId를 insert 후에 얻을 수 있다.
-        String middlePath = String.format("user/%d", userId);
+//        long userId = user.getUserId(); //userId를 insert 후에 얻을 수 있다.
+        String uuid=user.getUuid();
+        String middlePath = String.format("uuid/%d", uuid);
         myFileUtils.makeFolders(middlePath);
         log.info("middlePath: {}", middlePath);
         String filePath = String.format("%s/%s", middlePath, savedPicName);
@@ -187,7 +188,8 @@ public class UserService {
         } else if(profile.equals(profile3)){
             res.setPic(res.getPic());
         } else {
-                res.setPic(PicUrlMaker.makePicUserUrl(userId, res.getPic()));
+//                res.setPic(PicUrlMaker.makePicUserUrl(userId, res.getPic()));
+            res.setPic(PicUrlMaker.makePicUserUuidUrl(res.getUuid(),res.getPic()));
         }
 
 
@@ -253,7 +255,8 @@ public class UserService {
 
         int result=userRepository.updateUserInfo(user);
 
-        String middlePath = String.format("user/%d", userId);
+//        String middlePath = String.format("user/%d", userId);
+        String middlePath = String.format("%s/%s",UUID.randomUUID().toString().replace("-", ""),savedPicName);
 
 
         myFileUtils.deleteFolder(middlePath,true);

@@ -27,6 +27,10 @@ public class PicUrlMaker {
     }
 
 
+    public static String makePicUserUuidUrl(String uuid, String picName) {
+        return String.format("/pic/user/%s/%s", uuid,picName);
+    }
+
     public static String makePicUserUrl(long userId, String picName) {
         return String.format("/pic/user/%d/%s", userId, picName);
     }
