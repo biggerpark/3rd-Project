@@ -2,6 +2,8 @@ package com.green.jobdone.business.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,6 +13,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @ToString
+@Builder
 public class BusinessPostSignUpReq {
 
     @JsonIgnore
@@ -25,6 +28,7 @@ public class BusinessPostSignUpReq {
     private String safeTel;
 
     @Schema(title = "사업자번호", example = "0000000", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Size(min = 10, max = 10, message = "사업자번호는 10자리여야 합니다.")
     private String businessNum;
     @Schema(title = "업체 이름", example = "싹 박멸해", requiredMode = Schema.RequiredMode.REQUIRED)
     private String businessName;
