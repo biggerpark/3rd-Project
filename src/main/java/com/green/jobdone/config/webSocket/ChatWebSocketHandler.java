@@ -4,7 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.green.jobdone.common.exception.ChatErrorCode;
 import com.green.jobdone.common.exception.CustomException;
+import com.green.jobdone.config.jwt.JwtUser;
+import com.green.jobdone.config.jwt.TokenProvider;
 import com.green.jobdone.config.security.AuthenticationFacade;
+import com.green.jobdone.entity.Room;
+import com.green.jobdone.room.RoomRepository;
 import com.green.jobdone.room.chat.ChatService;
 import com.green.jobdone.room.chat.model.ChatPostReq;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +21,6 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,18 +31,38 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     private final AuthenticationFacade authenticationFacade;
     private ObjectMapper objectMapper = new ObjectMapper();
+    private final RoomRepository roomRepository;
     private final ChatService chatService;
     private final Set<WebSocketSession> sessions = new HashSet<>();
     private final Map<WebSocketSession, Long> sessionRoomMap = new HashMap<>();
     private final Map<Long, Set<WebSocketSession>> roomSessions = new ConcurrentHashMap<>();
-    public ChatWebSocketHandler(ChatService chatService, AuthenticationFacade authenticationFacade) {
+    private final TokenProvider tokenProvider;
+    public ChatWebSocketHandler(ChatService chatService, AuthenticationFacade authenticationFacade, RoomRepository roomRepository, TokenProvider tokenProvider) {
         this.chatService = chatService;
         this.authenticationFacade = authenticationFacade;
+        this.roomRepository = roomRepository;
+        this.tokenProvider = tokenProvider;
     }
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         long roomId = getRoomIdByUri(session.getUri().toString());
         log.info("현재 방 {}에 연결된 세션 목록: {}", roomId, roomSessions.get(roomId));
+        Map<String,Object> attributes = session.getAttributes();
+        String token = (String) attributes.get("JWTToken");
+        Long signedUserId = null;
+        if(token!=null){
+            JwtUser jwtUser = tokenProvider.getJwtUserFromToken(token);
+            signedUserId = jwtUser.getSignedUserId();
+        } else {
+            throw new CustomException(ChatErrorCode.FAIL_TO_CONNECT);
+        }
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new CustomException(ChatErrorCode.MISSING_ROOM));
+        Long userId = room.getUser().getUserId();
+        Long businessId = room.getBusiness().getBusinessId();
+        // 아이디가 둘중 하나라도 맞다면 false>둘다 해당되지 않으면 true> a!=b and c!=b
+        if(!userId.equals(signedUserId) && !businessId.equals(signedUserId)){
+            throw new CustomException(ChatErrorCode.FAIL_TO_CONNECT);
+        }
 
 //        if (sessionRoomMap.containsKey(session)) {
 //            long currentRoomId = sessionRoomMap.get(session);
@@ -156,7 +179,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             long roomId2 = Long.parseLong(uriParts[uriParts.length - 1]);
 
             if(roomId != roomId2) {
-                throw new CustomException(ChatErrorCode.FAIL_TO_REG);
+                throw new CustomException(ChatErrorCode.FAIL_TO_CONNECT);
             }
 
             // 해당 roomId의 모든 세션에 메시지 전송
@@ -172,10 +195,10 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
                     }
                 }
                         log.info("req확인: {}", req);
-                        chatService.insChat(null,null,req);
+                        chatService.insChat(null,req);
             }
         } catch (Exception e) {
-            throw new CustomException(ChatErrorCode.FAIL_TO_REG);
+            throw new CustomException(ChatErrorCode.FAIL_TO_CONNECT);
         }
 }
 
@@ -197,7 +220,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
 //            int flag = jsonNode.get("flag").asInt();
             String flag1 = jsonNode.get("flag").asText();
             int flag = Integer.parseInt(flag1);
-            String token = jsonNode.has("token") ? jsonNode.get("token").asText().trim() : null;
+//            String token = jsonNode.has("token") ? jsonNode.get("token").asText().trim() : null; 토큰 인증은 첨 접속시!
             String textMessage = jsonNode.has("message") ? jsonNode.get("message").asText().trim() : "";
             log.info("textMessage 확인: {}",textMessage);
 
@@ -230,8 +253,8 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
             chatPostReq.setContents(textMessage.isEmpty() ? null : textMessage);
             chatPostReq.setFlag(flag);
             log.info("roomId {}, flag {}, message: {}", roomId, flag, textMessage);
-            log.info("토큰: " + token);
-            String jsonData = chatService.insChat(token, pic, chatPostReq);
+//            log.info("토큰: " + token);
+            String jsonData = chatService.insChat(pic, chatPostReq);
             // jsondata가 아니라 사진 url으로 내용 변경
             log.info("jsonData 어케 나옴: "+jsonData);
             // string 으로넘어옴
