@@ -12,7 +12,7 @@ public class PortfolioListGetRes {
     private long businessId;
     private long portfolioId;
     private String title;
-    private String isThumbnail;
+    private String thumbnail;
 
 
 }
