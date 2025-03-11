@@ -3,6 +3,7 @@ package com.green.jobdone.user;
 import com.green.jobdone.user.model.*;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
 import java.util.Optional;
 
 @Mapper
@@ -17,5 +18,5 @@ public interface UserMapper {
     int deleteUser(UserInfoDelReq p);
     int updatePassword(UserPwPatchReq p);
     int updatePasswordThEmail(UserPwPatchReq p);
-
+//    List<UserUuidDto> getUuidCheck();
 }

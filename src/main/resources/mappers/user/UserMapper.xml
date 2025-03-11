@@ -60,7 +60,7 @@
 
 
     <select id="getUserInfo">
-        SELECT pic,name,email,phone
+        SELECT pic,name,email,phone,uuid
         FROM user
         WHERE userId=#{userId}
 
@@ -112,5 +112,9 @@
         WHERE email=#{email}
     </select>
 
+<!--    <select id="getUuidCheck">-->
+<!--        SELECT userId,uuid-->
+<!--        FROM user-->
+<!--    </select>-->
 
 </mapper>
