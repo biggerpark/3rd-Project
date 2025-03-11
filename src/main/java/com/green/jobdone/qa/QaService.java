@@ -68,7 +68,7 @@ public class QaService {
         }
         if(p.getQaReportReason().getCode()==1){
             ServiceQaDto qaDto = serviceRepository.findQaDtoByServiceId(p.getQaTargetId());
-            if(qaDto==null){
+            if(qaDto==null || qaDto.getDoneAt()==null){
                 throw new CustomException(ServiceErrorCode.FAIL_UPDATE_SERVICE);
             }
             if(qaDto.getDoneAt().isBefore(LocalDateTime.now().minusWeeks(1))){
