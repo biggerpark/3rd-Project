@@ -70,7 +70,7 @@ class BusinessServiceInsertTest {
                 .signedUserId(1L)
                 .detailTypeId(2L)
                 .businessName("")
-                .businessNum("01234565789")
+                .businessNum("012434565789")
                 .address("address")
                 .tel("01022225555")
                 .busiCreatedAt("2022/05/05")

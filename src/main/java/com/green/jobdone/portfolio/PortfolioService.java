@@ -74,12 +74,14 @@ public class PortfolioService {
                 .price(p.getPrice())
                 .takingTime(p.getTakingTime())
                 .contents(p.getContents())
-                .thumbnail(thumbnailFilePath)
+                .thumbnail(savedThumbName)
                 .youtubeUrl(youtubeUrl)
                 .youtubeId(youtubeId)
                 .build(); // 일단 빌더로 적을거 다 적고
 
         Portfolio savedPortfolio = portfolioRepository.save(portfolio);
+
+        //entityManager.flush();
         Long portfolioId = savedPortfolio.getPortfolioId();
 
         String middlePath = String.format("business/%d/portfolio/%d", p.getBusinessId(), portfolioId);

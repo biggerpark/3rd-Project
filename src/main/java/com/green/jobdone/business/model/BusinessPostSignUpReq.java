@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
+@Builder
 public class BusinessPostSignUpReq {
 
     @JsonIgnore
