@@ -45,8 +45,8 @@ public class ServiceService {
 
     @Transactional
     public int postService(ServicePostReq p){
-        String st = String.format(p.getMStartTime()+":00");
-        p.setMStartTime(st);
+//        String st = String.format(p.getMStartTime()+":00");
+        p.setMStartTime(plusDoubleZero(p.getMStartTime()));
 
         Long userId = authenticationFacade.getSignedUserId();
         p.setUserId(userId);
@@ -175,10 +175,10 @@ public class ServiceService {
 //             p.getProviderUserId 대신 authenticationFacade.getSignedUserId()
             throw new CustomException(ServiceErrorCode.BUSINESS_OWNER_MISMATCH);
         }
-        String st = String.format(p.getMStartTime()+":00");
-        p.setMStartTime(st);
-        String et = String.format(p.getMEndTime()+":00");
-        p.setMEndTime(et);
+//        String st = String.format(p.getMStartTime()+":00");
+        p.setMStartTime(plusDoubleZero(p.getMStartTime()));
+//        String et = String.format(p.getMEndTime()+":00");
+        p.setMEndTime(plusDoubleZero(p.getMEndTime()));
         List<ServiceEtcDto> etcDto = p.getEtc();
         int sum = 0;
         int i=0;
@@ -327,5 +327,8 @@ public class ServiceService {
 
         // 유저일 때 상태변환 허용
         return userAllowed.getOrDefault(oldCompleted, List.of()).contains(newCompleted);
+    }
+    private String plusDoubleZero(String time){
+        return String.format(time+":00");
     }
 }

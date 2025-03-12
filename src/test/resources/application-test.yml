@@ -1,0 +1,16 @@
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true #snake_case column명을 자동으로 camel_case형으로 변환
+  mapper-locations: mappers/**/*.xml
+
+file:
+  directory: D:/2024-02/download/tdd
+
+spring:
+  datasource:
+    url: jdbc:log4jdbc:mariadb://localhost/localhost/job_done_test
+    username: root
+    password: green502
+  jpa:
+    hibernate:
+      ddl-auto: validate
