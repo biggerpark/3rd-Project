@@ -14,8 +14,8 @@ public class UserInfoGetRes {
     private String name;
     private String email;
     private String phone;
-    @JsonIgnore
-    private String uuid;
+//    @JsonIgnore
+//    private String uuid;
 
 
 

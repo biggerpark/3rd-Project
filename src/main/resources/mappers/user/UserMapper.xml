@@ -60,7 +60,7 @@
 
 
     <select id="getUserInfo">
-        SELECT pic,name,email,phone,uuid
+        SELECT pic,name,email,phone
         FROM user
         WHERE userId=#{userId}
 
