@@ -57,7 +57,8 @@ class BusinessServiceInsertTest {
     private User user;
     private DetailType detailType;
 
-    @BeforeEach
+
+@Test
     void setUp() {
         user = new User();
         user.setUserId(1L);
@@ -69,7 +70,7 @@ class BusinessServiceInsertTest {
                 .signedUserId(1L)
                 .detailTypeId(2L)
                 .businessName("")
-                .businessNum("0123456789")
+                .businessNum("01234565789")
                 .address("address")
                 .tel("01022225555")
                 .busiCreatedAt("2022/05/05")

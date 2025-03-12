@@ -1,5 +1,6 @@
 package com.green.jobdone.portfolio.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,7 @@ public class PortfolioPatchThumbnailReq {
     @Schema(title = "portfolioId")
     private long portfolioId;
 
-    @Schema(title = "thumbnail")
+    @JsonIgnore
     private String thumbnail;
 
 
