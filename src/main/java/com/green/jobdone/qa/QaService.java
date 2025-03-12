@@ -171,12 +171,12 @@ public class QaService {
             Qa qa = qaRepository.findById(qaId)
                     .orElseThrow(() -> new RuntimeException("해당 QA가 존재하지 않습니다."));
 
-            qa.setQaState("00102"); // state 를 검토중 으로 바꿔줌.
-
-
-            qaRepository.save(qa);
-
+            if (!"00103".equals(qa.getQaState())) { // 🔥 상태가 "답변 완료(00103)"이면 변경하지 않음!
+                qa.setQaState("00102"); // 검토중으로 변경
+                qaRepository.save(qa);
+            }
         }
+
 
         return res;
     }
