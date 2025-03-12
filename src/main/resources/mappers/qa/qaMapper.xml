@@ -54,6 +54,8 @@
         on a.qaId=b.qaId
         WHERE a.qaId=#{qaId}
         AND b.qaState='00103'
+        ORDER BY a.qaAnswerId DESC
+        LIMIT 1
     </select>
 
     <select id="getQaTypeDetail">
