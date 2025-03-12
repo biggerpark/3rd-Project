@@ -10,4 +10,5 @@ import lombok.ToString;
 public class QaAnswerRes {
     private String answer;
     private long qaAnswerId;
+    private String createdAt;
 }

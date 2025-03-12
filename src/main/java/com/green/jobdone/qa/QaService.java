@@ -66,25 +66,21 @@ public class QaService {
         if (pics == null) {
             qaRepository.save(qa);
         }
-        if(p.getQaReportReason().getCode()==1){
+        if (p.getQaReportReason().getCode() == 1) {
             ServiceQaDto qaDto = serviceRepository.findQaDtoByServiceId(p.getQaTargetId());
-            if(qaDto==null){
+            if (qaDto == null || qaDto.getCompleted() < 6) {
                 throw new CustomException(ServiceErrorCode.FAIL_UPDATE_SERVICE);
             }
-            if(qaDto.getDoneAt().isBefore(LocalDateTime.now().minusWeeks(1))){
-                serviceRepository.updCompleted(p.getQaTargetId(),13);
+            if (qaDto.getDoneAt() == null) {
+                updCompleted(qaDto.getCompleted(), p.getQaTargetId());
+                return;
+            }
+
+            if (qaDto.getDoneAt().isBefore(LocalDateTime.now().minusWeeks(1))) {
+                serviceRepository.updCompleted(p.getQaTargetId(), 13);
                 throw new CustomException(ServiceErrorCode.TIME_OVER);
             }
-            switch (qaDto.getCompleted()){
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                    serviceRepository.updCompleted(p.getQaTargetId(),10);
-                    break;
-                default:
-                    throw new CustomException(ServiceErrorCode.INVALID_SERVICE_STATUS);
-            }
+            updCompleted(qaDto.getCompleted(), p.getQaTargetId());
         }
 
         if (pics != null) {
@@ -114,16 +110,28 @@ public class QaService {
         }
     }
 
+    private void updCompleted(int completed, Long targetId) {
+        switch (completed) {
+            case 7:
+            case 8:
+            case 9:
+                serviceRepository.updCompleted(targetId, 10);
+                break;
+            default:
+                throw new CustomException(ServiceErrorCode.INVALID_SERVICE_STATUS);
+        }
+    }
+
     @Transactional
-    public List<QaRes> getQa(int page) {
-        int offset = (page - 1) * 10;
+    public List<QaRes> getQa() {
+
         JwtUser jwtUser = authenticationFacade.getSignedUser();
         long signedUserId = authenticationFacade.getSignedUserId(); // 일반 유저일때 사용할 유저 pk
 
         boolean isAdmin = jwtUser.getRoles().contains(UserRole.ADMIN); // Admin 인지 판단하는것
 
 //        if(jwtUser.getRoles().contains(UserRole.ADMIN)){
-        List<QaRes> res = qaMapper.getQa(offset,isAdmin,signedUserId); // 관리자일때 가져오는 RES
+        List<QaRes> res = qaMapper.getQa(isAdmin, signedUserId); // 관리자일때 가져오는 RES
 
         for (QaRes item : res) {
             String type = switch (item.getUserTypeDB()) {
@@ -144,7 +152,7 @@ public class QaService {
     @Transactional
     public QaDetailRes getQaDetail(long qaId) { // 문의상세내역 확인
         JwtUser jwtUser = authenticationFacade.getSignedUser(); // 관리자인지 일반유저인지 판단하기.
-        boolean isAdmin=jwtUser.getRoles().contains(UserRole.ADMIN);// 관리자인지 판단하는 boolean
+        boolean isAdmin = jwtUser.getRoles().contains(UserRole.ADMIN);// 관리자인지 판단하는 boolean
 
 
         long signedUserId = authenticationFacade.getSignedUserId(); // 유저일때 사용할 유저 pk, qaId 로 판단돼서 필요없을듯
@@ -177,6 +185,7 @@ public class QaService {
     public int postQaAnswer(QaAnswerReq p) { // 관리자측 문의 답변
         List<UserRole> userRole = authenticationFacade.getSignedUser().getRoles();
 
+
         if (!userRole.contains(UserRole.ADMIN)) {
             throw new CustomException(UserErrorCode.FORBIDDEN_ACCESS);
         }
@@ -206,9 +215,9 @@ public class QaService {
     }
 
     @Transactional
-    public QaAnswerRes getQaAnswer(long qaId){ // 관리자가 답변한 문의 답변 확인
+    public QaAnswerRes getQaAnswer(long qaId) { // 관리자가 답변한 문의 답변 확인
 
-        if(qaMapper.getQaAnswer(qaId)==null){
+        if (qaMapper.getQaAnswer(qaId) == null) {
             throw new CustomException(CommonErrorCode.NOT_ANSWER);
         }
 
@@ -225,15 +234,12 @@ public class QaService {
     }
 
 
-
     @Transactional
     public QaDetailRes getQaBoardDetail(long qaId) {
         long signedUserId = authenticationFacade.getSignedUserId();
 
 
-
-
-        Optional<QaView> qaViewOptional=qaViewRepository.findByQaViewsIds_QaIdAndQaViewsIds_UserId(qaId,signedUserId); // 복합키를 이용해서 QaView ENTITY 설정
+        Optional<QaView> qaViewOptional = qaViewRepository.findByQaViewsIds_QaIdAndQaViewsIds_UserId(qaId, signedUserId); // 복합키를 이용해서 QaView ENTITY 설정
 
         if (qaViewOptional.isPresent()) {
             QaView qaView = qaViewOptional.get();
@@ -260,7 +266,7 @@ public class QaService {
         // 위 로직은 DB 에 userId,qaId 집어넣고 조회수 증가시켜주는 로직
 
 
-        QaDetailRes result=qaMapper.getQaDetail(qaId);
+        QaDetailRes result = qaMapper.getQaDetail(qaId);
 
         List<String> updatedPics = new ArrayList<>();
         for (String item : result.getPics()) {
@@ -280,6 +286,18 @@ public class QaService {
         return qaMapper.getQaBoard();
     }
 
+    @Transactional
+    public int deleteQa(long qaId) {
+
+
+        qaRepository.deleteById(qaId);
+
+        String deletePath = String.format("qa/%d", qaId);
+        myFileUtils.deleteFolder(deletePath, true);
+
+
+        return 1;
+    }
 
 
 //    public List<QaReportRes> getQaReport(int page) { // 신고내역 확인
