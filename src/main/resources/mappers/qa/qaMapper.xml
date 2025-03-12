@@ -48,7 +48,7 @@
 
 
     <select id="getQaAnswer">
-        SELECT a.answer,a.qaAnswerId
+        SELECT a.answer,a.qaAnswerId,a.createdAt
         FROM qa_answer a
         LEFT JOIN qa b
         on a.qaId=b.qaId

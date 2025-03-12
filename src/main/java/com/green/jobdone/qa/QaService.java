@@ -185,6 +185,7 @@ public class QaService {
     public int postQaAnswer(QaAnswerReq p) { // 관리자측 문의 답변
         List<UserRole> userRole = authenticationFacade.getSignedUser().getRoles();
 
+
         if (!userRole.contains(UserRole.ADMIN)) {
             throw new CustomException(UserErrorCode.FORBIDDEN_ACCESS);
         }
