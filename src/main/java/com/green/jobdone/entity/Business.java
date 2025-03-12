@@ -1,6 +1,7 @@
 package com.green.jobdone.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
@@ -30,6 +31,7 @@ public class Business extends UpdatedAt {
     private User user;
 
     @Column(length = 10, name = "businessNum")
+    @Size(min = 10, max = 10, message = "사업자 번호는 10자리여야 합니다.")
     private String businessNum;
 
     @Column(length = 20, name = "businessName")

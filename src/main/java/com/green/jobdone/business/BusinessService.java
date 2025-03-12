@@ -13,12 +13,17 @@ import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.Business;
 import com.green.jobdone.entity.BusinessPic;
 import com.green.jobdone.user.UserRepository;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -26,10 +31,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Validated
 public class BusinessService {
 
     @Value("${file.directory}")
@@ -49,9 +56,11 @@ public class BusinessService {
     private final UserRepository userRepository;
     private final DetailTypeRepository detailTypeRepository;
 
+    private final Validator validator;
 
     @Transactional
-    public long insBusiness(MultipartFile paper, MultipartFile logo, BusinessPostSignUpReq p) {
+    public long insBusiness(MultipartFile paper, MultipartFile logo, @Valid BusinessPostSignUpReq p) {
+
 
         Long userId = authenticationFacade.getSignedUserId();
         p.setSignedUserId(userId);
