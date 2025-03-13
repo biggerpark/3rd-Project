@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @Import(JpaAuditingConfiguration.class) // created_at, updated_at 현재시간을 넣기 위해선 auditing 써야 됨
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class ServicePostServiceTest {
+public class ServiceDBConnectTest {
     @Autowired ServiceRepository serviceRepository;
     static final Long userId_1 = 1L;
     static final Long serviceId_5 = 5L;
