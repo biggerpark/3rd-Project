@@ -52,21 +52,7 @@ public class PortfolioService {
         String youtubeUrl = p.getYoutubeUrl();
         String youtubeId = youtubeService.extractVideoId(youtubeUrl);
 
-        String thumbPath = String.format("business/%d/portfolio/%d/thumbnail", p.getBusinessId(), p.getPortfolioId());
-        myFileUtils.makeFolders(thumbPath);
-
         String savedThumbName = (thumbnail != null && !thumbnail.isEmpty()) ? myFileUtils.makeRandomFileName(thumbnail) : null;
-        String thumbnailFilePath = String.format("%s/%s",thumbPath,savedThumbName);
-
-        try {
-            if (thumbnail != null && !thumbnail.isEmpty()) {
-                myFileUtils.transferTo(thumbnail,thumbnailFilePath);
-            }
-        }catch (IOException e) {
-            log.error("error occurs:{}", e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-
-        }
 
         Portfolio portfolio = Portfolio.builder()
                 .business(businessRepository.findById(p.getBusinessId()).orElse(null))
@@ -82,7 +68,22 @@ public class PortfolioService {
         Portfolio savedPortfolio = portfolioRepository.save(portfolio);
 
         //entityManager.flush();
-        Long portfolioId = savedPortfolio.getPortfolioId();
+        long portfolioId = savedPortfolio.getPortfolioId();
+
+        String thumbPath = String.format("business/%d/portfolio/%d/thumbnail", p.getBusinessId(), portfolioId);
+        myFileUtils.makeFolders(thumbPath);
+
+        String thumbnailFilePath = String.format("%s/%s",thumbPath,savedThumbName);
+
+        try {
+            if (thumbnail != null && !thumbnail.isEmpty()) {
+                myFileUtils.transferTo(thumbnail,thumbnailFilePath);
+            }
+        }catch (IOException e) {
+            log.error("error occurs:{}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+
+        }
 
         String middlePath = String.format("business/%d/portfolio/%d", p.getBusinessId(), portfolioId);
         myFileUtils.makeFolders(middlePath);

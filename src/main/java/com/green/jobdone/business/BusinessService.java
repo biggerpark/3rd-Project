@@ -59,10 +59,10 @@ public class BusinessService {
     private final Validator validator;
 
     @Transactional
-    public long insBusiness(MultipartFile paper, MultipartFile logo, @Valid BusinessPostSignUpReq p) {
+    public long insBusiness(MultipartFile paper, MultipartFile logo,  BusinessPostSignUpReq p) {
 
 
-        Long userId = authenticationFacade.getSignedUserId();
+        long userId = authenticationFacade.getSignedUserId();
         p.setSignedUserId(userId);
 
 
@@ -82,8 +82,21 @@ public class BusinessService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 등록된 사업자 번호입니다");
         }
 
-        String paperPath = String.format("business/%d/paper", p.getBusinessId());
-        String logoPath = String.format("business/%d/logo", p.getBusinessId());
+        Business business = new Business();
+        business.setUser(userRepository.findById(userId).orElse(null));
+        business.setDetailType(detailTypeRepository.findById(p.getDetailTypeId()).orElse(null));
+        business.setBusinessNum(p.getBusinessNum());
+        business.setBusinessName(p.getBusinessName());
+        business.setAddress(p.getAddress());
+        business.setTel(p.getTel());
+        business.setSafeTel(safeTel);
+
+        businessRepository.save(business);
+        long businessId = business.getBusinessId();
+
+
+        String paperPath = String.format("business/%d/paper",businessId );
+        String logoPath = String.format("business/%d/logo", businessId);
         myFileUtils.makeFolders(paperPath);
         myFileUtils.makeFolders(logoPath);
 
@@ -102,21 +115,10 @@ public class BusinessService {
 
         }
         log.debug("Generated safeTel: {}", safeTel);
-        log.debug("Generated safeTel: {}", safeTel);
-        log.debug("BusinessPostSignUpReq: {}", p.toString());
 
-        Business business = new Business();
-        business.setUser(userRepository.findById(userId).orElse(null));
-        business.setDetailType(detailTypeRepository.findById(p.getDetailTypeId()).orElse(null));
-        business.setBusinessNum(p.getBusinessNum());
-        business.setBusinessName(p.getBusinessName());
-        business.setAddress(p.getAddress());
-        business.setTel(p.getTel());
-        business.setSafeTel(safeTel);
-        business.setLogo(logoFilePath);
-        business.setPaper(paperFilePath);
-        businessRepository.save(business);
-        return business.getBusinessId();
+        business.setLogo(savedLogoName);
+        business.setPaper(savedPaperName);
+        return businessRepository.save(business).getBusinessId();
     }
 
     //사업상세정보 기입 - 로고사진은 따로 뺄게요 ~~

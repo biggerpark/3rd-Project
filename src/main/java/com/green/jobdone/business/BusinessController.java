@@ -28,11 +28,11 @@ public class BusinessController {
     @PostMapping("sign-up")
     @Operation(summary = "업체 등록")
     public ResultResponse<Long> postBusiness(@RequestPart(required = false) MultipartFile paper, @RequestPart(required = false) MultipartFile logo,
-                                             @Valid @RequestPart BusinessPostSignUpReq p) {
-        long result = businessService.insBusiness(paper, logo, p);
+                                              @RequestPart BusinessPostSignUpReq p) {
+        Long result = businessService.insBusiness(paper, logo, p);
 
         return ResultResponse.<Long>builder()
-                .resultData(p.getBusinessId())
+                .resultData(result)
                 .resultMessage(result != 0 ? "업체 등록 완료" : "업체 등록 실패")
                 .build();
     }
