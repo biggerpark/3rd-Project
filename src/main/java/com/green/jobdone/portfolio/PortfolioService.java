@@ -159,7 +159,7 @@ public class PortfolioService {
             }
         }
 
-        entityManager.flush();
+        portfolioRepository.save(portfolio);
 
 
 
@@ -172,7 +172,7 @@ public class PortfolioService {
             myFileUtils.makeFolders(middlePath);
         }
 
-        portfolioPicRepository.deletePortfolioPicByPortfolioPicId(portfolioId);
+        int a = portfolioPicRepository.deletePortfolioPicByPortfolioPicId(portfolioId);
 
         if (pics == null || pics.isEmpty()) {
             return PortfolioPutRes.builder()
