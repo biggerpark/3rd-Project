@@ -48,7 +48,7 @@ public class WeatherApiController {
             double lon = locationJson.get("lon").asDouble();
 
             // 5일 날씨 예보 URL
-            String forecastUrl = String.format("https://api.openweathermap.org/data/2.5/forecast?lat=%s&lon=%s&appid=%s&units=metric",
+            String forecastUrl = String.format("https://api.openweathermap.org/data/2.5/forecast?lat=%s&lon=%s&appid=%s&units=metric&lang=kr",
                     lat, lon, apiKey);
 
             String forecastResponse = restTemplate.getForObject(forecastUrl, String.class);
