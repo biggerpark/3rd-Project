@@ -41,6 +41,9 @@ domain:
 mybatis:
   mapper-locations: mappers/**/*.xml
 
+kakao:
+  map:
+    api-key: 8d4a378a3a5e6b784cb2b5dd51098944
 
 kakaopay:
   secretKey: ${KAKAO.PAY.SECRET}
