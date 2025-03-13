@@ -1,5 +1,9 @@
 package com.green.jobdone.business;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.green.jobdone.business.model.*;
 import com.green.jobdone.business.model.get.*;
 import com.green.jobdone.business.pic.BusinessOnePicsGetReq;
@@ -19,11 +23,14 @@ import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -41,6 +48,8 @@ public class BusinessService {
 
     @Value("${file.directory}")
     private String fileDirectory;
+    @Value("${kakao.map.api-key}")
+    String apikey = "apiKey";
 
     @Value("${domain.path.server}")
     private String docker;
@@ -59,7 +68,7 @@ public class BusinessService {
     private final Validator validator;
 
     @Transactional
-    public long insBusiness(MultipartFile paper, MultipartFile logo,  BusinessPostSignUpReq p) {
+    public long insBusiness(MultipartFile paper, MultipartFile logo, BusinessPostSignUpReq p) {
 
 
         long userId = authenticationFacade.getSignedUserId();
@@ -82,6 +91,10 @@ public class BusinessService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 등록된 사업자 번호입니다");
         }
 
+        double[] coordinates = getCoordinatesFromAddress(p.getAddress());
+        double latitude = coordinates[0];
+        double longitude = coordinates[1];
+
         Business business = new Business();
         business.setUser(userRepository.findById(userId).orElse(null));
         business.setDetailType(detailTypeRepository.findById(p.getDetailTypeId()).orElse(null));
@@ -90,12 +103,14 @@ public class BusinessService {
         business.setAddress(p.getAddress());
         business.setTel(p.getTel());
         business.setSafeTel(safeTel);
+        business.setLat(latitude);
+        business.setLng(longitude);
 
         businessRepository.save(business);
         long businessId = business.getBusinessId();
 
 
-        String paperPath = String.format("business/%d/paper",businessId );
+        String paperPath = String.format("business/%d/paper", businessId);
         String logoPath = String.format("business/%d/logo", businessId);
         myFileUtils.makeFolders(paperPath);
         myFileUtils.makeFolders(logoPath);
@@ -120,6 +135,37 @@ public class BusinessService {
         business.setPaper(savedPaperName);
         return businessRepository.save(business).getBusinessId();
     }
+
+    public double[] getCoordinatesFromAddress(String address) {
+        String url = "https://dapi.kakao.com/v2/local/search/address.json?query=" + address;
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization","KakaoAK"+apikey);
+
+        HttpEntity<String> entity =new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+        String responseBody = response.getBody();
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(responseBody);
+
+            JsonNode document = rootNode.get("document");
+            if (document.isArray() && document.size() > 0) {
+                JsonNode firstResult = document.get(0);
+                double latitude = firstResult.get("latitude").path("y").asDouble(); // 위도
+                double longitude = firstResult.get("longitude").path("x").asDouble(); // 경도
+                return new double[]{ latitude,longitude};
+            }
+        }  catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new double[0];
+    }
+
+    ;
 
     //사업상세정보 기입 - 로고사진은 따로 뺄게요 ~~
 
@@ -372,9 +418,9 @@ public class BusinessService {
         List<BusinessGetRes> businessList = businessMapper.selAllBusiness(p);
 
         for (BusinessGetRes business : businessList) {
-       //로고 url을 생성하고 business객체의 logo필드에 설정
-        String logo = PicUrlMaker.makePicUrlLogo(business.getBusinessId(), business.getLogo());
-        business.setLogo(logo); // 만들어진 로고 경로를 업체 객체에 설정
+            //로고 url을 생성하고 business객체의 logo필드에 설정
+            String logo = PicUrlMaker.makePicUrlLogo(business.getBusinessId(), business.getLogo());
+            business.setLogo(logo); // 만들어진 로고 경로를 업체 객체에 설정
         }
 
         //결과값 설정
@@ -384,6 +430,7 @@ public class BusinessService {
 
         return res;
     }
+
     // 2. 단일업체 조회
     @Transactional
     public BusinessGetOneRes getBusinessOne(BusinessGetOneReq p) {
@@ -431,6 +478,7 @@ public class BusinessService {
         }
         return businessMapper.getBusinessMonthly(p);
     }
+
     @Transactional
     public List<BusinessGetRevenueResByAdmin> getBusinessRevenueByAdmins() {
 
@@ -448,6 +496,7 @@ public class BusinessService {
         }
         return businessMapper.countBusinessServices(p); //이거 마저 해야해요
     }
+
     @Transactional
     public List<BusinessGetServiceResByAdmin> getBusinessServiceByAdmin() {
         return businessMapper.countBusinessServicesList(); //이거 마저 해야해요
