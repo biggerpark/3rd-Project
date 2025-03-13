@@ -71,4 +71,12 @@ public class ServiceRepositoryTest {
         assertEquals("테스트", service.getAddress());
         assertNull(selNullService);
     }
+
+    @Test
+    void jpaServiceTest(){
+        serviceRepository.updCompleted(serviceId_1,1);
+        Service afterUpdService = serviceRepository.findById(serviceId_1).orElse(null);
+
+        assertEquals(1, afterUpdService.getCompleted());
+    }
 }
