@@ -54,15 +54,8 @@ public class BusinessServiceTestForPost extends BusinessServiceParentTest{
         business.setBusinessId(1L);
 
         when(businessRepository.save(any(Business.class))).thenReturn(business);
-        long businessId = businessService.insBusiness(mockPaper, mockLogo,req);
+        long businessId = businessService.insBusiness(mockPaper, mockLogo, req);
 
         assertThat(businessId).isGreaterThan(0L);
-
-        assertThatThrownBy(() -> {
-            if (businessId <= 0) {
-                throw new NullPointerException("Business ID is invalid or null.");
-            }
-        }).isInstanceOf(NullPointerException.class)
-                .hasMessageContaining("Business ID is invalid or null.");
     }
 }
