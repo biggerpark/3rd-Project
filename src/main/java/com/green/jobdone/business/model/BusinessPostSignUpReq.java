@@ -3,16 +3,16 @@ package com.green.jobdone.business.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Getter
+@Schema(title="업체 컨텐츠 등록 요청")
+@EqualsAndHashCode
+@AllArgsConstructor
+@NoArgsConstructor
 @Setter
-@ToString
 @Builder
 public class BusinessPostSignUpReq {
 
