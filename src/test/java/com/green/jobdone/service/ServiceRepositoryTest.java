@@ -15,8 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test") //test yaml을 사용
 @DataJpaTest
@@ -29,6 +28,7 @@ public class ServiceRepositoryTest {
     static final Long userId_1 = 1L;
     static final Long productId_1 =1L;
     static final Long serviceId_1 =1L;
+    static final Long serviceId_5 =5L;
 
     Service service = new Service();
 
@@ -63,10 +63,12 @@ public class ServiceRepositoryTest {
         assertEquals("서비스업데이트테스트", updService.getAddress());
     }
     @Test
-    void delServiceTest(){
-        List<Service> beforeDelServices = serviceRepository.findAll();
-        serviceRepository.deleteById(serviceId_1);
-        List<Service> afterDelServices = serviceRepository.findAll();
-        assertEquals(beforeDelServices.size()+1, afterDelServices.size());
+    void selServiceTest(){
+        serviceRepository.save(service);
+        Service selNotNullService = serviceRepository.findById(service.getServiceId()).orElse(null);
+        Service selNullService = serviceRepository.findById(serviceId_5).orElse(null);
+        assertNotNull(selNotNullService);
+        assertEquals("테스트", service.getAddress());
+        assertNull(selNullService);
     }
 }

@@ -173,14 +173,14 @@ public class PayService {
         // 파라미터, 헤더
         HttpEntity<Map<String ,String>> requestEntity = new HttpEntity<>(params, getHeaders());
         log.info("requestEntity: {}", requestEntity);
-        CompletedDto dto = new CompletedDto();
-        dto.setServiceId(serviceId);
+//        CompletedDto dto = new CompletedDto();
+//        dto.setServiceId(serviceId);
 
-        int res = serviceMapper.payOrDoneCompleted(dto);
-        if(res==0){
-            throw new RuntimeException();
-        }
-//        serviceRepository.updateServiceStatus(serviceId,6);
+//        int res = serviceMapper.payOrDoneCompleted(dto);
+//        if(res==0){
+//            throw new RuntimeException();
+//        }
+        serviceRepository.updateServiceStatus(serviceId,6);
 
         // 카톡 메세지 보냄
         RestTemplate restTemplate = new RestTemplate();

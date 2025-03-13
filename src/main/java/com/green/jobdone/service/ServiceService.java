@@ -287,12 +287,12 @@ public class ServiceService {
         }
         p.setUserId(0);
 
-        if(p.getCompleted()==7){
-            CompletedDto dto = new CompletedDto();
-            dto.setServiceId(p.getServiceId());
-            dto.setBusinessId(p.getBusinessId());
-            return serviceMapper.payOrDoneCompleted(dto);
-//            serviceRepository.updateServiceStatus(p.getServiceId(),7);
+        if(p.getCompleted()==7&&p.getBusinessId()!=null){
+//            CompletedDto dto = new CompletedDto();
+//            dto.setServiceId(p.getServiceId());
+//            dto.setBusinessId(p.getBusinessId());
+//            return serviceMapper.payOrDoneCompleted(dto);
+            serviceRepository.updateServiceStatus(p.getServiceId(),7);
         }
 
 
@@ -306,7 +306,7 @@ public class ServiceService {
 
         Map<Integer, List<Integer>> businessAllowed = Map.of(
                 0, List.of(1, 5),
-                1, List.of(2),
+                1, List.of(2, 5),
                 2, List.of(1, 5),
                 3, List.of(4),
                 6, List.of(7)

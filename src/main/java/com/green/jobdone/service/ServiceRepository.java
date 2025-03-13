@@ -62,11 +62,10 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
 
     @Transactional
     @Modifying
-    @Query("UPDATE Service s SET s.completed = CASE " +
-            "WHEN :businessId IS NULL THEN 6 " +
-            "ELSE 7 END, " +
-            "s.paidAt = CASE WHEN :businessId IS NULL AND s.paidAt IS NULL THEN CURRENT_TIMESTAMP ELSE s.paidAt END, " +
-            "s.doneAt = CASE WHEN :businessId IS NOT NULL AND s.doneAt IS NULL THEN CURRENT_TIMESTAMP ELSE s.doneAt END " +
+    @Query("UPDATE Service s SET s.completed =:completed , " +
+            "s.paidAt = CASE WHEN :completed = 6 AND s.paidAt IS NULL THEN CURRENT_TIMESTAMP ELSE s.paidAt END, " +
+            "s.doneAt = CASE WHEN :completed = 7 AND s.doneAt IS NULL THEN CURRENT_TIMESTAMP ELSE s.doneAt END " +
             "WHERE s.serviceId = :serviceId")
-    void updateServiceStatus(@Param("serviceId") Long serviceId, @Param("businessId") Long businessId);
+    void updateServiceStatus(@Param("serviceId") Long serviceId, @Param("completed") int completed);
+    //차라리 6 7을 받고나서 직접 여기서 처리하면?
 }
