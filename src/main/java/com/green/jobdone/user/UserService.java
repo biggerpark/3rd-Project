@@ -148,7 +148,7 @@ public class UserService {
         return UserSignInRes
                 .builder()
                 .email(res.getEmail())
-                .type(res.getType())
+                .type(res.getRoles().get(0).getCode())
                 .userId(res.getUserId())
                 .pic(res.getPic())
                 .accessToken(accessToken)
