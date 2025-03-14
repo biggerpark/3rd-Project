@@ -8,7 +8,7 @@ file:
 
 spring:
   datasource:
-    url: jdbc:log4jdbc:mariadb://localhost/localhost/job_done_test
+    url: jdbc:log4jdbc:mariadb://localhost/job_done_test
     username: root
     password: green502
   jpa:

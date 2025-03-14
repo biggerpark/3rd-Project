@@ -27,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.netty.udp.UdpServer;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -287,11 +286,11 @@ public class AdminService {
     }
     public SignInAdminRes signInAdmin(SignInAdminReq p, HttpServletResponse response){
 //        String aPw = adminRepository.findAPwdByAId(p.getAId());
-        Admin admin = adminRepository.findByaId(p.getAId());
-        AdminDto dto = adminMapper.getAdminInfo(p.getAId());
+        Admin admin = adminRepository.findByaId(p.getAid());
+        AdminDto dto = adminMapper.getAdminInfo(p.getAid());
         //log.info("dto: {}",dto);
 
-        if(admin.getAPw()==null || !passwordEncoder.matches(p.getAPw(),admin.getAPw())) {
+        if(admin.getAPw()==null || !passwordEncoder.matches(p.getApw(),admin.getAPw())) {
             throw new CustomException(AdminErrorCode.CHECK_ADMIN);
         }
         List<UserRole> roles = new ArrayList<>();
