@@ -171,4 +171,18 @@
         WHERE q.qaState = '00101'
     </select>
 
+    <resultMap id="getAdmin" type="com.green.jobdone.admin.model.AdminDto">
+        <id property="adminId" column="adminId"/>
+        <result property="aPw" column="aPw"/>
+        <result property="name" column="name"/>
+        <result property="roles" column="type"
+        typeHandler="com.green.jobdone.config.handler.UserRoleTypeHandler"/>
+    </resultMap>
+
+    <select id="getAdminInfo" resultMap="getAdmin">
+        select aPw, type, name, adminId
+        from admin
+        where aId = #{aId}
+    </select>
+
 </mapper>

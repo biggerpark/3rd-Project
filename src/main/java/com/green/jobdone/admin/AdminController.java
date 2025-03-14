@@ -4,6 +4,7 @@ import com.green.jobdone.admin.model.*;
 import com.green.jobdone.common.model.ResultResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -140,6 +141,25 @@ public class AdminController {
         return ResultResponse.<List<AdminNewBusinessInfoRes>>builder()
                 .resultMessage("관리자 측 신규 등록 업체 조회 완료")
                 .resultData(result)
+                .build();
+    }
+    @PostMapping("sign-up")
+    @Operation(summary = "관리자 가입(최상위 관리자만 가능함)")
+    public ResultResponse<Integer> signUpAdmin(@RequestBody SignUpAdminReq p){
+        adminService.SignUpAdmin(p);
+        return ResultResponse.<Integer>builder()
+                .resultMessage("완료")
+                .resultData(1)
+                .build();
+    }
+
+    @PostMapping("sign-in")
+    @Operation(summary = "관리자 로그인")
+    public ResultResponse<SignInAdminRes> signInAdmin(@RequestBody SignInAdminReq p, HttpServletResponse response) {
+        SignInAdminRes res = adminService.signInAdmin(p, response);
+        return ResultResponse.<SignInAdminRes>builder()
+                .resultMessage("로그인 완료")
+                .resultData(res)
                 .build();
     }
 }
