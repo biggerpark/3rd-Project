@@ -22,6 +22,9 @@ public class PicUrlMaker {
     public static String makePicUrlPortfolioThumb(long businessId, long portfolioId, String picName) {
         return String.format("/pic/business/%d/portfolio/%d/thumbnail/%s", businessId,portfolioId, picName);
     }
+    public static String makePicUrlBusinessThumb(long businessId, String picName) {
+        return String.format("/pic/business/%d/thumbnail/%s", businessId, picName);
+    }
     public static String makePicUrlBusiness(long businessId, String picName) {
         return String.format("/pic/business/%d/pics/%s", businessId, picName);
     }

@@ -86,6 +86,9 @@ public class Business extends UpdatedAt {
     @Column(length = 200)
     private String rejectContents;
 
+    @Column(length = 200)
+    private String thumbnail;
+
 
 
     public Business() {
