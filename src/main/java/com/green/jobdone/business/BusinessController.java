@@ -27,9 +27,9 @@ public class BusinessController {
 
     @PostMapping("sign-up")
     @Operation(summary = "업체 등록")
-    public ResultResponse<Long> postBusiness(@RequestPart(required = false) MultipartFile paper, @RequestPart(required = false) MultipartFile logo,
+    public ResultResponse<Long> postBusiness(@RequestPart(required = false) MultipartFile paper, @RequestPart(required = false) MultipartFile logo,@RequestPart(required = false) MultipartFile thumbnail,
                                               @RequestPart BusinessPostSignUpReq p) {
-        Long result = businessService.insBusiness(paper, logo, p);
+        Long result = businessService.insBusiness(paper, logo, thumbnail, p);
 
         return ResultResponse.<Long>builder()
                 .resultData(result)
@@ -62,6 +62,18 @@ public class BusinessController {
 
         return ResultResponse.<Integer>builder()
                 .resultMessage("사업자등록증 사진 수정 완료")
+                .resultData(result)
+                .build();
+    }
+    @PatchMapping("thumbnail")
+    @Operation(summary = "업체 썸네일 변경")
+    public ResultResponse<Integer> patchBusinessThumbnail(@Valid @RequestPart BusinessPatchThumbnailReq p, @RequestPart(required = false) MultipartFile thumbnail) {
+        log.info("UserController > patchProfilePic > p: {}", p);
+
+        int result = businessService.patchBusinessThumbnail(p, thumbnail);
+
+        return ResultResponse.<Integer>builder()
+                .resultMessage("썸네일 사진 수정 완료")
                 .resultData(result)
                 .build();
     }

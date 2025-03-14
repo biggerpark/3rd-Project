@@ -23,6 +23,8 @@ public class BusinessPostSignUpReq {
     @JsonIgnore
     private String logo;
     @JsonIgnore
+    private String thumbnail;
+    @JsonIgnore
     private long signedUserId;
     @JsonIgnore
     private String safeTel;
