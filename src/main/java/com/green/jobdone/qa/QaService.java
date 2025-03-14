@@ -66,7 +66,7 @@ public class QaService {
         if (pics == null) {
             qaRepository.save(qa);
         }
-        if (p.getQaReportReason().getCode() == 1) {
+        if (p.getQaReportReason().getCode() == 4) {
             ServiceQaDto qaDto = serviceRepository.findQaDtoByServiceId(p.getQaTargetId());
             if (qaDto == null || qaDto.getCompleted() < 6) {
                 throw new CustomException(ServiceErrorCode.FAIL_UPDATE_SERVICE);
