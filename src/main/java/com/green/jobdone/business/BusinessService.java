@@ -16,6 +16,7 @@ import com.green.jobdone.common.model.Domain;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.Business;
 import com.green.jobdone.entity.BusinessPic;
+import com.green.jobdone.portfolio.model.PortfolioPatchThumbnailReq;
 import com.green.jobdone.user.UserRepository;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -66,7 +67,7 @@ public class BusinessService {
     private final Validator validator;
 
     @Transactional
-    public long insBusiness(MultipartFile paper, MultipartFile logo, BusinessPostSignUpReq p) {
+    public long insBusiness(MultipartFile paper, MultipartFile logo, MultipartFile thumbnail, BusinessPostSignUpReq p) {
 
 
         long userId = authenticationFacade.getSignedUserId();
@@ -110,18 +111,23 @@ public class BusinessService {
 
         String paperPath = String.format("business/%d/paper", businessId);
         String logoPath = String.format("business/%d/logo", businessId);
+        String thumbnailPath = String.format("business/%d/thumbnail", businessId);
         myFileUtils.makeFolders(paperPath);
         myFileUtils.makeFolders(logoPath);
+        myFileUtils.makeFolders(thumbnailPath);
 
         String savedPaperName = (paper != null ? myFileUtils.makeRandomFileName(paper) : null);
         String savedLogoName = (logo != null ? myFileUtils.makeRandomFileName(logo) : null);
+        String savedThumbnailName = (logo != null ? myFileUtils.makeRandomFileName(thumbnail) : null);
 
         String paperFilePath = String.format("%s/%s", paperPath, savedPaperName);
         String logoFilePath = String.format("%s/%s", logoPath, savedLogoName);
+        String thumbnailFilePath = String.format("%s/%s", thumbnailPath, savedThumbnailName);
 
         try {
             if (paper != null) myFileUtils.transferTo(paper, paperFilePath);
             if (logo != null) myFileUtils.transferTo(logo, logoFilePath);
+            if (thumbnail != null) myFileUtils.transferTo(thumbnail, thumbnailFilePath);
         } catch (IOException e) {
             log.error("error occurs:{}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
@@ -131,6 +137,7 @@ public class BusinessService {
 
         business.setLogo(savedLogoName);
         business.setPaper(savedPaperName);
+        business.setThumbnail(savedThumbnailName);
         return businessRepository.save(business).getBusinessId();
     }
 
@@ -168,7 +175,43 @@ public class BusinessService {
     ;
 
     //사업상세정보 기입 - 로고사진은 따로 뺄게요 ~~
+    @Transactional
+    public int patchBusinessThumbnail(BusinessPatchThumbnailReq p, MultipartFile thumbnail) {
 
+        long signedUserId = authenticationFacade.getSignedUserId();
+
+        long userId = businessRepository.findUserIdByBusinessId(p.getBusinessId());
+        if (userId != signedUserId) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
+        }
+
+
+        Long businessId = p.getBusinessId();
+        // 누락 파일 처리
+        if (thumbnail == null || thumbnail.isEmpty()) {
+            return 0;
+        }
+        String thumbPath = String.format("business/%d/thumbnail", p.getBusinessId());
+        myFileUtils.makeFolders(thumbPath);
+
+        String savedThumbName = (thumbnail != null && !thumbnail.isEmpty()) ? myFileUtils.makeRandomFileName(thumbnail) : null;
+        String thumbnailFilePath = String.format("%s/%s",thumbPath,savedThumbName);
+
+        try {
+            if (thumbnail != null && !thumbnail.isEmpty()) {
+                myFileUtils.transferTo(thumbnail,thumbnailFilePath);
+            }
+        }catch (IOException e) {
+            log.error("error occurs:{}", e.getMessage());
+            return 0;
+        }
+
+        // DB에 썸넬 수정 정보 업데이트
+
+        p.setBusinessId(businessId);
+        p.setThumbnail(savedThumbName);
+        return businessRepository.patchBusinessThumbnail(p);
+    }
 
     // 로고 수정
     @Transactional
@@ -404,8 +447,10 @@ public class BusinessService {
         // 각 비즈니스 객체마다 사진 경로 생성
         for (BusinessGetRes business : res) {
             // 비즈니스 객체의 pic 필드를 이용하여 사진 경로 생성
-            String picUrl = PicUrlMaker.makePicUrlBusiness(business.getBusinessId(), business.getPic());
-            business.setPic(picUrl);  // 사진 경로 업데이트
+            String picUrl = PicUrlMaker.makePicUrlBusinessThumb(business.getBusinessId(), business.getThumbnail());
+            business.setThumbnail(picUrl);  // 사진 경로 업데이트
+            String logoUrl = PicUrlMaker.makePicUrlLogo(business.getBusinessId(), business.getLogo());
+            business.setThumbnail(logoUrl);  // 사진 경로 업데이트
         }
 
         return res;

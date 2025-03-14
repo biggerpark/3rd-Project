@@ -116,7 +116,7 @@
         , ROUND(COALESCE(AVG(r.score), 0), 2) AS scoreAvg
         , IFNULL(l.userId, 0) AS `like`
         , g.regionId, g.region
-        , c.pic
+        , b.thumbnail
         , b.lat, b.lng
         , ROUND(6371000 * ACOS(COS(RADIANS(#{userLat})) * COS(RADIANS(b.lat)) * COS(RADIANS(b.lng) -
         RADIANS(#{userLng})) + SIN(RADIANS(#{userLat})) * SIN(RADIANS(b.lat)))) AS distance
