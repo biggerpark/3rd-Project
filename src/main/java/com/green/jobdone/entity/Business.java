@@ -1,5 +1,6 @@
 package com.green.jobdone.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -74,9 +75,11 @@ public class Business extends UpdatedAt {
     private String safeTel;
 
     @Column
+    @JsonIgnore
     private Double lat;
 
     @Column
+    @JsonIgnore
     private Double lng;
 
 

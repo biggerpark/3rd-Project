@@ -43,7 +43,7 @@ mybatis:
 
 kakao:
   map:
-    api-key: 8d4a378a3a5e6b784cb2b5dd51098944
+    api-key: 5d58f74383aea3ac7b020083d8c08607
 
 kakaopay:
   secretKey: ${KAKAO.PAY.SECRET}
