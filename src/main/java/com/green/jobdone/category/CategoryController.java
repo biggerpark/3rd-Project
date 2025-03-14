@@ -3,6 +3,7 @@ package com.green.jobdone.category;
 import com.green.jobdone.category.detail.model.DetailTypeGetReq;
 import com.green.jobdone.category.detail.model.DetailTypeGetRes;
 import com.green.jobdone.category.detail.model.DetailTypePostReq;
+import com.green.jobdone.category.model.CategoryDelReq;
 import com.green.jobdone.category.model.CategoryGetRes;
 import com.green.jobdone.category.model.CategoryPostReq;
 import com.green.jobdone.common.model.ResultResponse;
@@ -63,6 +64,14 @@ public class CategoryController {
     public ResultResponse<List<DetailTypeGetRes>> getAllDetailType(@Valid @ParameterObject @ModelAttribute DetailTypeGetReq p){
         return ResultResponse.<List<DetailTypeGetRes>>builder().resultMessage("상세 서비스 조회 완료")
                 .resultData(categoryService.getDetailType(p)).build();
+    }
+    @DeleteMapping
+    public ResultResponse<Integer> delCategory(@RequestBody CategoryDelReq p) {
+        categoryService.delCategory(p);
+        return ResultResponse.<Integer>builder()
+                .resultMessage("삭제 완료")
+                .resultData(1)
+                .build();
     }
 
     @DeleteMapping

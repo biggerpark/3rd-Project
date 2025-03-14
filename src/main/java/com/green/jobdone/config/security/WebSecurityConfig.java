@@ -97,10 +97,16 @@ public class WebSecurityConfig {
                                 //카카오페이쪽
                                 .requestMatchers("/api/payment/**").permitAll()
 
+
+                                //관리자
+                                .requestMatchers("/api/admin/sgin-in").permitAll()
+                                .requestMatchers("/api/admin/sgin-up").permitAll()
+
                                 //문의쪽
                                 .requestMatchers(HttpMethod.DELETE,"/api/qa").hasRole(
                                         UserRole.ADMIN.name()
                                 )
+
 
                                 //스웨거쪽
                                 .requestMatchers("/chat/**").permitAll()
