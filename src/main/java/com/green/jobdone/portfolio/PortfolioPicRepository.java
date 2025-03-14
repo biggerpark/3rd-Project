@@ -10,9 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 public interface PortfolioPicRepository extends JpaRepository<PortfolioPic, Integer> {
+
     @Modifying
     @Transactional
-    @Query("UPDATE PortfolioPic SET state = 1 WHERE portfolioPicId = :portfolioId")
+    @Query("UPDATE PortfolioPic SET state = 1 WHERE portfolioPicId = :portfolioPicId")
     void updateStateByPortfolioPicId(@Param("portfolioPicId") Long portfolioPicId);
 
     @Modifying
@@ -20,11 +21,14 @@ public interface PortfolioPicRepository extends JpaRepository<PortfolioPic, Inte
     @Query("UPDATE PortfolioPic  SET state = 0 WHERE portfolio.portfolioId = :portfolioId")
     void updateStateByPortfolioId(@Param("portfolioId") Long portfolioId);
 
-    @Query("SELECT p.pic FROM PortfolioPic p WHERE p.portfolio.portfolioId = :portfolioId AND p.state = 1")
-    List<String> getPortfolioPicsByPortfolioId(@Param("portfolioId") Long portfolioId);
-
     @Modifying
     @Transactional
     @Query("delete from PortfolioPic p where p.portfolio.portfolioId =:portfolioId and p.state = 1")
     int deletePortfolioPicByPortfolioPicId(@Param("portfolioId") Long portfolioId);
+
+    @Query("SELECT p.pic FROM PortfolioPic p WHERE p.portfolio.portfolioId = :portfolioId AND p.state = 1")
+    List<String> getPortfolioPicsByPortfolioId(@Param("portfolioId") Long portfolioId);
+
+
+
 }

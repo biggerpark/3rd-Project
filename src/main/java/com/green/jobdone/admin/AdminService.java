@@ -4,16 +4,30 @@ import com.green.jobdone.admin.model.*;
 import com.green.jobdone.business.BusinessRepository;
 import com.green.jobdone.category.CategoryRepository;
 import com.green.jobdone.category.DetailTypeRepository;
+import com.green.jobdone.common.CookieUtils;
 import com.green.jobdone.common.PicUrlMaker;
+import com.green.jobdone.common.exception.AdminErrorCode;
+import com.green.jobdone.common.exception.CustomException;
+import com.green.jobdone.config.jwt.JwtConst;
+import com.green.jobdone.config.jwt.JwtUser;
+import com.green.jobdone.config.jwt.TokenProvider;
+import com.green.jobdone.config.jwt.UserRole;
+import com.green.jobdone.config.security.AuthenticationFacade;
+import com.green.jobdone.entity.Admin;
 import com.green.jobdone.entity.Business;
+import com.green.jobdone.entity.User;
 import com.green.jobdone.service.ServiceRepository;
+import com.green.jobdone.user.UserRepository;
 import com.green.jobdone.visitor.VisitorCountRepository;
 import com.green.jobdone.visitor.VisitorHistoryRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.netty.udp.UdpServer;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -32,6 +46,12 @@ public class AdminService {
     private final VisitorCountRepository visitorCountRepository;
     private final CategoryRepository categoryRepository;
     private final DetailTypeRepository detailTypeRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationFacade authenticationFacade;
+    private final TokenProvider tokenProvider;
+    private final CookieUtils cookieUtils;
+    private final JwtConst jwtConst;
 
 
     public List<BusinessApplicationGetRes> getBusinessApplication(int page) {
@@ -66,7 +86,7 @@ public class AdminService {
     }
 
 
-    @Transactional
+    @Transactional // 업체승인 하면 user type 사장으로 바뀌고, business state 도 바뀜
     public int postBusinessApprove(long businessId) {
         Business business = businessRepository.findById(businessId) // 프론트에서 받은 해당 pk를 통해 업체 정보를 entity 에 담음
                 .orElseThrow(() -> new EntityNotFoundException("해당 업체를 찾을 수 없습니다."));
@@ -74,10 +94,16 @@ public class AdminService {
 
         LocalDate today = LocalDate.now();
 
+        Optional<User> user=userRepository.findById(business.getUser().getUserId());
+
+        User user1=user.get();
+        user1.setRole(UserRole.PRESIDENT);
+        userRepository.save(user1);
+
+
 
         business.setApproveAt(today);
         business.setState(101); // 업체 상태를 수락완료로 바꿈
-
 
         return 1;
     }
@@ -266,19 +292,69 @@ public class AdminService {
         res.setIncreaseUnprocessedInquiries(unprocessedInquiriesInfoDto.getTodayUnprocessedInquiries());
         return res;
     }
+    public void SignUpAdmin(SignUpAdminReq p){
+        log.info("dd: {}",authenticationFacade.getSignedUser().getRoles().get(0).getCode());
+
+        if(authenticationFacade.getSignedUser().getRoles().get(0).getCode()!=102){
+            throw new CustomException(AdminErrorCode.USE_ONLY_ADMIN);
+        }
+        String aId = p.getAId();
+        if(adminRepository.existsByAId(aId)){
+            throw new CustomException(AdminErrorCode.ALREADY_USE_ID);
+        }
+        Admin admin = new Admin();
+        admin.setAId(aId);
+        String aPw = passwordEncoder.encode(p.getAPw());
+        admin.setAPw(aPw);
+        admin.setPhone(p.getPhone());
+        admin.setName(p.getName());
+        admin.setRole(UserRole.ADMIN);
+        adminRepository.save(admin);
+    }
+    public SignInAdminRes signInAdmin(SignInAdminReq p, HttpServletResponse response){
+//        String aPw = adminRepository.findAPwdByAId(p.getAId());
+        Admin admin = adminRepository.findByaId(p.getAId());
+        AdminDto dto = adminMapper.getAdminInfo(p.getAId());
+        //log.info("dto: {}",dto);
+
+        if(admin.getAPw()==null || !passwordEncoder.matches(p.getAPw(),admin.getAPw())) {
+            throw new CustomException(AdminErrorCode.CHECK_ADMIN);
+        }
+        List<UserRole> roles = new ArrayList<>();
+        roles.add(admin.getRole());
+        JwtUser jwtUser = new JwtUser(admin.getAdminId(), roles);
+        String accessToken = tokenProvider.generateAccessToken(jwtUser);
+        String refreshToken = tokenProvider.generateRefreshToken(jwtUser);
+        cookieUtils.setCookie(response, "refreshToken", refreshToken, jwtConst.getRefreshTokenCookieExpiry(), "/api/user/access-token");
+        SignInAdminRes res = new SignInAdminRes();
+        res.setAccessToken(accessToken);
+        res.setName(admin.getName());
+        return res;
+    }
 
 
+    @Transactional
+    public int patchAdminAllow(AdminAllowReq p){
+
+        User user=userRepository.findByEmail(p.getEmail()); // email 을 통해 User entity 객체 생성
+
+        user.setRole(UserRole.ADMIN);
 
 
+        Admin admin=Admin.builder()
+                .aId(user.getEmail())
+                .aPw(user.getUpw())
+                .phone(user.getPhone())
+                .name(user.getName())
+                .role(UserRole.ADMIN)
+                .build();
 
 
+        adminRepository.save(admin);
 
 
-
-
-
-
-
+        return 1;
+    }
 
 
 }

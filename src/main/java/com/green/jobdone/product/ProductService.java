@@ -32,6 +32,7 @@ public class ProductService {
     private final OptionDetailRepository optionDetailRepository;
     private final BusinessRepository businessRepository;
     private final DetailTypeRepository detailTypeRepository;
+    private final ProductMapper productMapper;
 
     public int postProduct(ProductPostReq p) {
 
@@ -211,10 +212,11 @@ public class ProductService {
 
     @Transactional
     public void postAll(ProductPostAllReq p){
+        Long userId = authenticationFacade.getSignedUserId();
         if (p.getProductId() == null) {
             throw new CustomException(CommonErrorCode.NOT_EXIST_BUSINESS);
         }
-        if(!businessRepository.findUserIdByProductId(p.getProductId()).equals(authenticationFacade.getSignedUserId())){
+        if(!businessRepository.findUserIdByProductId(p.getProductId()).equals(userId)){
             throw new CustomException(ServiceErrorCode.BUSINESS_OWNER_MISMATCH);
         };
         Product product = productRepository.findById(p.getProductId()).orElse(null);
@@ -223,8 +225,13 @@ public class ProductService {
             productRepository.save(product);
         }
 //        List<Option> optionList = new ArrayList<>(p.getOptions().size());
+        // 업체id로 옵션 조회 >> 옵션 조회후 새로 받은 옵션중 중복 이름이 있으면 에러 던짐 contains()
+//        List<String> optionName = optionRepository.findOptionNameByBusinessId(businessRepository.findBusinessIdByUserId(userId));
         if(p.getOptions()!=null && !p.getOptions().isEmpty()) {
             for (OptionDto ol : p.getOptions()) {
+//                if(optionName.contains(ol.getOptionName())){
+//                    throw new CustomException(ServiceErrorCode.FAIL_UPDATE_SERVICE);
+//                }
                 Option option = new Option();
                 if (ol.getOptionId() != null && ol.getOptionId() != 0) {
                     option = optionRepository.findById(ol.getOptionId()).orElseGet(Option::new);

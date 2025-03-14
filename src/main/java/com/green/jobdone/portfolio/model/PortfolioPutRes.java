@@ -9,5 +9,6 @@ import java.util.List;
 @Builder
 public class PortfolioPutRes {
     private long portfolioId;
+    private String youtubeId;
     private List<String> pics;
 }

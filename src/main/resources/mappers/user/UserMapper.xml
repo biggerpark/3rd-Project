@@ -112,5 +112,9 @@
         WHERE email=#{email}
     </select>
 
+<!--    <select id="getUuidCheck">-->
+<!--        SELECT userId,uuid-->
+<!--        FROM user-->
+<!--    </select>-->
 
 </mapper>

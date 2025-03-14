@@ -12,4 +12,5 @@ import java.time.LocalDateTime;
 public class ServiceQaDto {
     private int completed;
     private LocalDateTime doneAt;
+    private LocalDateTime paidAt;
 }

@@ -7,13 +7,14 @@ import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.common.exception.ChatErrorCode;
 import com.green.jobdone.common.exception.CustomException;
+import com.green.jobdone.config.jwt.TokenProvider;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.Chat;
 import com.green.jobdone.entity.ChatPic;
 import com.green.jobdone.entity.Room;
 import com.green.jobdone.room.RoomRepository;
-import com.green.jobdone.room.RoomService;
 import com.green.jobdone.room.chat.model.*;
+import com.green.jobdone.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,20 +37,33 @@ public class ChatService {
     private final RoomRepository roomRepository;
     private final ChatPicRepository chatPicRepository;
     private final BusinessRepository businessRepository;
+    private final UserRepository userRepository;
+    private final TokenProvider tokenProvider;
 
     @Transactional
-    public String insChat(String token ,MultipartFile pic, ChatPostReq p){
+    public String insChat(MultipartFile pic, ChatPostReq p){
 //        long userId = authenticationFacade.getSignedUserId();
 //        UserIdRoom userIdRoom = chatMapper.checkUserId(p.getRoomId());
 //        if(userId!=userIdRoom.getUserId()||userId!=userIdRoom.getBuid()){
 //            throw new CustomException(ChatErrorCode.FAIL_TO_REG);
 //        } // 채팅 인증 처리가 필요할때 사용용도
-        log.info("토큰값: {}",token);
+//        Long signedUserId = null;
+//        if(token!=null){
+//            JwtUser jwtUser = tokenProvider.getJwtUserFromToken(token);
+//            signedUserId = jwtUser.getSignedUserId();
+//        } else {
+//        }  이거 생각해보니 웹 소켓 접속할때 차단이 맞음 why? 아니면 실시간 채팅 염탐가능
+
+//        log.info("토큰값: {}",token);
         Room room = roomRepository.findById(p.getRoomId()).orElseThrow(() -> new CustomException(ChatErrorCode.MISSING_ROOM));
         Long userId = room.getUser().getUserId();
-//        if(userId!=authenticationFacade.getSignedUserId()|| !room.getBusiness().getBusinessId().equals(businessRepository.findBusinessIdByUserId(userId))){
+        Long businessId = room.getBusiness().getBusinessId();
+//        if(!userId.equals(signedUserId) || !room.getBusiness().getBusinessId().equals(signedUserId)){
 //            throw new CustomException(ChatErrorCode.FAIL_TO_REG);
-//        } //인증처리 나중에 복구해볼 생각 ㄱ
+//        } //인증처리 나중에 복구해볼 생각 ㄱ 이거 생각해보니 웹 소켓 접속할때 차단이 맞음 why? 아니면 실시간 채팅 염탐가능
+//        String logo = businessRepository.findBusinessLogoByBusinessId(businessId);
+        String logo = PicUrlMaker.makePicUrlLogo(businessId,businessRepository.findBusinessLogoByBusinessId(businessId));
+        String userPic = PicUrlMaker.makePicUserUrl(userId,userRepository.getUserPicByUserId(userId));
         Chat chat = new Chat();
         chat.setRoom(room);
         chat.setFlag(p.getFlag());
@@ -60,13 +74,15 @@ public class ChatService {
         Map<String ,Object> resJson = new HashMap<>();
         resJson.put("flag",p.getFlag());
         resJson.put("message",p.getContents());
+        resJson.put("logo2",userPic);
+        resJson.put("logo",logo);
         if(pic==null){
-            return null;
-//            try {
-//                return objectMapper.writeValueAsString(resJson);
-//            } catch (JsonProcessingException e) {
-//                throw new RuntimeException(e);
-//            }
+//            return null;
+            try {
+                return objectMapper.writeValueAsString(resJson);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         Long chatId = chat.getChatId();
@@ -91,14 +107,13 @@ public class ChatService {
 //        chatPicDto.setPic(fileName);
 //        int res2 = chatMapper.insChatPic(chatPicDto);
         String picUrl = String.format("/pic/%s",folderPath);
-
         resJson.put("pic",picUrl);
-//        try {
-//            return objectMapper.writeValueAsString(resJson);
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException(e);
-//        }
-        return picUrl;
+        try {
+            return objectMapper.writeValueAsString(resJson);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+//        return picUrl;
     }
 
     public Long insertChat(ChatPostReq p){
@@ -108,7 +123,7 @@ public class ChatService {
             int res = chatMapper.insChat(p);
             return p.getChatId();
         } else {
-            throw new CustomException(ChatErrorCode.FAIL_TO_REG);
+            throw new CustomException(ChatErrorCode.FAIL_TO_CONNECT);
         }
     }
     public int insChatPic(List<MultipartFile> pics) {
@@ -125,22 +140,29 @@ public class ChatService {
 
     public List<ChatGetRes> selRoomChat(ChatGetReq p){
         List<ChatGetRes> res = chatMapper.selRoomChat(p);
+        if(res.isEmpty()){
+            return res;
+        }
         String logo = res.get(0).getLogo();
         long roomId = p.getRoomId();
         for (ChatGetRes chat : res) {
             long chatId = chat.getChatId();
             long businessId = chat.getBusinessId();
-            List<GetPicDto> a = chat.getPics();
+//            List<GetPicDto> a = chat.getPics();
             chat.setLogo(PicUrlMaker.makePicUrlLogo(businessId , logo));
-
-            if (a == null) {continue;}
-
-            for (GetPicDto picDto : a) {
-                String picName = picDto.getPic();
-                picDto.setPic(PicUrlMaker.makePicUrlChat(roomId, chatId, picName));
+            chat.setLogo2(PicUrlMaker.makePicUserUrl(chat.getUserId(),chat.getLogo2()));
+            if(chat.getPic()!=null){
+                chat.setPic(PicUrlMaker.makePicUrlChat(roomId,chatId,chat.getPic()));
             }
+
+//            if (a == null) {continue;}
+//
+//            for (GetPicDto picDto : a) {
+//                String picName = picDto.getPic();
+//                picDto.setPic(PicUrlMaker.makePicUrlChat(roomId, chatId, picName));
+//            }
         }
-        log.info("res: {} ", res);
+//        log.info("res: {} ", res); 로그 너무 보여
 
         return res;
     }

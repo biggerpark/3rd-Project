@@ -16,5 +16,8 @@ public class PortfolioGetOneRes {
     private String contents;
     private String detailType;
     private String category;
+    private String youtubeUrl;
+    private String youtubeId;
+    private String thumbnail;
 
 }

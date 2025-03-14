@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 @ToString
 public class QaDetailRes {
+    private String title;
     private String contents;
     private List<String> pics;
 

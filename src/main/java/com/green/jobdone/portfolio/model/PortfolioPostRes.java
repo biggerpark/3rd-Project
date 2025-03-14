@@ -10,5 +10,7 @@ import java.util.List;
 @Builder
 public class PortfolioPostRes {
     private long portfolioId;
+    private String thumbnail;
+    private String youtubeId;
     private List<String> pics;
 }

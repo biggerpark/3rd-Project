@@ -4,6 +4,7 @@ import com.green.jobdone.admin.model.*;
 import com.green.jobdone.common.model.ResultResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -154,4 +155,41 @@ public class AdminController {
                 .resultData(result)
                 .build();
     }
+
+    @PostMapping("sign-up")
+    @Operation(summary = "관리자 가입(최상위 관리자만 가능함)")
+    public ResultResponse<Integer> signUpAdmin(@RequestBody SignUpAdminReq p){
+        adminService.SignUpAdmin(p);
+        return ResultResponse.<Integer>builder()
+                .resultMessage("완료")
+                .resultData(1)
+                .build();
+    }
+
+    @PostMapping("sign-in")
+    @Operation(summary = "관리자 로그인")
+    public ResultResponse<SignInAdminRes> signInAdmin(@RequestBody SignInAdminReq p, HttpServletResponse response) {
+        SignInAdminRes res = adminService.signInAdmin(p, response);
+        return ResultResponse.<SignInAdminRes>builder()
+                .resultMessage("로그인 완료")
+                .resultData(res)
+                .build();
+    }
+
+
+    @PatchMapping("adminAllow")
+    @Operation(summary = "이메일을 입력하여 관리자가 관리자 권한 부여,화면은 따로 안만들거고 서버 자체적으로 특정 이메일 지정할때 쓸 api")
+    public ResultResponse<Integer> patchAdminAllow(@RequestBody AdminAllowReq p){
+        Integer result = adminService.patchAdminAllow(p);
+
+        return ResultResponse.<Integer> builder()
+                .resultMessage("관리자 권한 부여 완료")
+                .resultData(result)
+                .build();
+
+    }
+
+
+
+
 }

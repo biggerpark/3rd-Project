@@ -20,4 +20,5 @@ public interface AdminMapper {
     AdminNewUserInfoDto getNewUserCount(String today, String yesterday);
     AdminNewBusinessInfoDto getNewBusinessCount(String today, String yesterday);
     AdminUnprocessedInquiriesInfoDto getUnprocessedInquiries(String today);
+    AdminDto getAdminInfo(String Aid);
 }

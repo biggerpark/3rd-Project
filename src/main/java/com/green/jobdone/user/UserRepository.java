@@ -19,7 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     String getUserNameByUserId(@Param("userId") Long userId);
 
     @Modifying
-    @Query("DELETE FROM User u where u.role = 999 and u.updatedAt < :sixMonthAgo ")
+    @Query("DELETE FROM User u where u.role = 999 and u.updatedAt < :sixMonthsAgo ")
     void deleteByDays(@Param("sixMonthsAgo") LocalDateTime sixMonthsAgo);
 
     @Query("select new com.green.jobdone.user.model.UserDto(u.role, u.userId, u.email) from User u where u.email =:email")
@@ -42,5 +42,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional
     @Query("DELETE FROM User u WHERE u.userId = :userId")
     int deleteUser(@Param("userId") Long userId);
+
+    @Query("select u.pic from User u where u.userId =:userId")
+    String getUserPicByUserId(@Param("userId") Long userId);
+
+
+    User findByEmail(String email);
 
 }

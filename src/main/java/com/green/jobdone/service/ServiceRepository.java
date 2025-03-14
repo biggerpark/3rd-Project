@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -46,7 +47,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
     @Query("select new com.green.jobdone.service.model.Dto.CancelDto(s.tid ,s.user.userId, s.totalPrice, s.completed) from Service s where s.serviceId =:serviceId")
     CancelDto findCancelDtoByServiceId(@Param("serviceId") Long serviceId);
 
-    @Query("select new com.green.jobdone.service.model.Dto.ServiceQaDto(s.completed, s.doneAt) from Service s where s.serviceId =:serviceId")
+    @Query("select new com.green.jobdone.service.model.Dto.ServiceQaDto(s.completed, s.doneAt, s.paidAt) from Service s where s.serviceId =:serviceId")
     ServiceQaDto findQaDtoByServiceId(@Param("serviceId") Long serviceId);
 
 
@@ -58,4 +59,13 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
 
     @Query("SELECT COUNT(s.serviceId) FROM Service s WHERE s.completed >= 6")
     int getTotalCompletedInfo();
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Service s SET s.completed =:completed , " +
+            "s.paidAt = CASE WHEN :completed = 6 AND s.paidAt IS NULL THEN CURRENT_TIMESTAMP ELSE s.paidAt END, " +
+            "s.doneAt = CASE WHEN :completed = 7 AND s.doneAt IS NULL THEN CURRENT_TIMESTAMP ELSE s.doneAt END " +
+            "WHERE s.serviceId = :serviceId")
+    void updateServiceStatus(@Param("serviceId") Long serviceId, @Param("completed") int completed);
+    //차라리 6 7을 받고나서 직접 여기서 처리하면?
 }

@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class ServiceEtcDto {
     private Long etcId;
-    private int etcPrice;
+    private Integer etcPrice;
     private String etcComment;
 }

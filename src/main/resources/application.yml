@@ -14,6 +14,14 @@ global:
       - http://${DOMAIN.SERVER.PATH}0/fe/redirect
       - http://localhost:5173/fe/redirect
 
+youtube:
+  api:
+    key: ${YOUTUBE.API_KEY}
+
+weather:
+  api:
+    key: ${WEATHER.API_KEY}
+
 upstage:
   api:
     key: ${UPSTAGE.API_KEY}
@@ -33,6 +41,9 @@ domain:
 mybatis:
   mapper-locations: mappers/**/*.xml
 
+kakao:
+  map:
+    api-key: 5d58f74383aea3ac7b020083d8c08607
 
 kakaopay:
   secretKey: ${KAKAO.PAY.SECRET}

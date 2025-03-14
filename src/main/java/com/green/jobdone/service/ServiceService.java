@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -44,8 +45,8 @@ public class ServiceService {
 
     @Transactional
     public int postService(ServicePostReq p){
-        String st = String.format(p.getMStartTime()+":00");
-        p.setMStartTime(st);
+//        String st = String.format(p.getMStartTime()+":00");
+        p.setMStartTime(plusDoubleZero(p.getMStartTime()));
 
         Long userId = authenticationFacade.getSignedUserId();
         p.setUserId(userId);
@@ -147,8 +148,9 @@ public class ServiceService {
         if(p.getServiceId()==0){
             return null;
         }
-
-        if(businessId==null && userId==null || res.getUserId()!=userId) {
+        //업체가 null 이면서 userid도 null   || res. get유저 아이디가 다르다면?
+        // res 의 유저 id가 service 제공받는사람의 userId임
+        if((businessId==null && userId==null) || (res.getBusiUserId()!=userId && businessId!=null) || (res.getUserId()!=userId &&   businessId==null)) {
             res.setUserName("");
             res.setUserPhone("");
             res.setAddress("");
@@ -173,10 +175,10 @@ public class ServiceService {
 //             p.getProviderUserId 대신 authenticationFacade.getSignedUserId()
             throw new CustomException(ServiceErrorCode.BUSINESS_OWNER_MISMATCH);
         }
-        String st = String.format(p.getMStartTime()+":00");
-        p.setMStartTime(st);
-        String et = String.format(p.getMEndTime()+":00");
-        p.setMEndTime(et);
+//        String st = String.format(p.getMStartTime()+":00");
+        p.setMStartTime(plusDoubleZero(p.getMStartTime()));
+//        String et = String.format(p.getMEndTime()+":00");
+        p.setMEndTime(plusDoubleZero(p.getMEndTime()));
         List<ServiceEtcDto> etcDto = p.getEtc();
         int sum = 0;
         int i=0;
@@ -190,16 +192,38 @@ public class ServiceService {
         service.setAddComment(p.getAddComment());
         service.setPyeong(p.getPyeong());
         // update시 set으로 null 지정시 기존값을 변경하지 않음
+
         List<Etc> etcList = new ArrayList<>();
-        for(ServiceEtcDto dto : etcDto){
-            sum += dto.getEtcPrice();
-            Etc etc = Etc.builder()
-                    .service(service)
-                    .etcId(p.getEtc().get(i++).getEtcId())
-                    .price(dto.getEtcPrice())
-                    .comment(dto.getEtcComment())
-                    .build();
-            etcList.add(etc);
+        if(etcDto !=null){
+            List<Long> etcIds = Optional.ofNullable(etcRepository.findEtcIdsByServiceId(p.getServiceId()))
+                    .orElse(Collections.emptyList());
+            List<Long> newEtcIds = etcDto.stream().map(ServiceEtcDto::getEtcId).filter(Objects::nonNull).toList();
+            List<Long> delEtdByPk = etcIds.stream().filter(id -> !newEtcIds.contains(id)).toList();
+            for(Long etcId : delEtdByPk){
+                etcRepository.deleteById(etcId);
+            }
+
+            for(ServiceEtcDto dto : etcDto){
+                sum += dto.getEtcPrice();
+                if(dto.getEtcId()==null){
+//                    Etc etc = Etc.builder()
+//                            .service(service)
+//                            .etcId(dto.getEtcId())
+//                            .price(dto.getEtcPrice())
+//                            .comment(dto.getEtcComment())
+//                            .build();
+                    Etc etc = new Etc();
+                    etc.setService(service);
+                    etc.setPrice(dto.getEtcPrice());
+                    etc.setComment(dto.getEtcComment());
+                    etcList.add(etc);
+                } else {
+                    Etc etc = etcRepository.findById(dto.getEtcId()).orElse(null);
+                    etc.setPrice(dto.getEtcPrice());
+                    etc.setComment(dto.getEtcComment());
+                    etcList.add(etc);
+                }
+            }
         }
 
         if(sum!=0){
@@ -228,7 +252,9 @@ public class ServiceService {
 
         serviceRepository.save(service);
         serviceDetailRepository.save(serviceDetail);
-        etcRepository.saveAll(etcList);
+        if(!etcList.isEmpty()){
+            etcRepository.saveAll(etcList);
+        }
 
 //        int res1 = serviceMapper.updService(p);
 //        int res2 = serviceMapper.updServiceDetail(p);
@@ -261,12 +287,12 @@ public class ServiceService {
         }
         p.setUserId(0);
 
-        if(p.getCompleted()==7){
+        if(p.getCompleted()==7&&p.getBusinessId()!=null){
 //            CompletedDto dto = new CompletedDto();
 //            dto.setServiceId(p.getServiceId());
 //            dto.setBusinessId(p.getBusinessId());
 //            return serviceMapper.payOrDoneCompleted(dto);
-            serviceRepository.updCompleted(p.getServiceId(),7);
+            serviceRepository.updateServiceStatus(p.getServiceId(),7);
         }
 
 
@@ -280,17 +306,17 @@ public class ServiceService {
 
         Map<Integer, List<Integer>> businessAllowed = Map.of(
                 0, List.of(1, 5),
-                1, List.of(2),
+                1, List.of(2, 5),
                 2, List.of(1, 5),
+                3, List.of(4),
                 6, List.of(7)
         );
 
 
         Map<Integer, List<Integer>> userAllowed = Map.of(
-                0, List.of(1, 3, 5),
-                1, List.of(2),
-                2, List.of(1, 3, 5, 6),
-                3, List.of(4),
+                0, List.of(1, 3),
+                1, List.of(3),
+                2, List.of(3, 6),
                 7, List.of(8, 9)
         );
 
@@ -301,5 +327,8 @@ public class ServiceService {
 
         // 유저일 때 상태변환 허용
         return userAllowed.getOrDefault(oldCompleted, List.of()).contains(newCompleted);
+    }
+    private String plusDoubleZero(String time){
+        return String.format(time+":00");
     }
 }

@@ -1,9 +1,13 @@
 package com.green.jobdone.user.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.green.jobdone.config.jwt.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.List;
 
 @Getter
 @Builder
@@ -14,8 +18,7 @@ public class UserSignInRes {
     private String name;
     private String email;
     private String phone;
-    @JsonIgnore
-    private String type;
+    private int type;
     private String pic;
     private String accessToken;
     private long businessId;
