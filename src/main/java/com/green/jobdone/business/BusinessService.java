@@ -48,8 +48,6 @@ public class BusinessService {
 
     @Value("${file.directory}")
     private String fileDirectory;
-    @Value("${kakao.map.api-key}")
-    String apikey = "apiKey";
 
     @Value("${domain.path.server}")
     private String docker;
@@ -136,13 +134,15 @@ public class BusinessService {
         return businessRepository.save(business).getBusinessId();
     }
 
+    @Value("${kakao.map.api-key}")
+    String apikey = "apiKey";
     public double[] getCoordinatesFromAddress(String address) {
         String url = "https://dapi.kakao.com/v2/local/search/address.json?query=" + address;
 
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization","KakaoAK"+apikey);
+        headers.set("Authorization","KakaoAK " + apikey);
 
         HttpEntity<String> entity =new HttpEntity<>(headers);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
@@ -152,11 +152,11 @@ public class BusinessService {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(responseBody);
 
-            JsonNode document = rootNode.get("document");
-            if (document.isArray() && document.size() > 0) {
-                JsonNode firstResult = document.get(0);
-                double latitude = firstResult.get("latitude").path("y").asDouble(); // 위도
-                double longitude = firstResult.get("longitude").path("x").asDouble(); // 경도
+            JsonNode documents = rootNode.get("documents");
+            if (documents.isArray() && documents.size() > 0) {
+                JsonNode firstResult = documents.get(0);
+                double latitude = firstResult.get("x").asDouble(); // 위도
+                double longitude = firstResult.get("y").asDouble(); // 경도
                 return new double[]{ latitude,longitude};
             }
         }  catch (Exception e) {
