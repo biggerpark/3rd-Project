@@ -65,14 +65,15 @@ public class CategoryController {
         return ResultResponse.<List<DetailTypeGetRes>>builder().resultMessage("상세 서비스 조회 완료")
                 .resultData(categoryService.getDetailType(p)).build();
     }
-    @DeleteMapping
-    public ResultResponse<Integer> delCategory(@RequestBody CategoryDelReq p) {
-        categoryService.delCategory(p);
-        return ResultResponse.<Integer>builder()
-                .resultMessage("삭제 완료")
-                .resultData(1)
-                .build();
-    }
+
+//    @DeleteMapping
+//    public ResultResponse<Integer> delCategory(@RequestBody CategoryDelReq p) {
+//        categoryService.delCategory(p);
+//        return ResultResponse.<Integer>builder()
+//                .resultMessage("삭제 완료")
+//                .resultData(1)
+//                .build();
+//    }
 
     @DeleteMapping
     @Operation(summary = "관리자가 잘못 등록된 카테고리 삭제")

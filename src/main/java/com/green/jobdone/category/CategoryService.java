@@ -75,16 +75,17 @@ public class CategoryService {
         return categoryMapper.getDetailType(p);
     }
 
-    public void delCategory(CategoryDelReq p) {
 
-//        JwtUser user = authenticationFacade.getSignedUser();
-//        List<UserRole> role = user.getRoles();
-//        if (!role.contains(UserRole.ADMIN)) {
-//            throw new CustomException(AdminErrorCode.USE_ONLY_ADMIN);
-//        }
-
-        categoryRepository.deleteById(p.getCategoryId());
-    }
+//    public void delCategory(CategoryDelReq p) {
+//
+////        JwtUser user = authenticationFacade.getSignedUser();
+////        List<UserRole> role = user.getRoles();
+////        if (!role.contains(UserRole.ADMIN)) {
+////            throw new CustomException(AdminErrorCode.USE_ONLY_ADMIN);
+////        }
+//
+//        categoryRepository.deleteById(p.getCategoryId());
+//    }
 
 
     @Transactional
