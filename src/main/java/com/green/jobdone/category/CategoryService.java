@@ -3,8 +3,16 @@ package com.green.jobdone.category;
 import com.green.jobdone.category.detail.model.DetailTypeGetReq;
 import com.green.jobdone.category.detail.model.DetailTypeGetRes;
 import com.green.jobdone.category.detail.model.DetailTypePostReq;
+import com.green.jobdone.category.model.CategoryDelReq;
+import com.green.jobdone.category.model.CategoryGetReq;
 import com.green.jobdone.category.model.CategoryGetRes;
 import com.green.jobdone.category.model.CategoryPostReq;
+import com.green.jobdone.common.exception.AdminErrorCode;
+import com.green.jobdone.common.exception.CustomException;
+import com.green.jobdone.config.jwt.JwtUser;
+import com.green.jobdone.config.jwt.UserRole;
+import com.green.jobdone.config.security.AuthenticationFacade;
+import com.green.jobdone.entity.Admin;
 import com.green.jobdone.entity.Category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +27,7 @@ import java.util.List;
 public class CategoryService {
     private final CategoryMapper categoryMapper;
     private final CategoryRepository categoryRepository;
+    private final AuthenticationFacade authenticationFacade;
 
     //카테고리
 
@@ -62,5 +71,15 @@ public class CategoryService {
         return categoryMapper.getDetailType(p);
     }
 
+    public void delCategory(CategoryDelReq p) {
+
+//        JwtUser user = authenticationFacade.getSignedUser();
+//        List<UserRole> role = user.getRoles();
+//        if (!role.contains(UserRole.ADMIN)) {
+//            throw new CustomException(AdminErrorCode.USE_ONLY_ADMIN);
+//        }
+
+        categoryRepository.deleteById(p.getCategoryId());
+    }
 
 }
