@@ -34,5 +34,7 @@ public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
     @Query("update Portfolio  p set p.thumbnail=:#{#p.thumbnail} where p.portfolioId=:#{#p.portfolioId}")
     Integer patchPortfolioThumbnail(@Param("p") PortfolioPatchThumbnailReq p);
 
+    @Query("select p.business.businessId from Portfolio p where p.portfolioId = :portfolioId ")
+    long getBusinessIdFromPortfolio(@Param("portfolioId") Long portfolioId);
 
 }
