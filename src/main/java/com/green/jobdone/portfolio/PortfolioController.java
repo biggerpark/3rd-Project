@@ -78,8 +78,8 @@ public class PortfolioController {
 
     @PutMapping
     @Operation(summary = "포폴 수정")
-    public ResultResponse<PortfolioPutRes> udtPortfolioPut(@RequestPart(required = false) List<MultipartFile> pics, @Valid @RequestPart PortfolioPutReq p) {
-        PortfolioPutRes res = portfolioService.udtPortfolio(pics, p);
+    public ResultResponse<PortfolioPutRes> udtPortfolioPut(@RequestPart(required = false) List<MultipartFile> pics,MultipartFile thumbnail, @Valid @RequestPart PortfolioPutReq p) {
+        PortfolioPutRes res = portfolioService.udtPortfolio(pics, thumbnail,p);
         log.info("res: {}",res);
         return ResultResponse.<PortfolioPutRes>builder().resultData(res).resultMessage(res != null? "포폴 수정 완료": "나가라").build();
     }

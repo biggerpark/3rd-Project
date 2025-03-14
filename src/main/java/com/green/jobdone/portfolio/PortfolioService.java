@@ -128,7 +128,7 @@ public class PortfolioService {
 
     //포폴 수정하기
     @Transactional
-    public PortfolioPutRes udtPortfolio(List<MultipartFile> pics, PortfolioPutReq p) {
+    public PortfolioPutRes udtPortfolio(List<MultipartFile> pics, MultipartFile thumbnail, PortfolioPutReq p) {
 
         long signedUserId = authenticationFacade.getSignedUserId();
 
