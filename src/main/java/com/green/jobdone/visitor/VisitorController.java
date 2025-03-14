@@ -1,6 +1,5 @@
 package com.green.jobdone.visitor;
 
-import com.green.jobdone.visitor.model.VisitorWeekInfoGetRes;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,10 +16,5 @@ class VisitorController {
     public String visit(HttpServletRequest request) {
         visitorService.incrementVisitor(request);
         return "현재 방문자 수: " + visitorService.getVisitorCount();
-    }
-
-    @GetMapping("/visit/week")
-    public VisitorWeekInfoGetRes getVisitorInfo() {
-        return null;
     }
 }

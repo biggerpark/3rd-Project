@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Year;
 import java.util.List;
 
 @RestController
@@ -100,6 +101,17 @@ public class AdminController {
         List<AdminSalesInfoRes> result = adminService.getAdminSalesInfo();
         return ResultResponse.<List<AdminSalesInfoRes>>builder()
                 .resultMessage("관리자 측 총매출 조회 완료")
+                .resultData(result)
+                .build();
+    }
+
+    @GetMapping("statsSalesYear")
+    @Operation(summary = "관리자 통계) 연도별 매출 조회")
+    public ResultResponse<List<AdminSalesYearInfoRes>> getAdminSalesYearInfo(Year year) {
+        log.info("year: {}", year);
+        List<AdminSalesYearInfoRes> result = adminService.getAdminSalesYearInfo(year);
+        return ResultResponse.<List<AdminSalesYearInfoRes>>builder()
+                .resultMessage("관리자 측 연도별 총매출 조회 완료")
                 .resultData(result)
                 .build();
     }

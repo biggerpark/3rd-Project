@@ -29,9 +29,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.netty.udp.UdpServer;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.YearMonth;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.*;
 
@@ -151,6 +150,33 @@ public class AdminService {
             //lastDays.add(month.lengthOfMonth());
             res.setMonth(month.toString());
             List<AdminSalesInfoDto> adminSalesInfoDtos = adminMapper.getSalesInfo(month.toString(), month.lengthOfMonth());
+            for (AdminSalesInfoDto item : adminSalesInfoDtos) {
+                item.setTotalPrice(item.getTotalPrice()*5/100);
+            }
+            res.setSalesInfoDtos(adminSalesInfoDtos);
+            int totalPrice = 0;
+            for (AdminSalesInfoDto item : adminSalesInfoDtos) {
+                totalPrice += item.getTotalPrice();
+            }
+            res.setTotalPrice(totalPrice);
+            result.add(res);
+        }
+        return result;
+    }
+
+    public List<AdminSalesYearInfoRes> getAdminSalesYearInfo(Year year) {
+        String targetyear = String.format("%s-12",year);
+        YearMonth targetMonth = YearMonth.parse(targetyear, DateTimeFormatter.ofPattern("yyyy-MM"));
+        List<AdminSalesYearInfoRes> result = new ArrayList<>();
+        for (int i = 11; i >= 0; i--) {
+            AdminSalesYearInfoRes res = new AdminSalesYearInfoRes();
+            YearMonth month = targetMonth.minusMonths(i);
+            //lastDays.add(month.lengthOfMonth());
+            res.setMonth(month.toString());
+            List<AdminSalesInfoDto> adminSalesInfoDtos = adminMapper.getSalesInfo(month.toString(), month.lengthOfMonth());
+            for (AdminSalesInfoDto item : adminSalesInfoDtos) {
+                item.setTotalPrice(item.getTotalPrice()*5/100);
+            }
             res.setSalesInfoDtos(adminSalesInfoDtos);
             int totalPrice = 0;
             for (AdminSalesInfoDto item : adminSalesInfoDtos) {
