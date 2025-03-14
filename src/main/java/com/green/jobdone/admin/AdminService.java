@@ -305,4 +305,30 @@ public class AdminService {
         res.setName(admin.getName());
         return res;
     }
+
+
+    @Transactional
+    public int patchAdminAllow(AdminAllowReq p){
+
+        User user=userRepository.findByEmail(p.getEmail()); // email 을 통해 User entity 객체 생성
+
+        user.setRole(UserRole.ADMIN);
+
+
+        Admin admin=Admin.builder()
+                .aId(user.getEmail())
+                .aPw(user.getUpw())
+                .phone(user.getPhone())
+                .name(user.getName())
+                .role(UserRole.ADMIN)
+                .build();
+
+
+        adminRepository.save(admin);
+
+
+        return 1;
+    }
+
+
 }

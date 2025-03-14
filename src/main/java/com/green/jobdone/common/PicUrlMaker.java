@@ -19,10 +19,17 @@ public class PicUrlMaker {
     public static String makePicUrlPortfolio(long businessId, long portfolioId, String picName) {
         return String.format("/pic/business/%d/portfolio/%d/%s", businessId,portfolioId, picName);
     }
+    public static String makePicUrlPortfolioThumb(long businessId, long portfolioId, String picName) {
+        return String.format("/pic/business/%d/portfolio/%d/thumbnail/%s", businessId,portfolioId, picName);
+    }
     public static String makePicUrlBusiness(long businessId, String picName) {
         return String.format("/pic/business/%d/pics/%s", businessId, picName);
     }
 
+
+    public static String makePicUserUuidUrl(String uuid, String picName) {
+        return String.format("/pic/user/%s/%s", uuid,picName);
+    }
 
     public static String makePicUserUrl(long userId, String picName) {
         return String.format("/pic/user/%d/%s", userId, picName);

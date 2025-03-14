@@ -4,15 +4,15 @@ import com.green.jobdone.config.converter.UserRoleConverter;
 import com.green.jobdone.config.jwt.UserRole;
 import com.green.jobdone.config.security.SignInProviderType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Table(
         uniqueConstraints = {
                 @UniqueConstraint(
@@ -43,6 +43,9 @@ public class User extends UpdatedAt {
 
     @Column(length = 11, nullable = false)
     private String phone;
+
+//    @Column(length = 50)
+//    private String uuid;
 
 //    @Column(nullable = false)
 //    @ColumnDefault("100")

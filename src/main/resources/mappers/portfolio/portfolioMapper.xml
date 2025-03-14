@@ -76,14 +76,8 @@
 
     <select id="selAllPortfolioList">
 
-        SELECT f.businessId, f.portfolioId, f.title, t.pic AS isThumbnail
+        SELECT f.businessId, f.portfolioId, f.title, f.thumbnail
         FROM portfolio f
-        LEFT JOIN (
-        SELECT c.portfolioId, c.pic
-        FROM portfolio_pic c
-        WHERE c.state = 2
-        ) t
-        ON f.portfolioId = t.portfolioId
         LEFT JOIN business b
         ON b.businessId = f.businessId
         LEFT JOIN detail_type d

@@ -22,7 +22,6 @@
             WHERE b.userId=#{signedUserId}
         </if>
         ORDER BY a.qaId DESC
-        LIMIT 10 OFFSET #{offset}
     </select>
 
 
@@ -49,12 +48,14 @@
 
 
     <select id="getQaAnswer">
-        SELECT a.answer,a.qaAnswerId
+        SELECT a.answer,a.qaAnswerId,a.createdAt
         FROM qa_answer a
         LEFT JOIN qa b
         on a.qaId=b.qaId
         WHERE a.qaId=#{qaId}
         AND b.qaState='00103'
+        ORDER BY a.qaAnswerId DESC
+        LIMIT 1
     </select>
 
     <select id="getQaTypeDetail">
@@ -65,13 +66,16 @@
 
 
     <select id="getQaBoard">
-        SELECT a.title,c.name as userName,a.createdAt,SUM(b.viewCount) as qaView,a.qaId
+        SELECT a.title,c.name as userName,a.createdAt,SUM(b.viewCount) as qaView,a.qaId, d.reason
         FROM qa a
         LEFT JOIN qa_view b
         on a.qaId=b.qaId
         LEFT JOIN user c
         on a.userId=c.userId
-        GROUP BY b.qaId
+        LEFT JOIN qa_type_detail d
+        on a.qaTypeDetailId=d.qaTypeDetailId
+        WHERE a.reportReasonId=6
+        GROUP BY a.qaId
         ORDER BY a.qaId DESC
     </select>
 

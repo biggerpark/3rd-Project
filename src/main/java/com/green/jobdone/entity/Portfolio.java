@@ -42,6 +42,9 @@ public class Portfolio extends UpdatedAt{
     @Column(length = 500, nullable = false)
     private String contents;
 
+    @Column(length = 500, nullable = false)
+    private String thumbnail;
+
     //유튜브 영상 추가
 
     @Column(nullable = true,length = 255)
@@ -50,4 +53,6 @@ public class Portfolio extends UpdatedAt{
     // 유튜브 영상 ID 추가
     @Column(nullable = true, length = 20)
     private String youtubeId; // 영상의 ID 저장 (URL에서 추출)
+
+
 }

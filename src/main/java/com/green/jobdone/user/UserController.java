@@ -5,6 +5,7 @@ import com.green.jobdone.common.model.ResultResponse;
 import com.green.jobdone.user.model.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -143,8 +144,17 @@ public class UserController {
                 .resultData(result.getResult())
                 .build();
 
-
     }
+
+//    @GetMapping("uuidTest")
+//    public ResultResponse<Integer> getUuidCheck(){
+//        int result = service.getUuidCheck();
+//
+//        return ResultResponse.<Integer>builder()
+//                .resultMessage("uuidTest 완료")
+//                .resultData(result)
+//                .build();
+//    }
 
 
 }

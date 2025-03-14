@@ -2,12 +2,12 @@ package com.green.jobdone.entity;
 
 
 public enum ReportReason {
-    SERVICE(1,"서비스"),
-    BUSINESS(2,"업체"),
-    REVIEW(3,"리뷰"),
-    CHAT(4,"채팅"),
-    COMMENT(5,"댓글"),
-    USERREPORT(6,"유저 측 문의");
+    BUSINESS(1,"업체"),
+    REVIEW(2,"리뷰"),
+    CHAT(3,"채팅"),
+    SERVICE(4,"환불"),
+    USERREPORT(5,"유저 측 문의"),
+    BUSINESSREPORT(6,"업체 측 문의");
 
     private final int code;
     private final String value;

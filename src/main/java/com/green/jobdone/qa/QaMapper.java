@@ -7,7 +7,7 @@ import java.util.List;
 
 @Mapper
 public interface QaMapper {
-    List<QaRes> getQa(int offset,boolean isAdmin,long signedUserId);
+    List<QaRes> getQa(boolean isAdmin,long signedUserId);
     QaDetailRes getQaDetail(long qaId);
 //    List<QaReportRes> getQaReport(int offset);
     QaAnswerRes getQaAnswer(long qaId);

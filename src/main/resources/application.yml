@@ -18,6 +18,9 @@ youtube:
   api:
     key: ${YOUTUBE.API_KEY}
 
+weather:
+  api:
+    key: ${WEATHER.API_KEY}
 
 upstage:
   api:
@@ -38,6 +41,9 @@ domain:
 mybatis:
   mapper-locations: mappers/**/*.xml
 
+kakao:
+  map:
+    api-key: 5d58f74383aea3ac7b020083d8c08607
 
 kakaopay:
   secretKey: ${KAKAO.PAY.SECRET}
