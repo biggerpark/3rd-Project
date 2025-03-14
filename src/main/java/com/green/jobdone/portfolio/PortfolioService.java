@@ -328,7 +328,9 @@ public class PortfolioService {
             res.setPortfolioId(p.getPortfolioId());
         }
 
-        res.setThumbnail(res.getThumbnail());
+        long businessId = portfolioRepository.getBusinessIdFromPortfolio(p.getPortfolioId());
+        String middlePath = String.format("/pic/business/%d/portfolio/%d", businessId, p.getPortfolioId());
+        res.setThumbnail(String.format("%s/%s",middlePath,res.getThumbnail()));
         return res;
     }
 
