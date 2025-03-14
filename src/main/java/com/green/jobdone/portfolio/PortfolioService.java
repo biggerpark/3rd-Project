@@ -327,6 +327,8 @@ public class PortfolioService {
         if (p.getPortfolioId() > 0) {
             res.setPortfolioId(p.getPortfolioId());
         }
+
+        res.setThumbnail(res.getThumbnail());
         return res;
     }
 
