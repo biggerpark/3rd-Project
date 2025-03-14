@@ -7,6 +7,7 @@ import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.common.exception.ChatErrorCode;
 import com.green.jobdone.common.exception.CustomException;
+import com.green.jobdone.config.firebase.FcmService;
 import com.green.jobdone.config.jwt.TokenProvider;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.Chat;
@@ -20,11 +21,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +39,8 @@ public class ChatService {
     private final BusinessRepository businessRepository;
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
+    private Map<Long, Set<WebSocketSession>> roomSessions = new HashMap<>();
+    private final FcmService fcmService;
 
     @Transactional
     public String insChat(MultipartFile pic, ChatPostReq p){
@@ -101,6 +103,25 @@ public class ChatService {
         chatPic.setChat(chat);
         chatPic.setPic(fileName);
         chatPicRepository.save(chatPic);
+        Set<WebSocketSession> sessionSet = roomSessions.get(p.getRoomId());
+        boolean isReceiverInRoom = false;
+        List<Integer> flags = new ArrayList<>();
+        if (sessionSet != null) {
+            for (WebSocketSession session : sessionSet) {
+                String token = (String) session.getAttributes().get("token");
+                Integer sessionFlag = (Integer) session.getAttributes().get("flag");
+                flags.add(sessionFlag);
+                // flag에 따라서 1이 있으면 유저 0이있으면 업체 size가 2가 아니라면(1이라면) 자기가 가진 플래그에 반대되는 사람이 없는것
+            }
+            if (flags.size()==2)
+            {
+                isReceiverInRoom = true;
+            }
+        }
+
+        if (!isReceiverInRoom) {
+//            fcmService.sendChatNotification(, p.getContents()); 유저id랑 로직 생각
+        }
 
 //        ChatPicDto chatPicDto = new ChatPicDto();
 //        chatPicDto.setChatId(chatId);

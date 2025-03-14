@@ -2,6 +2,7 @@ package com.green.jobdone.config.webSocket;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.green.jobdone.business.BusinessRepository;
 import com.green.jobdone.common.exception.ChatErrorCode;
 import com.green.jobdone.common.exception.CustomException;
 import com.green.jobdone.config.jwt.JwtUser;
@@ -30,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     private final AuthenticationFacade authenticationFacade;
+    private final BusinessRepository businessRepository;
     private ObjectMapper objectMapper = new ObjectMapper();
     private final RoomRepository roomRepository;
     private final ChatService chatService;
@@ -37,11 +39,12 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final Map<WebSocketSession, Long> sessionRoomMap = new HashMap<>();
     private final Map<Long, Set<WebSocketSession>> roomSessions = new ConcurrentHashMap<>();
     private final TokenProvider tokenProvider;
-    public ChatWebSocketHandler(ChatService chatService, AuthenticationFacade authenticationFacade, RoomRepository roomRepository, TokenProvider tokenProvider) {
+    public ChatWebSocketHandler(ChatService chatService, AuthenticationFacade authenticationFacade, RoomRepository roomRepository, TokenProvider tokenProvider, BusinessRepository businessRepository) {
         this.chatService = chatService;
         this.authenticationFacade = authenticationFacade;
         this.roomRepository = roomRepository;
         this.tokenProvider = tokenProvider;
+        this.businessRepository = businessRepository;
     }
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -58,11 +61,22 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         }
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new CustomException(ChatErrorCode.MISSING_ROOM));
         Long userId = room.getUser().getUserId();
-        Long businessId = room.getBusiness().getBusinessId();
+        Long busiUserId = businessRepository.findUserIdByBusinessId(room.getBusiness().getBusinessId());
         // 아이디가 둘중 하나라도 맞다면 false>둘다 해당되지 않으면 true> a!=b and c!=b
-        if(!userId.equals(signedUserId) && !businessId.equals(signedUserId)){
+//        if(!userId.equals(signedUserId) && !busiUserId.equals(signedUserId)){
+//            throw new CustomException(ChatErrorCode.FAIL_TO_CONNECT);
+//        }
+        Integer flag = null;
+        if (userId.equals(signedUserId)) {
+            flag = 1;
+        } else if (busiUserId.equals(signedUserId)) {
+            flag = 0;
+        } else {
             throw new CustomException(ChatErrorCode.FAIL_TO_CONNECT);
         }
+        session.getAttributes().put("flag", flag);
+        session.getAttributes().put("token", token);
+
 
 //        if (sessionRoomMap.containsKey(session)) {
 //            long currentRoomId = sessionRoomMap.get(session);
@@ -84,6 +98,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 //        if (isAlreadyConnected) {
 //            return; // 위에서 방이 있으면 true로 변했을거니 중복방 생성 x 될듯?
 //        }
+
 
         session.setBinaryMessageSizeLimit(10*1024*1024);
         Set<WebSocketSession> sessionSet = roomSessions.computeIfAbsent(roomId, k -> new HashSet<>());
