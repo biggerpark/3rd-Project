@@ -16,7 +16,7 @@ public class BusinessGetRes {
     private long detailTypeId;
     private String detailTypeName;
     private String logo;
-    private String thumbnail;
+    private String pic;
     private long businessId;
     private String businessName;
     private String title;
