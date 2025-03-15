@@ -45,6 +45,7 @@ public class Portfolio extends UpdatedAt{
     @Column(length = 500, nullable = false)
     private String thumbnail;
 
+
     //유튜브 영상 추가
 
     @Column(nullable = true,length = 255)

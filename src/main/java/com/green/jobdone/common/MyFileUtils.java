@@ -32,6 +32,11 @@ public class MyFileUtils {
         this.uploadPath = uploadPath;
     }
 
+    public boolean folderExists(String folderPath) {
+        File folder = new File(folderPath);
+        return folder.exists() && folder.isDirectory();  // 폴더가 존재하고, 디렉토리일 경우 true 반환
+    }
+
     // path = "ddd/aaa"
     // D:/2024-02/download/greengram_ver1/
     // feed/2
