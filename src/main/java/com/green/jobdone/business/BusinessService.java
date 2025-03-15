@@ -447,10 +447,10 @@ public class BusinessService {
         // 각 비즈니스 객체마다 사진 경로 생성
         for (BusinessGetRes business : res) {
             // 비즈니스 객체의 pic 필드를 이용하여 사진 경로 생성
-            String picUrl = PicUrlMaker.makePicUrlBusinessThumb(business.getBusinessId(), business.getThumbnail());
-            business.setThumbnail(picUrl);  // 사진 경로 업데이트
+            String picUrl = PicUrlMaker.makePicUrlBusiness(business.getBusinessId(), business.getPic());
+            business.setPic(picUrl);  // 사진 경로 업데이트
             String logoUrl = PicUrlMaker.makePicUrlLogo(business.getBusinessId(), business.getLogo());
-            business.setThumbnail(logoUrl);  // 사진 경로 업데이트
+            business.setLogo(logoUrl);  // 사진 경로 업데이트
         }
 
         return res;
