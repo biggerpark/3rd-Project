@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,13 +74,13 @@ public class PortfolioService {
         String thumbPath = String.format("business/%d/portfolio/%d/thumbnail", p.getBusinessId(), portfolioId);
         myFileUtils.makeFolders(thumbPath);
 
-        String thumbnailFilePath = String.format("%s/%s",thumbPath,savedThumbName);
+        String thumbnailFilePath = String.format("%s/%s", thumbPath, savedThumbName);
 
         try {
             if (thumbnail != null && !thumbnail.isEmpty()) {
-                myFileUtils.transferTo(thumbnail,thumbnailFilePath);
+                myFileUtils.transferTo(thumbnail, thumbnailFilePath);
             }
-        }catch (IOException e) {
+        } catch (IOException e) {
             log.error("error occurs:{}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 
@@ -160,12 +161,41 @@ public class PortfolioService {
             }
         }
 
+        if (thumbnail != null && !thumbnail.isEmpty()) {
+            String thumbPath = String.format("business/%d/portfolio/%d/thumbnail", p.getBusinessId(), p.getPortfolioId());
+            myFileUtils.makeFolders(thumbPath);  // 썸네일 경로에 폴더 생성
+
+            // 기존 썸네일 파일이 있으면 삭제
+            String existingThumbnailFilePath = String.format("%s/%s", thumbPath, portfolio.getThumbnail());
+            File existingThumbnailFile = new File(existingThumbnailFilePath);
+            if (existingThumbnailFile.exists()) {
+                if (existingThumbnailFile.delete()) {
+                    System.out.println("기존 썸네일 파일이 삭제되었습니다.");
+                } else {
+                    System.err.println("기존 썸네일 파일 삭제 실패.");
+                }
+            }
+
+            // 새로운 썸네일 파일 이름 생성
+            String savedThumbName = myFileUtils.makeRandomFileName(thumbnail);
+            String thumbnailFilePath = String.format("%s/%s", thumbPath, savedThumbName);
+
+            try {
+                // 새로운 썸네일 파일 저장
+                myFileUtils.transferTo(thumbnail, thumbnailFilePath);
+                portfolio.setThumbnail(savedThumbName);  // 새로운 썸네일 파일명 저장
+            } catch (IOException e) {
+                log.error("error occurs: {}", e.getMessage());
+                // 오류 발생 시 처리가 필요하면 추가 가능
+            }
+        }
+
+
+
+
         portfolioRepository.save(portfolio);
 
-
-
         List<String> portfolioPicList = new ArrayList<>();
-
         long portfolioId = p.getPortfolioId();
         List<String> delPortfolioPicList = portfolioPicRepository.getPortfolioPicsByPortfolioId(portfolioId);
         for (String pic : delPortfolioPicList) {
@@ -207,7 +237,8 @@ public class PortfolioService {
             portfolioPic.setPic(item);
             portfolioPics.add(portfolioPic);
         }
-        portfolioPicRepository.saveAll(portfolioPics);
+
+        portfolioRepository.save(portfolio);
         return PortfolioPutRes.builder()
                 .portfolioId(portfolioId)
                 .youtubeId(portfolio.getYoutubeId())
@@ -244,13 +275,13 @@ public class PortfolioService {
         myFileUtils.makeFolders(thumbPath);
 
         String savedThumbName = (thumbnail != null && !thumbnail.isEmpty()) ? myFileUtils.makeRandomFileName(thumbnail) : null;
-        String thumbnailFilePath = String.format("%s/%s",thumbPath,savedThumbName);
+        String thumbnailFilePath = String.format("%s/%s", thumbPath, savedThumbName);
 
         try {
             if (thumbnail != null && !thumbnail.isEmpty()) {
-                myFileUtils.transferTo(thumbnail,thumbnailFilePath);
+                myFileUtils.transferTo(thumbnail, thumbnailFilePath);
             }
-        }catch (IOException e) {
+        } catch (IOException e) {
             log.error("error occurs:{}", e.getMessage());
             return 0;
         }
@@ -265,7 +296,7 @@ public class PortfolioService {
 
 
     public int udtPortfolioThumbnail(PortfolioPicReq p) {
-        return portfolioRepository.updatePortfolioThumbnail(p.getPortfolioPicId(),p.getPortfolioId());
+        return portfolioRepository.updatePortfolioThumbnail(p.getPortfolioPicId(), p.getPortfolioId());
     }
     // 이런건 괜히 손대면 귀찮아지니까 냅두자
 
@@ -330,7 +361,7 @@ public class PortfolioService {
 
         long businessId = portfolioRepository.getBusinessIdFromPortfolio(p.getPortfolioId());
         String middlePath = String.format("/pic/business/%d/portfolio/%d", businessId, p.getPortfolioId());
-        res.setThumbnail(String.format("%s/%s",middlePath,res.getThumbnail()));
+        res.setThumbnail(String.format("%s/%s", middlePath, res.getThumbnail()));
         return res;
     }
 
