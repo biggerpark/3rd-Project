@@ -6,3 +6,8 @@ spring:
     url: jdbc:log4jdbc:mariadb://192.168.0.144:3306/db_even_last_4?serverTimezone=Asia/Seoul
     username: even_last_4
     password: keystone
+server:
+  ssl:
+    key-store: classpath:job-done.kro.kr.pem
+    key-store-type: PEM
+    key-alias: job-done.kro.kr
