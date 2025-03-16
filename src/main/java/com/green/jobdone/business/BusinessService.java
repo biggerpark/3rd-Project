@@ -146,9 +146,9 @@ public class BusinessService {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization","KakaoAK " + apikey);
+        headers.set("Authorization", "KakaoAK " + apikey);
 
-        HttpEntity<String> entity =new HttpEntity<>(headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
         String responseBody = response.getBody();
 
@@ -161,9 +161,9 @@ public class BusinessService {
                 JsonNode firstResult = documents.get(0);
                 double latitude = firstResult.get("x").asDouble(); // 위도
                 double longitude = firstResult.get("y").asDouble(); // 경도
-                return new double[]{ latitude,longitude};
+                return new double[]{latitude, longitude};
             }
-        }  catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return new double[0];

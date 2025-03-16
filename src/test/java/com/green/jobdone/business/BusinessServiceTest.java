@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -32,11 +33,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
 @ExtendWith(MockitoExtension.class)
 public class BusinessServiceTest {
-    @Value("${kakao.map.api-key}")
-    private String apikey;
+
 
     @InjectMocks
     private BusinessService businessService;
@@ -72,7 +71,7 @@ public class BusinessServiceTest {
         givenParam.setSignedUserId(SIGNED_USER_ID);
         givenParam.setBusinessNum("1234567890");
         givenParam.setBusinessName("test");
-        givenParam.setAddress("대구시 여러분 담배꽁초");
+        givenParam.setAddress("대구 서구 평리로 327 ");
         givenParam.setDetailTypeId(1L);
         givenParam.setBusiCreatedAt(String.format("%s",LocalDate.now()));
         givenParam.setTel("01012345678");
@@ -94,7 +93,7 @@ public class BusinessServiceTest {
         given(businessRepository.save(any(Business.class))).willReturn(savedBusiness);
 
         // kakao api mock
-        String apiResponse = "{ \"documents\": [ { \"x\": 127.123456, \"y\": 35.123456 } ] }";
+        String apiResponse = "{ \"documents\": [ { \"x\": 128.559148 \"y\": 35.864541 } ] }";
         ResponseEntity<String> mockResponse = ResponseEntity.ok(apiResponse);
         given(restTemplate.exchange(anyString(), eq(org.springframework.http.HttpMethod.GET), any(), eq(String.class)))
                 .willReturn(mockResponse);
@@ -109,19 +108,26 @@ public class BusinessServiceTest {
 
     @Test
     void getCoordinatesFromAddress() {
-        String address = "대구시 여러분 담배꽁초";
+        // 테스트용 가짜 API 키
+        String apikey = "fijsdoidfjo111";
+
+        String address = "대구 서구 평리로 327 1층";
         String url = "https://dapi.kakao.com/v2/local/search/address.json?query=" + address;
 
         // Authorization 헤더에 KakaoAK {apikey} 설정
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "KakaoAK " + apikey);  // 올바른 apiKey 형식 사용
+        headers.set("Authorization", "KakaoAK " + apikey);  // 가짜 API 키 사용
 
+        // HttpEntity 객체 생성 (헤더 포함)
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        // Mock API 응답 설정
         String apiResponse = "{ \"documents\": [ { \"x\": 127.123456, \"y\": 35.123456 } ] }";
-        ResponseEntity<String> responseEntity = ResponseEntity.ok(apiResponse);
+        ResponseEntity<String> mockResponse = ResponseEntity.ok(apiResponse);
 
-        // restTemplate.exchange() mock 설정
-        given(restTemplate.exchange(eq(url), eq(HttpMethod.GET), any(), eq(String.class)))
-                .willReturn(responseEntity);
+        // restTemplate.exchange() Mock 설정
+        given(restTemplate.exchange(eq(url), eq(HttpMethod.GET), eq(entity), eq(String.class)))
+                .willReturn(mockResponse);
 
         // 비즈니스 서비스에서 API 호출
         double[] coordinates = businessService.getCoordinatesFromAddress(address);
