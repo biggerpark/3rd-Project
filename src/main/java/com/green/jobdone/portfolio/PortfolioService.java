@@ -239,6 +239,7 @@ public class PortfolioService {
         }
 
         portfolioRepository.save(portfolio);
+        portfolioPicRepository.saveAll(portfolioPics);
         return PortfolioPutRes.builder()
                 .portfolioId(portfolioId)
                 .youtubeId(portfolio.getYoutubeId())
@@ -360,8 +361,9 @@ public class PortfolioService {
         }
 
         long businessId = portfolioRepository.getBusinessIdFromPortfolio(p.getPortfolioId());
-        String middlePath = String.format("/pic/business/%d/portfolio/%d", businessId, p.getPortfolioId());
-        res.setThumbnail(String.format("%s/%s", middlePath, res.getThumbnail()));
+
+            String picUrl = PicUrlMaker.makePicUrlPortfolioThumb(businessId, p.getPortfolioId(), res.getThumbnail());
+        res.setThumbnail(picUrl);
         return res;
     }
 
