@@ -8,5 +8,8 @@ spring:
     password: green502
   jpa:
     hibernate:
-      ddl-auto: create # 이거때문에 test에 데이터를 넣는 sql이 필요
-    #ddl-auto: validate # 서버 킬때마다 같은지 확인
+      #ddl-auto: create # 이거때문에 test에 데이터를 넣는 sql이 필요
+      ddl-auto: validate # 서버 킬때마다 같은지 확인
+kakao:
+  map:
+    api-key: 5d58f74383aea3ac7b020083d8c08607

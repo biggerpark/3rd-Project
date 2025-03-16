@@ -47,6 +47,8 @@ import java.util.Set;
 @Validated
 public class BusinessService {
 
+
+
     @Value("${file.directory}")
     private String fileDirectory;
 
@@ -67,7 +69,7 @@ public class BusinessService {
     private final Validator validator;
 
     @Transactional
-    public long insBusiness(MultipartFile paper, MultipartFile logo, MultipartFile thumbnail, BusinessPostSignUpReq p) {
+    public long insBusiness(MultipartFile paper, MultipartFile logo,  BusinessPostSignUpReq p) {
 
 
         long userId = authenticationFacade.getSignedUserId();
@@ -111,23 +113,18 @@ public class BusinessService {
 
         String paperPath = String.format("business/%d/paper", businessId);
         String logoPath = String.format("business/%d/logo", businessId);
-        String thumbnailPath = String.format("business/%d/thumbnail", businessId);
         myFileUtils.makeFolders(paperPath);
         myFileUtils.makeFolders(logoPath);
-        myFileUtils.makeFolders(thumbnailPath);
 
         String savedPaperName = (paper != null ? myFileUtils.makeRandomFileName(paper) : null);
         String savedLogoName = (logo != null ? myFileUtils.makeRandomFileName(logo) : null);
-        String savedThumbnailName = (logo != null ? myFileUtils.makeRandomFileName(thumbnail) : null);
 
         String paperFilePath = String.format("%s/%s", paperPath, savedPaperName);
         String logoFilePath = String.format("%s/%s", logoPath, savedLogoName);
-        String thumbnailFilePath = String.format("%s/%s", thumbnailPath, savedThumbnailName);
 
         try {
             if (paper != null) myFileUtils.transferTo(paper, paperFilePath);
             if (logo != null) myFileUtils.transferTo(logo, logoFilePath);
-            if (thumbnail != null) myFileUtils.transferTo(thumbnail, thumbnailFilePath);
         } catch (IOException e) {
             log.error("error occurs:{}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
@@ -137,12 +134,12 @@ public class BusinessService {
 
         business.setLogo(savedLogoName);
         business.setPaper(savedPaperName);
-        business.setThumbnail(savedThumbnailName);
         return businessRepository.save(business).getBusinessId();
     }
 
     @Value("${kakao.map.api-key}")
     String apikey = "apiKey";
+
     public double[] getCoordinatesFromAddress(String address) {
         String url = "https://dapi.kakao.com/v2/local/search/address.json?query=" + address;
 

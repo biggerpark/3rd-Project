@@ -1,143 +1,134 @@
 package com.green.jobdone.business;
 
-import com.green.jobdone.common.JpaAuditingConfiguration;
+import com.green.jobdone.business.model.BusinessPostSignUpReq;
+import com.green.jobdone.category.DetailTypeRepository;
+import com.green.jobdone.common.MyFileUtils;
+import com.green.jobdone.config.security.AuthenticationFacade;
+
 import com.green.jobdone.entity.Business;
 import com.green.jobdone.entity.DetailType;
 import com.green.jobdone.entity.User;
-import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.BeforeEach;
+import com.green.jobdone.user.UserRepository;
+
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
-@ActiveProfiles("test")
-@DataJpaTest
-@Transactional
-@Import(JpaAuditingConfiguration.class) // 현재시간을 넣기위함
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class BusinessServiceTest {
+    @Value("${kakao.map.api-key}")
+    private String apikey;
 
-        /*
-    given - 준비단계
-    when - 실행
-    then - 단언(검증)
-     */
+    @InjectMocks
+    private BusinessService businessService;
+    @Mock
+    private BusinessRepository businessRepository;
+    @Mock
+    private MyFileUtils myFileUtils;
+    @Mock
+    private AuthenticationFacade authenticationFacade;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private DetailTypeRepository detailTypeRepository;
 
-    @Autowired
-    BusinessRepository businessRepository;
-    static final Long userId_1 = 1L;
-    static final Long detailTypeId_1 = 1L;
-
-    Business business = new Business();
-
-    @BeforeEach
-    void initData() {
-        User user = new User();
-        user.setUserId(userId_1);
-        DetailType detailType = new DetailType();
-        detailType.setDetailTypeId(detailTypeId_1);
-        business.setUser(user);
-        business.setDetailType(detailType);
-        business.setBusinessName("business_test");
-        business.setBusiCreatedAt(LocalDate.now());
-        business.setBusinessNum("1234567890"); //10자리 한정
-        business.setAddress("대구시 여러분 담배꽁초");
-        business.setTel("12345678900");
-    }
+    @Mock
+    private RestTemplate restTemplate;
 
     @Test
-    void insBusiness() {
-        businessRepository.save(business);
+    void insBusiness_success() {
+        MockMultipartFile paper = new MockMultipartFile(
+                "paper", "paper.pdf", "application/pdf", "사업자등록증".getBytes()
+        );
+        MockMultipartFile logo = new MockMultipartFile(
+                "logo", "logo.jpg", "image/jpeg", "로고이미지".getBytes()
+        );
 
-        Business insertBusiness = businessRepository.findById(business.getBusinessId()).orElse(null);
+        //유저 인증
+        Long SIGNED_USER_ID = 1L;
+        given(authenticationFacade.getSignedUserId()).willReturn(SIGNED_USER_ID);
 
-        assertNotNull(insertBusiness);
-        assertEquals(business.getBusinessId(), insertBusiness.getBusinessId());
-        System.out.println("businessId:" + business.getBusinessId());
+        //요청 객체 생성
+        BusinessPostSignUpReq givenParam = new BusinessPostSignUpReq();
+        givenParam.setSignedUserId(SIGNED_USER_ID);
+        givenParam.setBusinessNum("1234567890");
+        givenParam.setBusinessName("test");
+        givenParam.setAddress("대구시 여러분 담배꽁초");
+        givenParam.setDetailTypeId(1L);
+        givenParam.setBusiCreatedAt(String.format("%s",LocalDate.now()));
+        givenParam.setTel("01012345678");
 
+        User mockUser = new User();
+        mockUser.setUserId(SIGNED_USER_ID);
+        DetailType mockDetailType = new DetailType();
+        mockDetailType.setDetailTypeId(givenParam.getDetailTypeId());
+
+        // 저장될 Business 객체 Mock 설정
+        Business savedBusiness = new Business();
+        savedBusiness.setBusinessName(givenParam.getBusinessName());
+        savedBusiness.setAddress(givenParam.getAddress());
+        savedBusiness.setBusinessNum(givenParam.getBusinessNum());
+        savedBusiness.setTel(givenParam.getTel());
+
+        given(userRepository.findById(SIGNED_USER_ID)).willReturn(Optional.of(mockUser));
+        given(detailTypeRepository.findById(givenParam.getDetailTypeId())).willReturn(Optional.of(mockDetailType));
+        given(businessRepository.save(any(Business.class))).willReturn(savedBusiness);
+
+        // kakao api mock
+        String apiResponse = "{ \"documents\": [ { \"x\": 127.123456, \"y\": 35.123456 } ] }";
+        ResponseEntity<String> mockResponse = ResponseEntity.ok(apiResponse);
+        given(restTemplate.exchange(anyString(), eq(org.springframework.http.HttpMethod.GET), any(), eq(String.class)))
+                .willReturn(mockResponse);
+
+
+        //메서드 실행
+        long businessId = businessService.insBusiness(paper,logo,givenParam);
+        assertNotNull(businessId);
+        assertEquals(savedBusiness.getBusinessId(), businessId);
     }
 
 
     @Test
     void getCoordinatesFromAddress() {
+        String address = "대구시 여러분 담배꽁초";
+        String url = "https://dapi.kakao.com/v2/local/search/address.json?query=" + address;
+
+        // Authorization 헤더에 KakaoAK {apikey} 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "KakaoAK " + apikey);  // 올바른 apiKey 형식 사용
+
+        String apiResponse = "{ \"documents\": [ { \"x\": 127.123456, \"y\": 35.123456 } ] }";
+        ResponseEntity<String> responseEntity = ResponseEntity.ok(apiResponse);
+
+        // restTemplate.exchange() mock 설정
+        given(restTemplate.exchange(eq(url), eq(HttpMethod.GET), any(), eq(String.class)))
+                .willReturn(responseEntity);
+
+        // 비즈니스 서비스에서 API 호출
+        double[] coordinates = businessService.getCoordinatesFromAddress(address);
+
+        // 결과 검증
+        assertEquals(127.123456, coordinates[0], 0.000001);
+        assertEquals(35.123456, coordinates[1], 0.000001);
     }
 
-    @Test
-    void patchBusinessThumbnail() {
-    }
-
-    @Test
-    void patchBusinessLogo() {
-    }
-
-    @Test
-    void patchBusinessPaper() {
-    }
-
-    @Test
-    void postBusinessContents() {
-    }
-
-    @Test
-    void businessPicTemp() {
-    }
-
-    @Test
-    void businessPicConfirm() {
-    }
-
-    @Test
-    void udtBusiness() {
-    }
-
-    @Test
-    void udtBusinessState() {
-    }
-
-    @Test
-    void setBusinessThumbnail() {
-    }
-
-    @Test
-    void delBusinessPic() {
-    }
-
-    @Test
-    void getBusinessList() {
-    }
-
-    @Test
-    void getBusinessListMap() {
-    }
-
-    @Test
-    void getBusinessOne() {
-    }
-
-    @Test
-    void getBusinessOnePics() {
-    }
-
-    @Test
-    void getBusinessMonthly() {
-    }
-
-    @Test
-    void getBusinessRevenueByAdmins() {
-    }
-
-    @Test
-    void getBusinessService() {
-    }
-
-    @Test
-    void getBusinessServiceByAdmin() {
-    }
 }

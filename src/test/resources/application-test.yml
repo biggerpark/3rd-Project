@@ -14,3 +14,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+
+kakao:
+  map:
+    api-key: 5d58f74383aea3ac7b020083d8c08607
