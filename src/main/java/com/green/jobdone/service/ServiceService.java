@@ -129,6 +129,14 @@ public class ServiceService {
         // 13으로 찍힘
 
         ServiceGetOneRes res = serviceMapper.GetServiceOne(p);
+
+        String aa = res.getMStartTime().substring(0,res.getMStartTime().lastIndexOf(":"));
+        res.setMStartTime(aa);
+        try{
+        String bb = res.getMEndTime().substring(0,res.getMEndTime().lastIndexOf(":"));
+        res.setMEndTime(bb);} catch (Exception e){
+            e.printStackTrace();
+        }
         if(res.getTotalPrice()==0){
             res.setTotalPrice(res.getPrice());
             res.setAddPrice(0);
@@ -243,7 +251,11 @@ public class ServiceService {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         LocalTime mStartTime = LocalTime.parse(p.getMStartTime(), timeFormatter);
         LocalTime mEndTime = LocalTime.parse(p.getMEndTime(), timeFormatter);
-        ServiceDetail serviceDetail = new ServiceDetail();
+//        ServiceDetail serviceDetail = new ServiceDetail();
+//        Long ServiceDetailId = serviceDetailRepository.findPkByServiceId(p.getServiceId());
+//        ServiceDetail serviceDetail1 = serviceDetailRepository.findById(ServiceDetailId).orElse(null);
+        ServiceDetail serviceDetail = serviceDetailRepository.findByService(service);
+        log.info("serviceDetail: {}",serviceDetail);
         serviceDetail.setService(service);
         serviceDetail.setStartDate(startDate);
         serviceDetail.setEndDate(endDate);
