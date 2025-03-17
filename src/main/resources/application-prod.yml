@@ -8,6 +8,6 @@ spring:
     password: keystone
 server:
   ssl:
-    key-store: classpath:job-done.kro.kr.pem
+    key-store: classpath:jobdone.pem
     key-store-type: PEM
-    key-alias: job-done.kro.kr
+#    key-alias: job-done.kro.kr
