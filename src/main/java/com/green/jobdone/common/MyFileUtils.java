@@ -119,26 +119,36 @@ public class MyFileUtils {
     }
 
     public boolean moveFolder(String oldFolderPath, String newFolderPath) {
-        Path sourcePath = Paths.get(oldFolderPath);
-        Path targetPath = Paths.get(newFolderPath);
+        Path sourcePath = Paths.get(uploadPath,oldFolderPath);
+        Path targetPath = Paths.get(uploadPath,newFolderPath);
 
         try {
             // 대상 폴더가 없으면 생성
             Files.createDirectories(targetPath);
 
-            // 파일 먼저 이동
+            // 깊이 우선 탐색으로 디렉터리와 파일 모두 처리
             Files.walk(sourcePath)
-                    .filter(Files::isRegularFile) // 파일만 필터링
+                    .sorted(Comparator.reverseOrder()) // 하위 폴더부터 먼저 처리 (DFS)
                     .forEach(source -> {
                         try {
                             Path destination = targetPath.resolve(sourcePath.relativize(source));
-                            Files.move(source, destination, StandardCopyOption.REPLACE_EXISTING);
+
+                            if (Files.isDirectory(source)) {
+                                // 디렉터리 생성
+                                Files.createDirectories(destination);
+                            } else {
+                                // 파일 이동 (이미 존재하면 덮어쓰기)
+                                Files.move(source, destination, StandardCopyOption.REPLACE_EXISTING);
+                            }
                         } catch (IOException e) {
-                            throw new RuntimeException("파일 이동 실패: " + source, e);
+                            System.err.println("이동 실패: " + source + " -> " + e.getMessage());
                         }
                     });
 
-            return true; // 폴더 삭제는 안 함
+            // 원본 폴더 삭제
+            Files.deleteIfExists(sourcePath);
+
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
