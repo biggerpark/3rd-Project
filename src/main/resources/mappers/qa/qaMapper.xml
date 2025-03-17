@@ -74,7 +74,7 @@
         on a.userId=c.userId
         LEFT JOIN qa_type_detail d
         on a.qaTypeDetailId=d.qaTypeDetailId
-        WHERE a.reportReasonId=6
+        WHERE a.reportReasonId=5
         GROUP BY a.qaId
         ORDER BY a.qaId DESC
     </select>
