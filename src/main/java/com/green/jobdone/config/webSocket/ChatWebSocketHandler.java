@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.green.jobdone.business.BusinessRepository;
 import com.green.jobdone.common.exception.ChatErrorCode;
 import com.green.jobdone.common.exception.CustomException;
+import com.green.jobdone.config.firebase.FcmService;
 import com.green.jobdone.config.jwt.JwtUser;
 import com.green.jobdone.config.jwt.TokenProvider;
 import com.green.jobdone.config.security.AuthenticationFacade;
@@ -39,12 +40,14 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final Map<WebSocketSession, Long> sessionRoomMap = new HashMap<>();
     private final Map<Long, Set<WebSocketSession>> roomSessions = new ConcurrentHashMap<>();
     private final TokenProvider tokenProvider;
-    public ChatWebSocketHandler(ChatService chatService, AuthenticationFacade authenticationFacade, RoomRepository roomRepository, TokenProvider tokenProvider, BusinessRepository businessRepository) {
+    private final FcmService fcmService;
+    public ChatWebSocketHandler(ChatService chatService, AuthenticationFacade authenticationFacade, RoomRepository roomRepository, TokenProvider tokenProvider, BusinessRepository businessRepository, FcmService fcmService) {
         this.chatService = chatService;
         this.authenticationFacade = authenticationFacade;
         this.roomRepository = roomRepository;
         this.tokenProvider = tokenProvider;
         this.businessRepository = businessRepository;
+        this.fcmService = fcmService;
     }
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -295,6 +298,7 @@ protected void handleTextMessage(WebSocketSession session, TextMessage message) 
                     }
                 }
             }
+
 
 //            session.sendMessage(new TextMessage("파일 업로드 및 메시지 저장 완료"));
 

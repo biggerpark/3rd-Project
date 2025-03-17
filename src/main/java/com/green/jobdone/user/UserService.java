@@ -379,4 +379,12 @@ public class UserService {
 //        return 1;
 //    }
 
+    public void saveFcmToken(String token){
+        User user = userRepository.findById(authenticationFacade.getSignedUserId()).orElse(null);
+        if(token==null || user==null){
+            return;
+        }
+        user.setFCMToken(token);
+        userRepository.save(user);
+    }
 }

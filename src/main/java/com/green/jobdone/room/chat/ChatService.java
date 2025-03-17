@@ -78,6 +78,39 @@ public class ChatService {
         resJson.put("message",p.getContents());
         resJson.put("logo2",userPic);
         resJson.put("logo",logo);
+
+        Set<WebSocketSession> sessionSet = roomSessions.get(p.getRoomId());
+        boolean isReceiverInRoom = false;
+        List<Integer> flags = new ArrayList<>();
+        if (sessionSet != null) {
+            for (WebSocketSession session : sessionSet) {
+                String token = (String) session.getAttributes().get("token");
+                Integer sessionFlag = (Integer) session.getAttributes().get("flag");
+                flags.add(sessionFlag);
+                // flag에 따라서 1이 있으면 유저 0이있으면 업체 size가 2가 아니라면(1이라면) 자기가 가진 플래그에 반대되는 사람이 없는것
+            }
+            if (flags.size()==2)
+            {
+                isReceiverInRoom = true;
+            }
+        }
+        Long receiverId = null;
+        if(p.getFlag()==1){
+            receiverId = room.getBusiness().getUser().getUserId();
+            log.info("업체의 유저Id 잘 들고옴? {} ", receiverId);
+        } else {
+            receiverId = room.getUser().getUserId();
+            log.info("유저Id 잘 들고옴? {} ", receiverId);
+        }
+        if(!room.getState().equals("00201")){
+            isReceiverInRoom = false;
+        }
+
+        if (!isReceiverInRoom) {
+            fcmService.sendChatNotification(receiverId, p.getContents());
+        }
+
+
         if(pic==null){
 //            return null;
             try {
@@ -103,25 +136,6 @@ public class ChatService {
         chatPic.setChat(chat);
         chatPic.setPic(fileName);
         chatPicRepository.save(chatPic);
-        Set<WebSocketSession> sessionSet = roomSessions.get(p.getRoomId());
-        boolean isReceiverInRoom = false;
-        List<Integer> flags = new ArrayList<>();
-        if (sessionSet != null) {
-            for (WebSocketSession session : sessionSet) {
-                String token = (String) session.getAttributes().get("token");
-                Integer sessionFlag = (Integer) session.getAttributes().get("flag");
-                flags.add(sessionFlag);
-                // flag에 따라서 1이 있으면 유저 0이있으면 업체 size가 2가 아니라면(1이라면) 자기가 가진 플래그에 반대되는 사람이 없는것
-            }
-            if (flags.size()==2)
-            {
-                isReceiverInRoom = true;
-            }
-        }
-
-        if (!isReceiverInRoom) {
-//            fcmService.sendChatNotification(, p.getContents()); 유저id랑 로직 생각
-        }
 
 //        ChatPicDto chatPicDto = new ChatPicDto();
 //        chatPicDto.setChatId(chatId);
