@@ -149,7 +149,17 @@ public class ReviewService {
     public List<ReviewGetMainRes> getReviewMainList() {
         List<ReviewGetMainRes> res = reviewRepository.selReviewForMain();
         for(ReviewGetMainRes item : res) {
-            item.setPic(PicUrlMaker.makePicUserUrl(item.getUserId(), item.getPic()));
+            String profile = item.getPic().substring(0,3);
+            String profile2 = "img";
+            String profile3 = "htt";
+
+            if(profile.equals(profile2)) {
+                item.setPic(String.format("/pic/user/defaultImg/%s", item.getPic()));
+            } else if(profile.equals(profile3)){
+                item.setPic(item.getPic());
+            } else {
+                item.setPic(PicUrlMaker.makePicUserUrl(item.getUserId(), item.getPic()));
+            }
             item.setUserId(null);
         }
         return res;
