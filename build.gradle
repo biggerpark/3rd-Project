@@ -60,6 +60,7 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
 
     //파이어베이스
+    implementation 'com.google.protobuf:protobuf-java:3.22.0'
     implementation 'com.google.firebase:firebase-admin:9.2.0'
 
     // 메일 관련 gradle

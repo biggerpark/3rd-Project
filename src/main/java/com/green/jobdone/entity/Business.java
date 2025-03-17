@@ -69,6 +69,7 @@ public class Business extends UpdatedAt {
     private String tel;
 
     @Column(nullable = false)
+    @Builder.Default
     private int state = 100;
 
     @Column(length = 13)

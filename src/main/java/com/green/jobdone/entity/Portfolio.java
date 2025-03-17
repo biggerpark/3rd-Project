@@ -28,6 +28,7 @@ public class Portfolio extends UpdatedAt{
     private Business business;
 
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<PortfolioPic> portfolioPics = new ArrayList<>();
 
     @Column(nullable = false)
