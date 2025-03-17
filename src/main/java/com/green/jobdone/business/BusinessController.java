@@ -27,9 +27,9 @@ public class BusinessController {
 
     @PostMapping("sign-up")
     @Operation(summary = "업체 등록")
-    public ResultResponse<Long> postBusiness(@RequestPart(required = false) MultipartFile paper, @RequestPart(required = false) MultipartFile logo,@RequestPart(required = false) MultipartFile thumbnail,
+    public ResultResponse<Long> postBusiness(@RequestPart(required = false) MultipartFile paper, @RequestPart(required = false) MultipartFile logo,
                                               @RequestPart BusinessPostSignUpReq p) {
-        Long result = businessService.insBusiness(paper, logo, thumbnail, p);
+        Long result = businessService.insBusiness(paper, logo, p);
 
         return ResultResponse.<Long>builder()
                 .resultData(result)

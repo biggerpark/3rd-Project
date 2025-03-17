@@ -8,9 +8,13 @@ file:
 
 spring:
   datasource:
-    url: jdbc:log4jdbc:mariadb://localhost/localhost/job_done_test
+    url: jdbc:log4jdbc:mariadb://localhost/job_done_test
     username: root
     password: green502
   jpa:
     hibernate:
       ddl-auto: validate
+
+kakao:
+  map:
+    api-key: 5d58f74383aea3ac7b020083d8c08607
