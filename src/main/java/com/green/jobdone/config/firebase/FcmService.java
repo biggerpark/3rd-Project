@@ -3,16 +3,23 @@ package com.green.jobdone.config.firebase;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
+import com.green.jobdone.user.UserRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class FcmService {
+    private final UserRepository userRepository;
+
+    public FcmService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     public void sendChatNotification(Long receiverId, String messageContent) {
         String userFcmToken = getUserFcmToken(receiverId);
         // db에서 파이어베이스 토큰 조회
 
         if (userFcmToken == null) {
-            System.out.println("⚠️ FCM 토큰이 존재하지 않음. 푸시 알림 생략.");
+            // 토큰없으면 메세지 못보냄
             return;
         }
 
@@ -37,7 +44,6 @@ public class FcmService {
     }
 
     private String getUserFcmToken(Long userId) {
-        // DB에서 userId에 해당하는 FCM 토큰을 조회하는 로직 필요
-        return null;
+        return userRepository.findFCMTokenById(userId);
     }
 }
