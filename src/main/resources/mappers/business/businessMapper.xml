@@ -219,7 +219,7 @@
     <select id="getBusinessPicList">
         select p.businessId, p.businessPicId, p.pic
         from business_pic p
-        where p.businessId = #{businessId} and p.state in(1,2)
+        where p.businessId = #{businessId}
     </select>
 
     <delete id="delBusinessPic">

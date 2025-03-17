@@ -146,7 +146,7 @@ public class MyFileUtils {
                     });
 
             // 원본 폴더 삭제
-            Files.deleteIfExists(sourcePath);
+           // Files.deleteIfExists(sourcePath);
 
             return true;
         } catch (Exception e) {
