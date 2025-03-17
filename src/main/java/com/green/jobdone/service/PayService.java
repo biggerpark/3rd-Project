@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -105,11 +106,14 @@ public class PayService {
         Long userId = authenticationFacade.getSignedUserId();
         CancelDto dto = serviceRepository.findCancelDtoByServiceId(serviceId);
 //        if(dto.getCompleted()!=10){
-        if(dto.getCompleted()!=6){
+        LocalDate threeDaysAgo = dto.getStartDate().minusDays(4);
+        // 오늘부터 3일 전 1월 4일이면 1월 1일
+        if(dto.getCompleted()==6 || !threeDaysAgo.isBefore(LocalDate.now())){
+            serviceRepository.updCompleted(serviceId,10);
+        } else {
             throw new CustomException(ServiceErrorCode.INVALID_SERVICE_STATUS);
         }
 //        serviceRepository.updCompleted(serviceId,11);
-        serviceRepository.updCompleted(serviceId,10);
 
 //        if(!userId.equals(dto.getUserId())){
 //            throw new CustomException(ServiceErrorCode.USER_MISMATCH);
