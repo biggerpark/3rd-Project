@@ -29,7 +29,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "WHERE r.reviewId = :reviewId")
     ReviewCommentGetRes selReviewCommentByReviewId(Long reviewId);
 
-    @Query("SELECT new com.green.jobdone.review.model.ReviewGetMainRes(u.name, u.pic, r.score, r.contents, r.createdAt) FROM Review r JOIN r.service s JOIN s.user u WHERE r.score >= 4")
+    @Query("SELECT new com.green.jobdone.review.model.ReviewGetMainRes(u.userId, u.name, u.pic, r.score, r.contents, r.createdAt) FROM Review r JOIN r.service s JOIN s.user u WHERE r.score >= 4")
     List<ReviewGetMainRes> selReviewForMain();
 
 

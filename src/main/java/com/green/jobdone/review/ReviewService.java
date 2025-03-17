@@ -147,7 +147,12 @@ public class ReviewService {
     }
 
     public List<ReviewGetMainRes> getReviewMainList() {
-        return reviewRepository.selReviewForMain();
+        List<ReviewGetMainRes> res = reviewRepository.selReviewForMain();
+        for(ReviewGetMainRes item : res) {
+            item.setPic(PicUrlMaker.makePicUserUrl(item.getUserId(), item.getPic()));
+            item.setUserId(null);
+        }
+        return res;
     }
 
     public ReviewPutRes updReview(List<MultipartFile> pics, ReviewPutReq p) {
