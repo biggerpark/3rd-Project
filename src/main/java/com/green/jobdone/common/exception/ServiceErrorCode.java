@@ -13,7 +13,8 @@ public enum ServiceErrorCode implements ErrorCode {
     OPTION_NOT_FOUND(HttpStatus.BAD_REQUEST, "찾을 수 없는 옵션입니다."),
     OPTION_DETAIL_NOT_FOUND(HttpStatus.BAD_REQUEST, "찾을 수 없는 세부옵션입니다."),
     FAIL_UPDATE_SERVICE(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
-    TIME_OVER(HttpStatus.BAD_REQUEST,"환불 가능한 시간이 지났습니다.")
+    TIME_OVER(HttpStatus.BAD_REQUEST,"환불 가능한 시간이 지났습니다."),
+    FAIL_FIREBASE(HttpStatus.INTERNAL_SERVER_ERROR, "firebase 초기화 실패")
 
     ;
     private final HttpStatus httpStatus;

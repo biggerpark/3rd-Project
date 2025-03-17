@@ -1,6 +1,8 @@
 .env
+.pem
+.pfx
 HELP.md
-
+**/src/main/resources/firebase/**
 application-pay.yml
 .gradle
 build/
