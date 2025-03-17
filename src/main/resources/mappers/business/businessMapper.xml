@@ -300,6 +300,8 @@
         JOIN business b ON p.businessId = b.businessId
         WHERE b.businessId = #{businessId}
         AND s.completed >= 7
+        AND YEAR(s.createdAt) = YEAR(CURDATE())
+        AND MONTH(s.createdAt) = MONTH(CURDATE())
         GROUP BY s.productId, YEAR(s.createdAt), MONTH(s.createdAt)
         ORDER BY s.productId, year DESC, month DESC;
     </select>
