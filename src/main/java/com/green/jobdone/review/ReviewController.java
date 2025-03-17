@@ -42,7 +42,7 @@ public class ReviewController {
     @Operation(summary = "리뷰 리스트 불러오기")
     public ResultResponse<List<ReviewGetRes>> getReviewList(@Valid @ParameterObject @ModelAttribute ReviewGetReq p) {
         log.info("ReviewController > getReviewList > p: {}", p);
-        List<ReviewGetRes> list = reviewService.getFeedList(p);
+        List<ReviewGetRes> list = reviewService.getReviewList(p);
         return ResultResponse.<List<ReviewGetRes>>builder()
                 .resultMessage(String.format("%d rows", list.size()))
                 .resultData(list)
