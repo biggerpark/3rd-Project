@@ -1,7 +1,6 @@
 package com.green.jobdone.review;
 
 import com.green.jobdone.common.model.ResultResponse;
-import com.green.jobdone.review.comment.model.ReviewCommentDelReq;
 import com.green.jobdone.review.model.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,8 +41,18 @@ public class ReviewController {
     @Operation(summary = "리뷰 리스트 불러오기")
     public ResultResponse<List<ReviewGetRes>> getReviewList(@Valid @ParameterObject @ModelAttribute ReviewGetReq p) {
         log.info("ReviewController > getReviewList > p: {}", p);
-        List<ReviewGetRes> list = reviewService.getFeedList(p);
+        List<ReviewGetRes> list = reviewService.getReviewList(p);
         return ResultResponse.<List<ReviewGetRes>>builder()
+                .resultMessage(String.format("%d rows", list.size()))
+                .resultData(list)
+                .build();
+    }
+
+    @GetMapping("/Main")
+    @Operation(summary = "메인에 쓸 리뷰 리스트 불러오기")
+    public ResultResponse<List<ReviewGetMainRes>> getReviewListForMain() {
+        List<ReviewGetMainRes> list = reviewService.getReviewMainList();
+        return ResultResponse.<List<ReviewGetMainRes>>builder()
                 .resultMessage(String.format("%d rows", list.size()))
                 .resultData(list)
                 .build();
