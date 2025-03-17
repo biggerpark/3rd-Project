@@ -96,7 +96,7 @@ public class ReviewService {
                 .build();
     }
 
-    public List<ReviewGetRes> getFeedList(ReviewGetReq p) {
+    public List<ReviewGetRes> getReviewList(ReviewGetReq p) {
         List<ReviewGetRes> list = new ArrayList<>(p.getSize());
 
         //SELECT (1): review + review_pic
@@ -144,6 +144,10 @@ public class ReviewService {
         }
 
         return list;
+    }
+
+    public List<ReviewGetMainRes> getReviewMainList() {
+        return reviewRepository.selReviewForMain();
     }
 
     public ReviewPutRes updReview(List<MultipartFile> pics, ReviewPutReq p) {
