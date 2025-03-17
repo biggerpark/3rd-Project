@@ -335,9 +335,17 @@ public class BusinessService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다, 근데 너 누구냐");
         } //일단 보안먼저 챙겨주고
 
-
+        String middlePath = String.format("business/%d/pics", businessId);
         String tempPath = String.format("business/%d/temp", businessId);
+
+
+        // temp 폴더가 없으면 생성
         myFileUtils.makeFolders(tempPath);
+
+        // pics 폴더가 존재하면, 기존 사진을 temp 폴더로 이동
+        if (myFileUtils.folderExists(middlePath)) {
+            myFileUtils.moveFolder(middlePath, tempPath);
+        }
 
         List<String> tempPicUrls = new ArrayList<>(pics.size());
         List<BusinessPic> businessPicList = new ArrayList<>(pics.size());
@@ -381,7 +389,9 @@ public class BusinessService {
         myFileUtils.makeFolders(middlePath);
 
         boolean moveSuccess = myFileUtils.moveFolder(tempPath, middlePath);
-
+        if (!moveSuccess) {
+            return false;
+        }
         return moveSuccess;
     }
 

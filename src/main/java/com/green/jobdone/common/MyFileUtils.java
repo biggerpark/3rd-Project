@@ -33,7 +33,7 @@ public class MyFileUtils {
     }
 
     public boolean folderExists(String folderPath) {
-        File folder = new File(folderPath);
+        File folder = new File(uploadPath,folderPath);
         return folder.exists() && folder.isDirectory();  // 폴더가 존재하고, 디렉토리일 경우 true 반환
     }
 
