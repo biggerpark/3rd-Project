@@ -195,7 +195,9 @@ public class PortfolioService {
 
         portfolioRepository.save(portfolio);
 
-        List<String> portfolioPicList = new ArrayList<>();
+        List<PortfolioPicInfo> portfolioPicList = new ArrayList<>();
+
+        // 일단 사진 지울건 지우고
         long portfolioId = p.getPortfolioId();
         List<String> delPortfolioPicList = portfolioPicRepository.getPortfolioPicsByPortfolioId(portfolioId);
         for (String pic : delPortfolioPicList) {
@@ -219,8 +221,8 @@ public class PortfolioService {
         for (MultipartFile pic : pics) {
             //랜덤파일명 만들기
             String savedPicName = myFileUtils.makeRandomFileName(pic);
-            portfolioPicList.add(savedPicName);
             String filePath = String.format("%s/%s", middlePath, savedPicName);
+
             try {
                 myFileUtils.transferTo(pic, filePath);
             } catch (IOException e) {
@@ -229,17 +231,35 @@ public class PortfolioService {
                 myFileUtils.deleteFolder(delFolderPath, true);
                 throw new RuntimeException(e);
             }
+
+        // pic info 에 저장할 파일명을 추가
+            PortfolioPicInfo picInfo = new PortfolioPicInfo();
+            picInfo.setPic(savedPicName);
+            portfolioPicList.add(picInfo);
+
         }
+
+        // PortfolioPic 객체로 변환하여 DB에 저장
         List<PortfolioPic> portfolioPics = new ArrayList<>(portfolioPicList.size());
-        for (String item : portfolioPicList) {
+        for (PortfolioPicInfo picInfo : portfolioPicList) {
             PortfolioPic portfolioPic = new PortfolioPic();
             portfolioPic.setPortfolio(portfolio);
-            portfolioPic.setPic(item);
+            portfolioPic.setPic(picInfo.getPic());
             portfolioPics.add(portfolioPic);
         }
 
+        List<PortfolioPic> savedPortfolioPics = portfolioPicRepository.saveAll(portfolioPics);
+
+        // savedPortfolioPics에서 portfolioPicId를 가져와서 portfolioPicList의 PortfolioPicInfo에 셋팅
+        int index = 0;
+        for (PortfolioPic savedPic : savedPortfolioPics) {
+            portfolioPicList.get(index++).setPortfolioPicId(savedPic.getPortfolioPicId());
+        }
+
+
         portfolioRepository.save(portfolio);
-        portfolioPicRepository.saveAll(portfolioPics);
+
+
         return PortfolioPutRes.builder()
                 .portfolioId(portfolioId)
                 .youtubeId(portfolio.getYoutubeId())
