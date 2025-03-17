@@ -10,5 +10,5 @@ import java.util.List;
 public class PortfolioPutRes {
     private long portfolioId;
     private String youtubeId;
-    private List<String> pics;
+    private List<PortfolioPicInfo> pics;
 }
