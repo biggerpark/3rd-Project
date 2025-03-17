@@ -338,20 +338,16 @@ public class BusinessService {
         String middlePath = String.format("business/%d/pics", businessId);
         String tempPath = String.format("business/%d/temp", businessId);
 
-
         // temp 폴더가 없으면 생성
         myFileUtils.makeFolders(tempPath);
 
-        // pics 폴더가 존재하면, 기존 사진을 temp 폴더로 이동
-        if (myFileUtils.folderExists(middlePath)) {
-            myFileUtils.moveFolder(middlePath, tempPath);
-        }
+
 
         List<String> tempPicUrls = new ArrayList<>(pics.size());
         List<BusinessPic> businessPicList = new ArrayList<>(pics.size());
         for (MultipartFile pic : pics) {
             String savedPicName = myFileUtils.makeRandomFileName(pic);
-            String filePath = String.format("%s/%s", tempPath, savedPicName);
+            String filePath = String.format("%s/%s", middlePath, savedPicName);
 
             String tempPicUrl = String.format("%s/pic/%s", docker, filePath);
 
@@ -366,7 +362,6 @@ public class BusinessService {
             businessPic.setBusiness(business);
             businessPic.setPic(savedPicName);
             businessPicList.add(businessPic);
-
             tempPicUrls.add(tempPicUrl);
         }
         businessPicRepository.saveAll(businessPicList);
@@ -555,6 +550,7 @@ public class BusinessService {
     }
 
 }
+
 
 
 
