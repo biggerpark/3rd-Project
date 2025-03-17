@@ -76,7 +76,9 @@ public class PayService {
         params.put("approval_url", approval_url); // 결제 성공 시 이동할 URL
         params.put("cancel_url", "http://"+server+"/api/payment/cancel"); // 결제 취소 시 이동할 URL
         params.put("fail_url", "http://"+server+"/api/payment/fail"); // 결제 실패 시 이동할 URL
-
+        com.green.jobdone.entity.Service service = serviceRepository.findById(serviceId).orElse(null);
+        service.setPayPrice(kakaoPayDto.getPrice());
+        serviceRepository.save(service);
         log.info("params : {}", params);
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -106,18 +108,20 @@ public class PayService {
         Long userId = authenticationFacade.getSignedUserId();
         CancelDto dto = serviceRepository.findCancelDtoByServiceId(serviceId);
 //        if(dto.getCompleted()!=10){
-        LocalDate threeDaysAgo = dto.getStartDate().minusDays(4);
+        LocalDate threeDaysAgo = dto.getStartDate().minusDays(3);
         // 오늘부터 3일 전 1월 4일이면 1월 1일
-        if(dto.getCompleted()==6 || !threeDaysAgo.isBefore(LocalDate.now())){
+        if(!userId.equals(dto.getUserId())){
+            throw new CustomException(ServiceErrorCode.USER_MISMATCH);
+        } //관리자라 여기 필요x >> 이제 관리자 아님 필요함
+        log.info("오늘 : {}, 아래 불린 {}",LocalDate.now(),!threeDaysAgo.isBefore(LocalDate.now()));
+        if(dto.getCompleted()==6 && !threeDaysAgo.isBefore(LocalDate.now())){
             serviceRepository.updCompleted(serviceId,10);
         } else {
-            throw new CustomException(ServiceErrorCode.INVALID_SERVICE_STATUS);
+            throw new CustomException(ServiceErrorCode.TIME_OVER);
         }
 //        serviceRepository.updCompleted(serviceId,11);
 
-//        if(!userId.equals(dto.getUserId())){
-//            throw new CustomException(ServiceErrorCode.USER_MISMATCH);
-//        } 관리자라 여기 필요x
+
         Map<String ,Object> req = new HashMap<>();
         req.put("cid",kaKaoPay.getCid());
         req.put("tid",dto.getTid());
