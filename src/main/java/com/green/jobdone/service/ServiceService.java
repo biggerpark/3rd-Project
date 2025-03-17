@@ -329,7 +329,7 @@ public class ServiceService {
                 0, List.of(1, 3),
                 1, List.of(3),
                 2, List.of(3, 6),
-                6, List.of(10),
+                6, List.of(7, 10),
                 7, List.of(8, 9)
         );
 

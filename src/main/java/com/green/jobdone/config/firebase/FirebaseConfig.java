@@ -15,26 +15,28 @@ import java.io.InputStream;
 @Configuration
 public class FirebaseConfig {
     @PostConstruct
-    public void init(){
-        try {
-            // src/main/resources/의 파일을 읽을 때는 ClassLoader를 사용하여 읽어야 함
-            InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("firebase/job-done-firebase-service.json");
+    public void init() {
+        if (FirebaseApp.getApps().isEmpty()) {
+            try {
+                // src/main/resources/의 파일을 읽을 때는 ClassLoader를 사용하여 읽어야 함
+                InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("firebase/job-done-firebase-service.json");
 
-            if (serviceAccount == null) {
-                throw new CustomException(ServiceErrorCode.FAIL_FIREBASE);  // 파일이 없으면 예외 처리
+                if (serviceAccount == null) {
+                    throw new CustomException(ServiceErrorCode.FAIL_FIREBASE);  // 파일이 없으면 예외 처리
+                }
+
+                // FirebaseOptions 초기화
+                FirebaseOptions options = FirebaseOptions.builder()
+                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                        .build();
+
+                // FirebaseApp 초기화
+                FirebaseApp.initializeApp(options);
+
+            } catch (IOException e) {
+                throw new CustomException(ServiceErrorCode.FAIL_FIREBASE);
             }
 
-            // FirebaseOptions 초기화
-            FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .build();
-
-            // FirebaseApp 초기화
-            FirebaseApp.initializeApp(options);
-
-        } catch (IOException e) {
-            throw new CustomException(ServiceErrorCode.FAIL_FIREBASE);
         }
-
     }
 }
