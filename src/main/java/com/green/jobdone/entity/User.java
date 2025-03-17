@@ -44,6 +44,9 @@ public class User extends UpdatedAt {
     @Column(length = 11, nullable = false)
     private String phone;
 
+    @Column
+    private String FCMToken;
+
 //    @Column(length = 50)
 //    private String uuid;
 

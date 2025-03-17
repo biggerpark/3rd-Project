@@ -155,6 +155,14 @@ public class UserController {
 //                .resultData(result)
 //                .build();
 //    }
+    @PostMapping("/FcmToken")
+    public ResultResponse<String> FcmToken(@RequestBody String fcmToken) {
+        service.saveFcmToken(fcmToken);
+        return ResultResponse.<String>builder()
+                .resultMessage("저장 완료")
+                .resultData("완료")
+                .build();
+    }
 
 
 }

@@ -104,10 +104,12 @@ public class PayService {
     public KakaoPayCancelRes cancelKakaoPay(Long serviceId){
         Long userId = authenticationFacade.getSignedUserId();
         CancelDto dto = serviceRepository.findCancelDtoByServiceId(serviceId);
-        if(dto.getCompleted()!=10){
+//        if(dto.getCompleted()!=10){
+        if(dto.getCompleted()!=6){
             throw new CustomException(ServiceErrorCode.INVALID_SERVICE_STATUS);
         }
-        serviceRepository.updCompleted(serviceId,11);
+//        serviceRepository.updCompleted(serviceId,11);
+        serviceRepository.updCompleted(serviceId,10);
 
 //        if(!userId.equals(dto.getUserId())){
 //            throw new CustomException(ServiceErrorCode.USER_MISMATCH);

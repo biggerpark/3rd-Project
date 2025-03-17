@@ -48,5 +48,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 
     User findByEmail(String email);
+    @Query("select u.FCMToken from User u where u.userId =:userId")
+    String findFCMTokenById(Long userId);
 
 }
