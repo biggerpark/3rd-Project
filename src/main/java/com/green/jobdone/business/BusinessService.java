@@ -342,9 +342,10 @@ public class BusinessService {
         // temp 폴더가 없으면 생성
         myFileUtils.makeFolders(tempPath);
 
-        // 수정하려는 경우, pics 폴더에서 temp 폴더로 사진을 이동
-        myFileUtils.moveFolder(middlePath, tempPath);
-
+        // pics 폴더가 존재하면, 기존 사진을 temp 폴더로 이동
+        if (myFileUtils.folderExists(middlePath)) {
+            myFileUtils.moveFolder(middlePath, tempPath);
+        }
 
         List<String> tempPicUrls = new ArrayList<>(pics.size());
         List<BusinessPic> businessPicList = new ArrayList<>(pics.size());
