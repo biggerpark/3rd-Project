@@ -48,7 +48,7 @@ public class ReviewController {
                 .build();
     }
 
-    @GetMapping("/Main")
+    @GetMapping("/main")
     @Operation(summary = "메인에 쓸 리뷰 리스트 불러오기")
     public ResultResponse<List<ReviewGetMainRes>> getReviewListForMain() {
         List<ReviewGetMainRes> list = reviewService.getReviewMainList();
