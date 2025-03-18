@@ -2,6 +2,7 @@ package com.green.jobdone.qa;
 
 
 import com.green.jobdone.admin.model.AdminUserInfoRes;
+import com.green.jobdone.business.BusinessRepository;
 import com.green.jobdone.common.MyFileUtils;
 import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.common.exception.CommonErrorCode;
@@ -13,6 +14,8 @@ import com.green.jobdone.config.jwt.UserRole;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.*;
 import com.green.jobdone.qa.model.*;
+import com.green.jobdone.review.ReviewRepository;
+import com.green.jobdone.room.RoomRepository;
 import com.green.jobdone.service.ServiceRepository;
 import com.green.jobdone.service.model.Dto.ServiceQaDto;
 import com.green.jobdone.user.UserRepository;
@@ -39,10 +42,12 @@ public class QaService {
     private final QaAnswerRepository qaAnswerRepository;
     private final QaPicRepository qaPicRepository;
     private final MyFileUtils myFileUtils;
+    private final BusinessRepository businessRepository;
+    private final ReviewRepository reviewRepository;
     private final ServiceRepository serviceRepository;
     private final QaViewRepository qaViewRepository;
     private final UserRepository userRepository;
-
+    private final RoomRepository roomRepository;
 
     @Transactional(noRollbackFor = CustomException.class)
     public void insQa(QaReq p, List<MultipartFile> pics) {
@@ -55,6 +60,10 @@ public class QaService {
                 QaTypeDetail.builder()
                         .qaTypeDetailId(p.getQaTypeDetailId())
                         .build();
+
+        validateTarget(p.getQaReportReason(), p.getQaTargetId()); //타겟아이디의 유효성 체크
+
+
         Qa qa = Qa.builder()
                 .user(user)
                 .title(p.getTitle())
@@ -63,10 +72,13 @@ public class QaService {
                 .reportReason(p.getQaReportReason())
                 .qaTargetId(p.getQaTargetId())
                 .build();
+
         if (pics == null) {
             qaRepository.save(qa);
         }
-        if (p.getQaReportReason().getCode() == 4) {
+
+
+        if (p.getQaReportReason().getCode() == 4) { // 서비스 신고일 경우
             ServiceQaDto qaDto = serviceRepository.findQaDtoByServiceId(p.getQaTargetId());
             if (qaDto == null || qaDto.getCompleted() < 6) {
                 throw new CustomException(ServiceErrorCode.FAIL_UPDATE_SERVICE);
@@ -106,6 +118,45 @@ public class QaService {
 
             }
 
+
+        }
+    }
+    /*
+       BUSINESS(1,"업체"),
+    REVIEW(2,"리뷰"),
+    CHAT(3,"채팅"),
+    SERVICE(4,"환불"),
+     */
+
+    private void validateTarget(ReportReason qaReportReason, Long qaTargetId) {
+        switch (qaReportReason.getCode()) {
+            case 1:
+                if (!businessRepository.existsById(qaTargetId)) {
+                    throw new CustomException(ServiceErrorCode.INVALID_BUSINESS);
+                }
+                break;
+            case 2:
+                if (!reviewRepository.existsById(qaTargetId)) {
+                    throw new CustomException(ServiceErrorCode.INVALID_REVIEW);
+                }
+                break;
+
+            case 3:
+                if (!roomRepository.existsById(qaTargetId)) {
+                    throw new CustomException(ServiceErrorCode.INVALID_CHAT);
+                }
+                break;
+            case 4:
+                if (!serviceRepository.existsById(qaTargetId)) {
+                    throw new CustomException(ServiceErrorCode.INVALID_SERVICE);
+                }
+                break;
+            case 5:
+                break;
+            case 6:
+                break;
+            default:
+                throw new CustomException(ServiceErrorCode.INVALID_BUSINESS);
 
         }
     }
