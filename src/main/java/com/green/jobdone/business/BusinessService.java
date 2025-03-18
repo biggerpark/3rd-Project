@@ -1,7 +1,5 @@
 package com.green.jobdone.business;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.green.jobdone.business.model.*;
@@ -16,17 +14,11 @@ import com.green.jobdone.common.model.Domain;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.Business;
 import com.green.jobdone.entity.BusinessPic;
-import com.green.jobdone.portfolio.model.PortfolioPatchThumbnailReq;
 import com.green.jobdone.user.UserRepository;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +31,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 @Service
 @Slf4j
@@ -369,6 +360,7 @@ public class BusinessService {
         return BusinessPicPostRes.builder().businessId(businessId).pics(tempPicUrls).build();
     }
 
+
     @Transactional
     public boolean businessPicConfirm(long businessId) {
         long signedUserId = authenticationFacade.getSignedUserId();
@@ -389,6 +381,12 @@ public class BusinessService {
             return false;
         }
         return moveSuccess;
+    }
+
+    //@Transactional
+    public boolean businessHasNoContents(long businessId) {
+        String isReal = businessRepository.findContentsById(businessId);
+        return isReal == null;
     }
 
     @Transactional

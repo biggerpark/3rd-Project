@@ -102,6 +102,16 @@ public class BusinessController {
 
     }
 
+    @PostMapping("businessIsNewbie")
+    @Operation(summary = "업체 새로 등록할놈인가")
+    public ResultResponse<Boolean> businessHasNoContents(long businessId) {
+        boolean isReal = businessService.businessHasNoContents(businessId);
+
+        return ResultResponse.<Boolean>builder().resultData(isReal).resultMessage(isReal ? "이즈리얼" : "이즌트리얼").build();
+// 귀찮은데 내일 테스트 해야지
+
+    }
+
     @PutMapping("detail")
     @Operation(summary = "업체 상세정보 기입")
     public ResultResponse<Integer> udtBusinessDetail(@RequestBody BusinessDetailPutReq p) {
