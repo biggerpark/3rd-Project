@@ -1,5 +1,6 @@
 package com.green.jobdone.business;
 
+import com.green.jobdone.entity.Business;
 import com.green.jobdone.entity.BusinessPic;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,5 +15,6 @@ public interface BusinessPicRepository extends JpaRepository<BusinessPic, Long> 
     @Query("delete from BusinessPic where businessPicId =:businessPicId")
     Integer deleteByBusinessPicId(@Param("businessPicId") Long businessPicId);
 
-  
+
+    boolean existsByBusinessAndState(Business business, int state);
 }
