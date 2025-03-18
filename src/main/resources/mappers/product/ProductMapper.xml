@@ -186,7 +186,7 @@
         left JOIN detail_type e
             on a.detailTypeId=e.detailTypeId
         WHERE a.businessId=#{businessId}
-        order by c.price
+        order by b.optionId,c.price
     </select>
 
 
