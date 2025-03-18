@@ -334,7 +334,7 @@ public class BusinessService {
         if (business.getUser().getUserId() != signedUserId) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다, 근데 너 누구냐");
         } //일단 보안먼저 챙겨주고
-
+        boolean hasThumbnail = businessPicRepository.existsByBusinessAndState(business, 2);
         String middlePath = String.format("business/%d/pics", businessId);
         String tempPath = String.format("business/%d/temp", businessId);
 
@@ -345,12 +345,11 @@ public class BusinessService {
 
         List<String> tempPicUrls = new ArrayList<>(pics.size());
         List<BusinessPic> businessPicList = new ArrayList<>(pics.size());
+        int index = 0;
         for (MultipartFile pic : pics) {
             String savedPicName = myFileUtils.makeRandomFileName(pic);
             String filePath = String.format("%s/%s", middlePath, savedPicName);
-
             String tempPicUrl = String.format("%s/pic/%s", docker, filePath);
-
 
             try {
                 myFileUtils.transferTo(pic, filePath);
@@ -361,8 +360,10 @@ public class BusinessService {
             BusinessPic businessPic = new BusinessPic();
             businessPic.setBusiness(business);
             businessPic.setPic(savedPicName);
+            businessPic.setState(index== 0 && !hasThumbnail ? 2:0);
             businessPicList.add(businessPic);
             tempPicUrls.add(tempPicUrl);
+            index++;
         }
         businessPicRepository.saveAll(businessPicList);
         return BusinessPicPostRes.builder().businessId(businessId).pics(tempPicUrls).build();
