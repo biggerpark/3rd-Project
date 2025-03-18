@@ -70,8 +70,8 @@ public class PayService {
         params.put("total_amount", kakaoPayDto.getPrice()); // 총 금액
         params.put("vat_amount", kakaoPayDto.getPrice()/10); // 부가세
         params.put("tax_free_amount", 0); // 비과세 금액
-//        String server = domain.getServer();
-        String server = "localhost:8080";
+        String server = domain.getServer();
+//        String server = "localhost:8080";
         String approval_url = String.format("http://%s/api/payment/success?service_id=%d", server,serviceId);
         params.put("approval_url", approval_url); // 결제 성공 시 이동할 URL
         params.put("cancel_url", "http://"+server+"/api/payment/cancel"); // 결제 취소 시 이동할 URL
