@@ -35,7 +35,7 @@ file:
 
 domain:
   path:
-    server: ${DOMAIN.SERVER.PATH}
+    server: job-done.r-e.kr:5234
     server2: ${DOMAIN.SERVER.PATH2}
 
 mybatis:
