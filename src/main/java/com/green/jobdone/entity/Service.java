@@ -41,6 +41,7 @@ public class Service extends UpdatedAt{
     @Column(columnDefinition = "DATETIME(0)") private LocalDateTime paidAt;
     @Column(columnDefinition = "DATETIME(0)") private LocalDateTime doneAt;
     @Column(nullable = false) @ColumnDefault("0") private int totalPrice;
+    @Column private Integer payPrice;
 
 //    @OneToMany(mappedBy = "service_option", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<ServiceOption> serviceOptionList = new ArrayList<>();
