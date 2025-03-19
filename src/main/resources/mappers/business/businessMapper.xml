@@ -166,7 +166,7 @@
             <when test="sortType == '주문순'">
                 ORDER BY serviceCount DESC
             </when>
-            <when test="sortType == '가격순'">
+            <when test="sortType == '저가순'">
                 ORDER BY p.price
             </when>
             <when test="sortType == '거리순'">

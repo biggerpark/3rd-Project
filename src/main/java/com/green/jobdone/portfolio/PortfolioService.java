@@ -94,8 +94,8 @@ public class PortfolioService {
             //pics리스트에 있는 사진들 전수조사
             String savedPicName = myFileUtils.makeRandomFileName(pic);
 
-            portfolioPicList.add(savedPicName);
             String filePath = String.format("%s/%s", middlePath, savedPicName);
+            portfolioPicList.add(filePath);
             try {
                 myFileUtils.transferTo(pic, filePath); // 포폴 사진값 설정해놓음
             } catch (IOException e) {
