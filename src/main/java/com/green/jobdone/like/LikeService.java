@@ -11,6 +11,7 @@ import com.green.jobdone.like.model.LikePostReq;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,6 +23,7 @@ public class LikeService {
     private final AuthenticationFacade authenticationFacade;
     private final LikeRepository likeRepository;
 
+    @Transactional
     public int postLikeInfo(LikePostReq p) {
 
         long userId=authenticationFacade.getSignedUserId();
@@ -49,7 +51,9 @@ public class LikeService {
         like.setUser(user);
 //        int result = mapper.deleteLikeInfo(p);
 
-        int result=likeRepository.deleteUser(userId);
+
+        // 특정 유저의 특정 비즈니스 좋아요 삭제
+        int result = likeRepository.deleteByUserIdAndBusinessId(userId, p.getBusinessId());
 
         if (result == 1) {
             return 0;

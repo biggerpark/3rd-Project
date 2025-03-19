@@ -126,8 +126,8 @@ public class WebSecurityConfig {
                         .successHandler(oauth2AuthenticationSuccessHandler)
                         .failureHandler(oauth2AuthenticationFailureHandler) )
                 .addFilterBefore(oauth2AuthenticationCheckRedirectUriFilter, OAuth2AuthorizationRequestRedirectFilter.class)
-                .requiresChannel(channel -> channel
-                        .anyRequest().requiresSecure()) // http 요청을 https로
+//                .requiresChannel(channel -> channel
+//                        .anyRequest().requiresSecure()) // http 요청을 https로
                 .build();
     }
 

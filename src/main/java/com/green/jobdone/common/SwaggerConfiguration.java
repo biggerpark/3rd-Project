@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
         , description = "잡던"
         , version = "v2"
     ),
-    servers ={@Server(url="https://job-done.r-e.kr")}
+    servers ={@Server(url="https://job-done.r-e.kr:52340")}
     , security = @SecurityRequirement(name = "Authorization")
 )
 

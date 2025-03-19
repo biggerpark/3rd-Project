@@ -7,6 +7,7 @@ global:
     redirect-uri-param-cookie-name: redirect_uri
     cookie-expiry-seconds: 180
     authorized-redirect-uris:
+      - https://job-done.r-e.kr:52340/fe/redirect
       - http://localhost:8080/fe/redirect
       - http://${DOMAIN.SERVER.PATH2}/fe/redirect
       - http://${DOMAIN.SERVER.PATH2}0/fe/redirect
@@ -35,7 +36,7 @@ file:
 
 domain:
   path:
-    server: job-done.r-e.kr:5234
+    server: job-done.r-e.kr:52340
     server2: ${DOMAIN.SERVER.PATH2}
 
 mybatis:
