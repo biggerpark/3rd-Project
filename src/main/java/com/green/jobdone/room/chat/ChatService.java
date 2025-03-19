@@ -44,6 +44,7 @@ public class ChatService {
 
     @Transactional
     public String insChat(MultipartFile pic, ChatPostReq p){
+        log.info("채팅보내기 로직 들어옴");
 //        long userId = authenticationFacade.getSignedUserId();
 //        UserIdRoom userIdRoom = chatMapper.checkUserId(p.getRoomId());
 //        if(userId!=userIdRoom.getUserId()||userId!=userIdRoom.getBuid()){
@@ -103,8 +104,11 @@ public class ChatService {
             log.info("유저Id 잘 들고옴? {} ", receiverId);
         }
         if(!room.getState().equals("00201")){
-            isReceiverInRoom = false;
+            isReceiverInRoom = true;
         }
+        log.info("아래 파이어베이스용 들어감? false면 들어감 ㅇㅇ ,{}", isReceiverInRoom);
+        log.info("그외 넣어야 하는 값은? ,{} 이랑 {}", receiverId,p.getContents());
+
 
         if (!isReceiverInRoom) {
             fcmService.sendChatNotification(receiverId, p.getContents());
