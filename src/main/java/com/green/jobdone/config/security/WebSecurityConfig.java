@@ -99,13 +99,21 @@ public class WebSecurityConfig {
 
 
                                 //관리자
-                                .requestMatchers("/api/admin/sgin-in").permitAll()
-                                .requestMatchers("/api/admin/sgin-up").permitAll()
+                                .requestMatchers("/api/admin/sign-in").permitAll()
+                                .requestMatchers("/api/admin/sign-up").permitAll()
+                                .requestMatchers("/api/admin/**").hasRole(UserRole.ADMIN.name()) // 새로 추가
 
                                 //문의쪽
                                 .requestMatchers(HttpMethod.DELETE,"/api/qa").hasRole(
                                         UserRole.ADMIN.name()
                                 )
+                                .requestMatchers(HttpMethod.POST,"/api/qa").authenticated()
+                                .requestMatchers(HttpMethod.POST,"/api/qa/answer").hasRole(
+                                        UserRole.ADMIN.name()
+                                )
+//                                .requestMatchers(HttpMethod.GET,"/api/qa").authenticated()
+//                                .requestMatchers(HttpMethod.GET,"/api/qa/detail").authenticated()
+//                                .requestMatchers(HttpMethod.GET,"/api/qa/qaBoardDetail").authenticated()
 
 
                                 //스웨거쪽
