@@ -301,7 +301,7 @@
         WHERE b.businessId = #{businessId}
         AND s.completed >= 7
         AND YEAR(s.createdAt) = YEAR(CURDATE())
-        AND MONTH(s.createdAt) = MONTH(CURDATE())
+        AND s.createdAt BETWEEN DATE_SUB(CURDATE(), INTERVAL 6 MONTH) AND CURDATE()
         GROUP BY s.productId, YEAR(s.createdAt), MONTH(s.createdAt)
         ORDER BY s.productId, year DESC, month DESC;
     </select>
