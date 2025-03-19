@@ -1,5 +1,6 @@
 package com.green.jobdone.config.firebase;
 
+import com.green.jobdone.config.firebase.model.FcmTokenReq;
 import com.green.jobdone.config.jwt.JwtUser;
 import com.green.jobdone.config.jwt.TokenProvider;
 import com.green.jobdone.config.security.AuthenticationFacade;
@@ -27,7 +28,7 @@ public class FcmController {
 
 
     @PostMapping
-    public String saveFcmToken(@RequestBody String token, HttpServletRequest request) {
+    public String saveFcmToken(@RequestBody FcmTokenReq token, HttpServletRequest request) {
         log.info("Token 토큰 저장하는곳 잘 들어왔냐??: " + token);
         String accessToken = null;
         Cookie[] cookies = request.getCookies();
@@ -47,7 +48,7 @@ public class FcmController {
         log.info("userId: " + userId);
         User user = userRepository.findById(userId).orElse(null);
         log.info("user: " + user);
-        user.setFCMToken(token);
+        user.setFCMToken(token.getToken());
         userRepository.save(user);
         log.info("저장 잘됬음?? 어케됨??");
         return "저장 완료";
