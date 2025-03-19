@@ -226,7 +226,7 @@ public class PortfolioService {
         for (MultipartFile pic : pics) {
             //랜덤파일명 만들기
             String savedPicName = myFileUtils.makeRandomFileName(pic);
-            String filePath = String.format("/%s/%s", middlePath, savedPicName);
+            String filePath = String.format("%s/%s", middlePath, savedPicName);
 
             try {
                 myFileUtils.transferTo(pic, filePath);
@@ -240,7 +240,7 @@ public class PortfolioService {
             // pic info 에 저장할 파일명을 추가
             PortfolioPicInfo picInfo = new PortfolioPicInfo();
             picInfo.setPic(savedPicName);
-            picInfo.setPicPath(filePath);
+            picInfo.setPicPath("/pic/"+filePath);
             portfolioPicList.add(picInfo);
 
         }
