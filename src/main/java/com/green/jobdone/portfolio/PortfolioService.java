@@ -151,7 +151,7 @@ public class PortfolioService {
         if (p.getContents() != null) portfolio.setContents(p.getContents());
 
         // YouTube URL 처리
-        if (p.getYoutubeUrl() != null) {
+        if (p.getYoutubeUrl() != null && !p.getYoutubeUrl().isEmpty()) {
             String youtubeId = youtubeService.extractVideoId(p.getYoutubeUrl());
             if (youtubeId != null) {
                 portfolio.setYoutubeUrl(p.getYoutubeUrl());
@@ -159,7 +159,12 @@ public class PortfolioService {
             } else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "유효하지 않은 유튜브 URL입니다.");
             }
+        } else {
+            // youtubeUrl이 null이거나 빈 값일 경우, 처리하지 않음
+            portfolio.setYoutubeUrl(null); // youtubeUrl을 null로 설정하거나, 해당 필드에 대한 처리 생략
+            portfolio.setYoutubeId(null);
         }
+
 
         if (thumbnail != null && !thumbnail.isEmpty()) {
             String thumbPath = String.format("business/%d/portfolio/%d/thumbnail", p.getBusinessId(), p.getPortfolioId());
@@ -232,9 +237,10 @@ public class PortfolioService {
                 throw new RuntimeException(e);
             }
 
-        // pic info 에 저장할 파일명을 추가
+            // pic info 에 저장할 파일명을 추가
             PortfolioPicInfo picInfo = new PortfolioPicInfo();
             picInfo.setPic(savedPicName);
+            picInfo.setPicPath(filePath);
             portfolioPicList.add(picInfo);
 
         }

@@ -8,4 +8,5 @@ import lombok.Setter;
 public class PortfolioPicInfo {
     private Long portfolioPicId;
     private String pic;
+    private String picPath;
 }
