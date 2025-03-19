@@ -28,7 +28,7 @@ public class PortfolioPutReq {
     @Schema(title = "contents")
     private String contents;
 
-    @Schema(title = "youtubeUrl")
+    @Schema(title = "youtubeUrl", nullable = true)
     private String youtubeUrl;
 
 
