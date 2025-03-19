@@ -76,7 +76,7 @@ spring:
         serverTimezone: Asia/Seoul
   servlet:
     multipart:
-      max-file-size: 15MB
+      max-file-size: 500MB
 
   security:
     oauth2:
