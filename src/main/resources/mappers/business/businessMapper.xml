@@ -290,35 +290,20 @@
     </select>
     <select id="countBusinessServices">
 
-        WITH month_series AS (
-        SELECT YEAR(CURDATE()) AS year, MONTH(CURDATE()) AS month
-        UNION ALL
-        SELECT YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)), MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))
-        UNION ALL
-        SELECT YEAR(DATE_SUB(CURDATE(), INTERVAL 2 MONTH)), MONTH(DATE_SUB(CURDATE(), INTERVAL 2 MONTH))
-        UNION ALL
-        SELECT YEAR(DATE_SUB(CURDATE(), INTERVAL 3 MONTH)), MONTH(DATE_SUB(CURDATE(), INTERVAL 3 MONTH))
-        UNION ALL
-        SELECT YEAR(DATE_SUB(CURDATE(), INTERVAL 4 MONTH)), MONTH(DATE_SUB(CURDATE(), INTERVAL 4 MONTH))
-        UNION ALL
-        SELECT YEAR(DATE_SUB(CURDATE(), INTERVAL 5 MONTH)), MONTH(DATE_SUB(CURDATE(), INTERVAL 5 MONTH))
-        )
         SELECT
         b.businessName,
-        ms.year,
-        ms.month,
-        IFNULL(COUNT(s.serviceId), 0) AS serviceCount
-        FROM month_series ms
-        CROSS JOIN business b
-        LEFT JOIN product p ON b.businessId = p.businessId
-        LEFT JOIN service s
-        ON s.productId = p.productId
-        AND YEAR(s.createdAt) = ms.year
-        AND MONTH(s.createdAt) = ms.month
-        AND s.completed >= 7
+        YEAR(s.createdAt) AS year,
+        MONTH(s.createdAt) AS month,
+        COUNT(s.serviceId) AS serviceCount
+        FROM service s
+        JOIN product p ON s.productId = p.productId
+        JOIN business b ON p.businessId = b.businessId
         WHERE b.businessId = #{businessId}
-        GROUP BY ms.year, ms.month
-        ORDER BY ms.year DESC, ms.month DESC;
+        AND s.completed >= 7
+        AND YEAR(s.createdAt) = YEAR(CURDATE())
+        AND MONTH(s.createdAt) = MONTH(CURDATE())
+        GROUP BY s.productId, YEAR(s.createdAt), MONTH(s.createdAt)
+        ORDER BY s.productId, year DESC, month DESC;
     </select>
 
 
