@@ -234,7 +234,7 @@ public class PortfolioService {
 
         // pic info 에 저장할 파일명을 추가
             PortfolioPicInfo picInfo = new PortfolioPicInfo();
-            picInfo.setPic(filePath);
+            picInfo.setPic(savedPicName);
             portfolioPicList.add(picInfo);
 
         }
