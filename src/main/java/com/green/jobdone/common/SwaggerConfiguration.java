@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.OpenAPI;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +17,8 @@ import org.springframework.context.annotation.Configuration;
           title = "JobDone"
         , description = "잡던"
         , version = "v2"
-    )
+    ),
+    servers ={@Server(url="https://job-done.r-e.kr")}
     , security = @SecurityRequirement(name = "Authorization")
 )
 
