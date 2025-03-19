@@ -49,7 +49,7 @@ public class LikeService {
         like.setLikeIds(likeIds);
         like.setBusiness(business);
         like.setUser(user);
-//        int result = mapper.deleteLikeInfo(p);
+//        int result = mapper.deleteLikeInfo(p); 커밋테스트
 
 
         // 특정 유저의 특정 비즈니스 좋아요 삭제
