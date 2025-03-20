@@ -83,9 +83,7 @@ public class BusinessService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 등록된 사업자 번호입니다");
         }
 
-        double[] coordinates = getCoordinatesFromAddress(p.getAddress());
-        double latitude = coordinates[0];
-        double longitude = coordinates[1];
+
 
         Business business = new Business();
         business.setUser(userRepository.findById(userId).orElse(null));
@@ -95,8 +93,7 @@ public class BusinessService {
         business.setAddress(p.getAddress());
         business.setTel(p.getTel());
         business.setSafeTel(safeTel);
-        business.setLat(latitude);
-        business.setLng(longitude);
+
 
         businessRepository.save(business);
         long businessId = business.getBusinessId();
