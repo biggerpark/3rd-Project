@@ -1,8 +1,6 @@
 package com.green.jobdone.config.firebase;
 
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.Notification;
+import com.google.firebase.messaging.*;
 import com.green.jobdone.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,9 +30,17 @@ public class FcmService {
                 .build();
         log.info("notification: {}", notification);
 
+        WebpushNotification webpushNotification = WebpushNotification.builder()
+                .setTitle("새로운 채팅 메시지")
+                .setBody(messageContent)
+                .build();
+
         Message message = Message.builder()
                 .setToken(userFcmToken)
                 .setNotification(notification)
+                .setWebpushConfig(WebpushConfig.builder()
+                        .setNotification(webpushNotification)
+                        .build())
                 .build();
         log.info("message: {}", message);
         // 푸시 알림 생성
