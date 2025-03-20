@@ -39,8 +39,10 @@ public class BusinessPostSignUpReq {
     private String address;
     @Schema(title = "서비스 유형", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     private long detailTypeId;
+
     @Schema(title = "회사설립일", example = "2019-06-08", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDate busiCreatedAt;
+  
     @Schema(title = "회사전번", example = "0533836669", requiredMode = Schema.RequiredMode.REQUIRED)
     private String tel;
     private BigDecimal lat;

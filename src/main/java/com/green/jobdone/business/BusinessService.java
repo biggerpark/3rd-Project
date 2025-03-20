@@ -83,9 +83,7 @@ public class BusinessService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 등록된 사업자 번호입니다");
         }
 
-        double[] coordinates = getCoordinatesFromAddress(p.getAddress());
-        double latitude = coordinates[0];
-        double longitude = coordinates[1];
+
 
         Business business = new Business();
         business.setUser(userRepository.findById(userId).orElse(null));
@@ -97,8 +95,7 @@ public class BusinessService {
         business.setTel(p.getTel());
         business.setState(100);
         business.setSafeTel(safeTel);
-        business.setLat(latitude);
-        business.setLng(longitude);
+
 
         businessRepository.save(business);
         long businessId = business.getBusinessId();
@@ -108,9 +105,14 @@ public class BusinessService {
         String logoPath = String.format("business/%d/logo", businessId);
         myFileUtils.makeFolders(paperPath);
         myFileUtils.makeFolders(logoPath);
+        log.info("파일 저장 경로: {}", myFileUtils.getUploadPath());
 
         String savedPaperName = (paper != null ? myFileUtils.makeRandomFileName(paper) : null);
         String savedLogoName = (logo != null ? myFileUtils.makeRandomFileName(logo) : null);
+
+        if (savedPaperName == null || savedLogoName == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "파일 이름 생성 실패");
+        }
 
         String paperFilePath = String.format("%s/%s", paperPath, savedPaperName);
         String logoFilePath = String.format("%s/%s", logoPath, savedLogoName);

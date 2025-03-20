@@ -316,7 +316,7 @@
         AND YEAR(s.createdAt) = ms.year
         AND MONTH(s.createdAt) = ms.month
         AND s.completed >= 7
-        WHERE b.businessId = #{businessId}
+        WHERE b.businessId = 2
         GROUP BY ms.year, ms.month
         ORDER BY ms.year DESC, ms.month DESC;
     </select>
