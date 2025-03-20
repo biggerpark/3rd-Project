@@ -373,7 +373,7 @@ public class UserService {
 //                Optional<User> optionalUser=userRepository.findById(str.getUserId());
 //                User user=optionalUser.get();
 //                user.setUuid(UUID.randomUUID().toString().replace("-", ""));
-//                userRepository.save(user);
+//                userRepository.save(user);ㅇ
 //            }
 //        }
 //        return 1;
