@@ -31,7 +31,7 @@
         JOIN
         business b ON l.businessId = b.businessId
         LEFT JOIN
-        business_pic bp ON b.businessId = bp.businessId
+        business_pic bp ON b.businessId = bp.businessId and bp.state = 2
         LEFT JOIN
         product p ON b.businessId = p.businessId
         LEFT JOIN
