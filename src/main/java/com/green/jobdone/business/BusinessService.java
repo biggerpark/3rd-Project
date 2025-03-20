@@ -91,6 +91,7 @@ public class BusinessService {
         business.setBusinessNum(p.getBusinessNum());
         business.setBusinessName(p.getBusinessName());
         business.setAddress(p.getAddress());
+        business.setBusiCreatedAt(p.getBusiCreatedAt());
         business.setTel(p.getTel());
         business.setSafeTel(safeTel);
 
@@ -103,9 +104,14 @@ public class BusinessService {
         String logoPath = String.format("business/%d/logo", businessId);
         myFileUtils.makeFolders(paperPath);
         myFileUtils.makeFolders(logoPath);
+        log.info("파일 저장 경로: {}", myFileUtils.getUploadPath());
 
         String savedPaperName = (paper != null ? myFileUtils.makeRandomFileName(paper) : null);
         String savedLogoName = (logo != null ? myFileUtils.makeRandomFileName(logo) : null);
+
+        if (savedPaperName == null || savedLogoName == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "파일 이름 생성 실패");
+        }
 
         String paperFilePath = String.format("%s/%s", paperPath, savedPaperName);
         String logoFilePath = String.format("%s/%s", logoPath, savedLogoName);

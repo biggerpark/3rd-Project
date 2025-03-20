@@ -22,7 +22,7 @@ public interface BusinessRepository extends JpaRepository<Business, Long> {
     Long findBusinessIdByUserId(@Param("UserId") Long UserId);
 
 
-    @Query("SELECT COUNT(*) FROM Business b WHERE b.businessNum =:businessNum")
+    @Query("SELECT COUNT(b.businessId) FROM Business b WHERE b.businessNum =:businessNum")
     Integer findExistBusinessNum(@Param("businessNum") String businessNum); //사업자 등록번호 조회
 
 
