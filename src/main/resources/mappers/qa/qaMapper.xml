@@ -11,6 +11,7 @@
             </if>
                 ,d.type as qaType
                 ,a.qaState
+                ,c.reason
         FROM qa a
         LEFT JOIN user b
         on a.userId=b.userId

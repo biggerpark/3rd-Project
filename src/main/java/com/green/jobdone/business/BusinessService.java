@@ -446,6 +446,14 @@ public class BusinessService {
     // 1. 업체 리스트 조회
     @Transactional
     public List<BusinessGetRes> getBusinessList(BusinessGetReq p) {
+
+
+//        long signedUserId = authenticationFacade.getSignedUserId();
+//        if(signedUserId != 0L) {
+//            p.setSignedUserId(signedUserId);
+//        }else {
+//            p.setSignedUserId(null);
+//        }
         // 업체 리스트 조회
         List<BusinessGetRes> res = businessMapper.selAllBusiness(p);
 

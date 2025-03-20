@@ -17,5 +17,6 @@ public class QaRes {
     private String userType;
     private String qaType; // 환불,리뷰신고,일반문의 등 ..
     private String qaState;
+    private String reason;
 
 }

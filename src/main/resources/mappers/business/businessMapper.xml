@@ -114,7 +114,11 @@
         , COUNT(distinct s.serviceId) AS serviceCount
         , COUNT(DISTINCT r.reviewId) AS reviewCount
         , ROUND(COALESCE(AVG(r.score), 0), 2) AS scoreAvg
-        , IFNULL(l.userId, 0) AS `like`
+<!--        ,   CASE-->
+<!--            WHEN l.userId IS NULL THEN 0-->
+<!--            ELSE 1-->
+<!--            as like-->
+        , IFNULL(l.userId,0) as 'like'
         , g.regionId, g.region
         , c.pic
         , b.lat, b.lng
@@ -140,6 +144,16 @@
         ON g.regionId = br.regionId
         LEFT JOIN business_pic c
         ON c.businessId = b.businessId AND c.state = 2
+<!--        <if test="signedUserId != null">-->
+<!--            LEFT JOIN `like` l-->
+<!--            ON l.businessId = b.businessId-->
+<!--            AND l.userId = #{signedUserId}-->
+<!--        </if>-->
+<!--        <if test="signedUserId==null">-->
+<!--            LEFT JOIN `like` l-->
+<!--            ON l.businessId = b.businessId-->
+<!--        </if>-->
+
 
         WHERE 1=1
         <if test="regionId != null">
