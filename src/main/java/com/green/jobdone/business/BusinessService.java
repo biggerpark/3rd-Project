@@ -93,6 +93,7 @@ public class BusinessService {
         business.setAddress(p.getAddress());
         business.setBusiCreatedAt(p.getBusiCreatedAt());
         business.setTel(p.getTel());
+        business.setState(100);
         business.setSafeTel(safeTel);
 
 
