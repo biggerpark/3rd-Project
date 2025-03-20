@@ -100,7 +100,7 @@ public class WebSecurityConfig {
 
                                 //관리자
                                 .requestMatchers("/api/admin/sign-in").permitAll()
-                                .requestMatchers("/api/admin/sign-up").permitAll()
+                                .requestMatchers("/api/admin/sign-up").hasRole(UserRole.SUPER_ADMIN.name())
                                 .requestMatchers("/api/admin/**").hasRole(UserRole.ADMIN.name()) // 새로 추가
 
                                 //문의쪽
