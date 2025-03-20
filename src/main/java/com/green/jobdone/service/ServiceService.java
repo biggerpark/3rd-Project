@@ -183,16 +183,15 @@ public class ServiceService {
 //             p.getProviderUserId 대신 authenticationFacade.getSignedUserId()
             throw new CustomException(ServiceErrorCode.BUSINESS_OWNER_MISMATCH);
         }
-//        String st = String.format(p.getMStartTime()+":00");
+
         p.setMStartTime(plusDoubleZero(p.getMStartTime()));
-//        String et = String.format(p.getMEndTime()+":00");
         p.setMEndTime(plusDoubleZero(p.getMEndTime()));
         List<ServiceEtcDto> etcDto = p.getEtc();
+
         int sum = 0;
         int i=0;
-//        com.green.jobdone.entity.Service service = new com.green.jobdone.entity.Service();
         com.green.jobdone.entity.Service service = serviceRepository.findById(p.getServiceId()).orElse(null);
-        if(service!=null &&service.getCompleted()!=1){
+        if(service==null ||service.getCompleted()!=1){
             throw new CustomException(ServiceErrorCode.FAIL_UPDATE_SERVICE);
         }
         service.setCompleted(2);
@@ -242,6 +241,8 @@ public class ServiceService {
             p.setTotalPrice(realPrice);
             service.setTotalPrice(realPrice);
             // realPrice = totalPrice
+        } else {
+            service.setTotalPrice(p.getTotalPrice());
         }
 
 
