@@ -145,6 +145,10 @@ public class UserService {
 
         cookieUtils.setCookie(response, "refreshToken", refreshToken, jwtConst.getRefreshTokenCookieExpiry(), "/api/user/access-token");
 
+        if(res.getState()==120){
+            res.setBusinessId(0);
+        }
+
         return UserSignInRes
                 .builder()
                 .email(res.getEmail())

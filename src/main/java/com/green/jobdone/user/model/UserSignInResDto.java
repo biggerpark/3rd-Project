@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 public class UserSignInResDto {
     private long userId;
+    private Integer state;
     private String name;
     private String email;
     private String type;

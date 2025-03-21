@@ -168,6 +168,7 @@
         <if test="searchTerm != null">
             AND b.title like '%${searchTerm}%'
         </if>
+        AND P.PRICE !=0
         GROUP BY b.businessId
 
         <choose>

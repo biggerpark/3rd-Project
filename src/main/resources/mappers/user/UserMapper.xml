@@ -42,6 +42,7 @@
         <result property="email" column="email"/>
         <result property="upw" column="upw"/>
         <result property="name" column="name"/>
+        <result property="state" column="state"/>
         <result property="pic" column="pic"/>
         <result property="roles" column="type"
                 typeHandler="com.green.jobdone.config.handler.UserRoleTypeHandler" />
@@ -50,7 +51,7 @@
 
 
     <select id="postUserSignIn" resultMap="selUserWithRolesResultMap">
-        SELECT a.userId,a.name,a.email,a.type,a.pic,a.upw,a.phone,b.businessId
+        SELECT a.userId,a.name,a.email,a.type,a.pic,a.upw,a.phone,b.businessId, ifnull(b.state, 0) as state
         FROM user a
         LEFT JOIN business b
         on a.userId=b.userId
