@@ -284,22 +284,19 @@
     </select>
 
     <select id="countBusinessServicesList">
-
         SELECT
         b.businessName,
         d.detailTypeName,
         COUNT(s.serviceId) AS totalServiceCount,
-        COUNT(CASE
-        WHEN YEAR(s.createdAt) = YEAR(NOW())
-        AND MONTH(s.createdAt) = MONTH(NOW())
-        THEN 1
-        ELSE NULL
-        END) AS thisMonthServiceCount
-        FROM service s
-        JOIN product p ON s.productId = p.productId
-        JOIN business b ON p.businessId = b.businessId
+        SUM(
+        s.completed >= 7
+        AND s.createdAt >= DATE_FORMAT(NOW(), '%Y-%m-01')
+        ) AS thisMonthServiceCount
+        FROM business b
         JOIN detail_type d ON b.detailTypeId = d.detailTypeId
-        WHERE s.completed >= 7
+        JOIN product p ON b.businessId = p.businessId
+        LEFT JOIN service s ON s.productId = p.productId
+        AND s.completed >= 7
         GROUP BY b.businessName, d.detailTypeName;
     </select>
     <select id="countBusinessServices">
@@ -330,7 +327,7 @@
         AND YEAR(s.createdAt) = ms.year
         AND MONTH(s.createdAt) = ms.month
         AND s.completed >= 7
-        WHERE b.businessId = 2
+        WHERE b.businessId = #{businessId}
         GROUP BY ms.year, ms.month
         ORDER BY ms.year DESC, ms.month DESC;
     </select>
