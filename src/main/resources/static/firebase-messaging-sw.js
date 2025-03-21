@@ -17,7 +17,6 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage(payload => {
-  console.log("백그라운드 푸시 알림: ", payload);
   self.registration.showNotification(payload.notification.title, {
     body: payload.notification.body,
     icon: "/firebase-logo.png",

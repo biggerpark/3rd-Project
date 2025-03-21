@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Schema(title="업체 컨텐츠 등록 요청")
@@ -42,6 +43,7 @@ public class BusinessPostSignUpReq {
     private long detailTypeId;
 
     @Schema(title = "회사설립일", example = "2019-06-08", requiredMode = Schema.RequiredMode.REQUIRED)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private String busiCreatedAt;
   
     @Schema(title = "회사전번", example = "0533836669", requiredMode = Schema.RequiredMode.REQUIRED)
