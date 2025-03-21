@@ -90,7 +90,7 @@ public class OCRWebClientController {
                         result.indexOf("생년월일", startIdxBusiCreatedAt)
                 );
                 SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy년MM월dd일");
-                SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy/MM/dd");
+                SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date date = inputFormat.parse(busiCreatedAt);
                 ocrWebClientDto.setBusiCreatedAt(outputFormat.format(date));
             } catch (Exception e1) {
@@ -100,7 +100,7 @@ public class OCRWebClientController {
                             result.indexOf("사업장", startIdxBusiCreatedAt)
                     );
                     SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy년MM월dd일");
-                    SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy/MM/dd");
+                    SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
                     Date date = inputFormat.parse(busiCreatedAt);
                     ocrWebClientDto.setBusiCreatedAt(outputFormat.format(date));
                 } catch (Exception e2) {
