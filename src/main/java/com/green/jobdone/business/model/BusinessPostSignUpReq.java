@@ -42,7 +42,7 @@ public class BusinessPostSignUpReq {
     private long detailTypeId;
 
     @Schema(title = "회사설립일", example = "2019-06-08", requiredMode = Schema.RequiredMode.REQUIRED)
-    private LocalDate busiCreatedAt;
+    private String busiCreatedAt;
   
     @Schema(title = "회사전번", example = "0533836669", requiredMode = Schema.RequiredMode.REQUIRED)
     private String tel;

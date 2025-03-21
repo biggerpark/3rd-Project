@@ -51,8 +51,9 @@ public class Business extends UpdatedAt {
     @Column(length = 50, nullable = false)
     private String address;
 
+    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy//MM//dd")
     @Column(nullable = false, name = "busiCreatedAt")
-    private LocalDate busiCreatedAt;
+    private String busiCreatedAt;
 
     @Column(name = "approveAt")
     private LocalDate approveAt;

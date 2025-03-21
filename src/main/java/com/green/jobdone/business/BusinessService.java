@@ -28,6 +28,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -65,7 +67,7 @@ public class BusinessService {
 
         long userId = authenticationFacade.getSignedUserId();
         p.setSignedUserId(userId);
-
+        log.info("창업날짜:{}",p.getBusiCreatedAt());
 
         Random random = new Random();
 
@@ -83,7 +85,16 @@ public class BusinessService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 등록된 사업자 번호입니다");
         }
 
+        String busiCreatedAt = p.getBusiCreatedAt();
 
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // 날짜 문자열을 LocalDate로 변환
+        LocalDate formattedDate = LocalDate.parse(busiCreatedAt, inputFormatter);
+
+        // LocalDate를 "yyyy-MM-dd" 형식으로 변환한 후 객체에 저장
+        String formattedDateStr = formattedDate.format(outputFormatter);
 
         Business business = new Business();
         business.setUser(userRepository.findById(userId).orElse(null));
@@ -91,7 +102,7 @@ public class BusinessService {
         business.setBusinessNum(p.getBusinessNum());
         business.setBusinessName(p.getBusinessName());
         business.setAddress(p.getAddress());
-        business.setBusiCreatedAt(p.getBusiCreatedAt());
+        business.setBusiCreatedAt(formattedDateStr);
         business.setTel(p.getTel());
         business.setState(100);
         business.setSafeTel(safeTel);
