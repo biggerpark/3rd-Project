@@ -199,7 +199,7 @@ public class PayService {
                 requestEntity,KakaoPayRes.class);
         log.info("kakaoPayRedayRes: {}", kakaoPayRes);
 
-        String redirectUrl = String.format("http://%s/paySuccess", domain.getServer());
+        String redirectUrl = String.format("https://%s/paySuccess", domain.getServer());
         log.info("redirectUrl: {}",redirectUrl);
         return new RedirectView(redirectUrl);
         // 여기 만나서 바로 이동하는식
