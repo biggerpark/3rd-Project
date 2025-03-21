@@ -15,7 +15,9 @@ import com.green.jobdone.config.jwt.UserRole;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.entity.Admin;
 import com.green.jobdone.entity.Business;
+import com.green.jobdone.entity.Product;
 import com.green.jobdone.entity.User;
+import com.green.jobdone.product.ProductRepository;
 import com.green.jobdone.service.ServiceRepository;
 import com.green.jobdone.user.UserRepository;
 import com.green.jobdone.visitor.VisitorCountRepository;
@@ -51,6 +53,7 @@ public class AdminService {
     private final TokenProvider tokenProvider;
     private final CookieUtils cookieUtils;
     private final JwtConst jwtConst;
+    private final ProductRepository productRepository;
 
 
     public List<BusinessApplicationGetRes> getBusinessApplication(int page) {
@@ -98,7 +101,11 @@ public class AdminService {
         User user1=user.get();
         user1.setRole(UserRole.PRESIDENT);
         userRepository.save(user1);
-
+        Product product = new Product();
+        product.setBusiness(business);
+        product.setPrice(0);
+        product.setDetailType(business.getDetailType());
+        productRepository.save(product);
 
 
         business.setApproveAt(today);
