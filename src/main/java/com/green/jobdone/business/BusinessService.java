@@ -87,7 +87,7 @@ public class BusinessService {
 
         String busiCreatedAt = p.getBusiCreatedAt();
 
-        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         // 날짜 문자열을 LocalDate로 변환
