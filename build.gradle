@@ -25,27 +25,27 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux' //WebFlux 의존성 추가
-
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
-
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' //OAuth2를 위한 implementation
-
     implementation 'io.jsonwebtoken:jjwt:0.12.6'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.apache.opennlp:opennlp-tools:2.0.0'
+    implementation 'org.apache.lucene:lucene-core:8.11.1'
+    implementation 'org.apache.lucene:lucene-analyzers-nori:8.11.1'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.1.5'
+    // 일단 쳇봇용 gradle들
+
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
     implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
-
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
     implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
-
-
-
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
@@ -58,6 +58,10 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testCompileOnly 'org.projectlombok:lombok:1.18.36'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
+
+    //파이어베이스
+    implementation 'com.google.protobuf:protobuf-java:3.22.0'
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
 
     // 메일 관련 gradle
     implementation 'org.springframework.boot:spring-boot-starter-mail'

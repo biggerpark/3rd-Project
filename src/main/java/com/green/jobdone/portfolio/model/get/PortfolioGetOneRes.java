@@ -3,6 +3,8 @@ package com.green.jobdone.portfolio.model.get;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class PortfolioGetOneRes {
@@ -14,5 +16,8 @@ public class PortfolioGetOneRes {
     private String contents;
     private String detailType;
     private String category;
+    private String youtubeUrl;
+    private String youtubeId;
+    private String thumbnail;
 
 }

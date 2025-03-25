@@ -42,6 +42,7 @@
         <result property="email" column="email"/>
         <result property="upw" column="upw"/>
         <result property="name" column="name"/>
+        <result property="state" column="state"/>
         <result property="pic" column="pic"/>
         <result property="roles" column="type"
                 typeHandler="com.green.jobdone.config.handler.UserRoleTypeHandler" />
@@ -50,7 +51,7 @@
 
 
     <select id="postUserSignIn" resultMap="selUserWithRolesResultMap">
-        SELECT a.userId,a.name,a.email,a.type,a.pic,a.upw,a.phone,b.businessId
+        SELECT a.userId,a.name,a.email,a.type,a.pic,a.upw,a.phone,b.businessId, ifnull(b.state, 0) as state
         FROM user a
         LEFT JOIN business b
         on a.userId=b.userId
@@ -88,11 +89,11 @@
         WHERE userId=#{userId}
     </select>
 
-    <delete id="deleteUser">
-        DELETE
-        FROM user
+    <update id="deleteUser">
+        UPDATE user
+        set type=999
         WHERE userId=#{userId}
-    </delete>
+    </update>
 
     <update id="updatePassword">
         UPDATE user
@@ -112,5 +113,9 @@
         WHERE email=#{email}
     </select>
 
+<!--    <select id="getUuidCheck">-->
+<!--        SELECT userId,uuid-->
+<!--        FROM user-->
+<!--    </select>-->
 
 </mapper>

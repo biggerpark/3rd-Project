@@ -17,7 +17,7 @@ public class BusinessGetReq {
     private Long regionId;
 
     @JsonIgnore
-    private long signedUserId;
+    private Long signedUserId;
 
     @Schema(title = "정렬 기준", description = "latest(최신순), rating(별점순), order(주문순), price(가격순), distance(거리순)")
     private String sortType;

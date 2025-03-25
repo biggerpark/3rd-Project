@@ -16,14 +16,8 @@ public class PortfolioPutReq {
     @Schema(title = "portfolioId")
     private long portfolioId;
 
-    @Schema(title = "category")
-    private String category;
-
-    @Schema(title = "detailType")
-    private String detailType;
-
     @Schema(title = "price")
-    private int price;
+    private Integer price;
 
     @Schema(title = "takingTime")
     private String takingTime;
@@ -34,9 +28,8 @@ public class PortfolioPutReq {
     @Schema(title = "contents")
     private String contents;
 
-
-
-
+    @Schema(title = "youtubeUrl", nullable = true)
+    private String youtubeUrl;
 
 
 }

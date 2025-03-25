@@ -7,9 +7,21 @@ global:
     redirect-uri-param-cookie-name: redirect_uri
     cookie-expiry-seconds: 180
     authorized-redirect-uris:
+      - https://job-done.r-e.kr:52340/fe/redirect
       - http://localhost:8080/fe/redirect
-      - http://192.168.0.144:8080/fe/redirect
-      - http://112.222.157.156:8080/fe/redirect
+      - http://${DOMAIN.SERVER.PATH2}/fe/redirect
+      - http://${DOMAIN.SERVER.PATH2}0/fe/redirect
+      - http://${DOMAIN.SERVER.PATH}/fe/redirect
+      - http://${DOMAIN.SERVER.PATH}0/fe/redirect
+      - http://localhost:5173/fe/redirect
+
+youtube:
+  api:
+    key: ${YOUTUBE.API_KEY}
+
+weather:
+  api:
+    key: ${WEATHER.API_KEY}
 
 upstage:
   api:
@@ -20,16 +32,19 @@ const:
   auth-code-length: 6
 
 file:
-  directory: D:\pjh\3rd-Project\jobdone
+  directory: D:/pjh/3rd-Project/jobdone
 
 domain:
   path:
-    server: http://192.168.0.144:5234
-#    server: http://112.222.157.157:5234/
+    server: job-done.r-e.kr:52340
+    server2: ${DOMAIN.SERVER.PATH2}
 
 mybatis:
   mapper-locations: mappers/**/*.xml
 
+kakao:
+  map:
+    api-key: 5d58f74383aea3ac7b020083d8c08607
 
 kakaopay:
   secretKey: ${KAKAO.PAY.SECRET}
@@ -42,7 +57,7 @@ jwt-const:
   claim-key: signedUser
   token-name: JWT
   token-type: Bearer
-  access-token-expiry: 600_000 #10분(MS)
+  access-token-expiry: 600_000_000 #10분(MS)
   refresh-token-expiry: 1_296_000_000 #15일(MS)
   refresh-token-cookie-name: refresh-token
   refresh-token-cookie-expiry: 1_296_000 #15일 (S)
@@ -54,12 +69,15 @@ spring:
     name: Jobone
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:mariadb://${DEFAULT.DB_URL}
+    url: jdbc:log4jdbc:mariadb://${DEFAULT.DB_URL}?serverTimezone=Asia/Seoul
     username: ${DEFAULT.USERNAME}
     password: ${DEFAULT.PASSWORD}
+    hikari:
+      data-source-properties:
+        serverTimezone: Asia/Seoul
   servlet:
     multipart:
-      max-file-size: 15MB
+      max-file-size: 500MB
 
   security:
     oauth2:
@@ -130,6 +148,7 @@ spring:
           batch_size: 50
         format_sql: true
         order_updates: true
+        time_zone: Asia/Seoul
     show-sql: true
 
 

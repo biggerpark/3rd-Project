@@ -43,8 +43,8 @@ public class WebSecurityConfig {
     @Bean //스프링이 메소드 호출을 하고 리턴한 객체의 주소값을 관리한다. (빈 등록)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) //세션 필요할때만 사용
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //세션 사용안함
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) //세션 필요할때만 사용
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //세션 사용안함
                 .httpBasic(h -> h.disable()) // SSR을 사용하지 않기 때문에 HTTP Basic 인증 비활성화
                 .formLogin(form -> form.disable()) // SSR을 사용하지 않기 때문에 폼 로그인 비활성화
                 .csrf(csrf -> csrf.disable()) // SSR이 아니면 CSRF 보호 필요 없음
@@ -97,12 +97,32 @@ public class WebSecurityConfig {
                                 //카카오페이쪽
                                 .requestMatchers("/api/payment/**").permitAll()
 
+
+                                //관리자
+                                .requestMatchers("/api/admin/sign-in").permitAll()
+                                .requestMatchers("/api/admin/sign-up").hasRole(UserRole.SUPER_ADMIN.name())
+                                .requestMatchers("/api/admin/**").hasRole(UserRole.ADMIN.name()) // 새로 추가
+
+                                //문의쪽
+                                .requestMatchers(HttpMethod.DELETE,"/api/qa").hasRole(
+                                        UserRole.ADMIN.name()
+                                )
+                                .requestMatchers(HttpMethod.POST,"/api/qa").authenticated()
+                                .requestMatchers(HttpMethod.POST,"/api/qa/answer").hasRole(
+                                        UserRole.ADMIN.name()
+                                )
+//                                .requestMatchers(HttpMethod.GET,"/api/qa").authenticated()
+//                                .requestMatchers(HttpMethod.GET,"/api/qa/detail").authenticated()
+//                                .requestMatchers(HttpMethod.GET,"/api/qa/qaBoardDetail").authenticated()
+
+
                                 //스웨거쪽
                                 .requestMatchers("/chat/**").permitAll()
                                 .requestMatchers("/api/swagger-ui/**", "/api/v3/api-docs/**").permitAll()
 //                              .requestMatchers("/api/like").hasRole(UserRole.USER.name()) // /api/like는 USER 역할을 가진 사용자만 접근 가능
                                 .anyRequest().permitAll() // 그 외의 모든 요청은 허용
                 )
+
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)// 인증 실패 시 jwtAuthenticationEntryPoint 처리, 401 Unauthorized 처리(토큰이 필요하다는 에러)
                         .accessDeniedHandler(new CustomAccessDeniedHandler()))  // 403 Forbidden 처리(접근 가능한 role 이 아니다 라는 에러)
@@ -114,6 +134,8 @@ public class WebSecurityConfig {
                         .successHandler(oauth2AuthenticationSuccessHandler)
                         .failureHandler(oauth2AuthenticationFailureHandler) )
                 .addFilterBefore(oauth2AuthenticationCheckRedirectUriFilter, OAuth2AuthorizationRequestRedirectFilter.class)
+//                .requiresChannel(channel -> channel
+//                        .anyRequest().requiresSecure()) // http 요청을 https로
                 .build();
     }
 

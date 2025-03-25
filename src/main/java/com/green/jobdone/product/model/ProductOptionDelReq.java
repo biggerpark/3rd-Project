@@ -1,6 +1,11 @@
 package com.green.jobdone.product.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ProductOptionDelReq {
-    private long businessId;
-    private long optionId;
+    private Long businessId;
+    private Long optionId;
 }

@@ -1,18 +1,25 @@
 package com.green.jobdone.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
-@ToString
-public class Business {
+@Builder
+@AllArgsConstructor
+@DynamicUpdate
+public class Business extends UpdatedAt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) //auto_increment
     private Long businessId;
@@ -26,12 +33,13 @@ public class Business {
     private User user;
 
     @Column(length = 10, name = "businessNum")
+    @Size(min = 10, max = 10, message = "사업자 번호는 10자리여야 합니다.")
     private String businessNum;
 
     @Column(length = 20, name = "businessName")
     private String businessName;
 
-    @Column(length = 80)
+    @Column(length = 80)//ㅏㅏ
     private String title;
 
     @Column(length = 3000)
@@ -43,8 +51,12 @@ public class Business {
     @Column(length = 50, nullable = false)
     private String address;
 
+    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy//MM//dd")
     @Column(nullable = false, name = "busiCreatedAt")
-    private LocalDate busiCreatedAt;
+    private String busiCreatedAt;
+
+    @Column(name = "approveAt")
+    private LocalDate approveAt;
 
     @Column(name = "openingTime")
     private LocalTime openingTime;
@@ -59,23 +71,30 @@ public class Business {
     private String tel;
 
     @Column(nullable = false)
+    @Builder.Default
     private int state = 100;
 
     @Column(length = 13)
     private String safeTel;
 
     @Column
-    private double lat;
+    @JsonIgnore
+    private Double lat;
 
     @Column
-    private double lng;
-
-    @Column
-    private String tel2;
-
-    @Column
-    private String tel3;
+    @JsonIgnore
+    private Double lng;
 
 
+    @Column(length = 200)
+    private String rejectContents;
 
+    @Column(length = 200)
+    private String thumbnail;
+
+
+
+    public Business() {
+
+    }
 }

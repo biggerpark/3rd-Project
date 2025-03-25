@@ -23,7 +23,6 @@ public interface BusinessMapper {
 
     //pic
     int insBusinessPic(BusinessPicDto p);
-    int putBusinessPic(long businessPicId);
     List<BusinessOnePicsGetRes> getBusinessPicList(BusinessOnePicsGetReq p);
     int delBusinessPic(BusinessPicReq p);
     String getBusinessPicName(long businessPicId);
@@ -36,9 +35,11 @@ public interface BusinessMapper {
     List<BusinessGetRes> selAllBusiness(BusinessGetReq p);
     BusinessGetOneRes selOneBusiness(long businessId);
 
-    List<BusinessGetMonthlyRes> getBusinessMonthly(BusinessGetMonthlyReq p);
+    List<BusinessGetRevenueRes> getBusinessMonthly(BusinessGetInfoReq p);
+    List<BusinessGetRevenueResByAdmin> getBusinessRevenueList();
 
-
+    List<BusinessGetServiceRes> countBusinessServices(BusinessGetInfoReq p);
+    List<BusinessGetServiceResByAdmin> countBusinessServicesList();
 
 
 

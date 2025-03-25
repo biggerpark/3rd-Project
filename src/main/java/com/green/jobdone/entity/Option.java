@@ -1,14 +1,15 @@
 package com.green.jobdone.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @ToString
+@Setter
 public class Option {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,4 +20,7 @@ public class Option {
     private Product product;
 
     @Column(nullable = false, length = 30) private String name;
+
+    @OneToMany(mappedBy = "option", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<OptionDetail> optionDetails = new ArrayList<>();
 }

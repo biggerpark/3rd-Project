@@ -25,7 +25,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 //                "http://112.222.157.156:5224", // 외부 도메인
 //                "http://192.168.0.77:5173",
 //                "http://192.168.0.134:5173"
-        );
+        ).addInterceptors(new ChatRoomCheckInterceptor());
         //chat 이후에 어떤곳이라도 웹소케 헨들러 등록
     }
 }

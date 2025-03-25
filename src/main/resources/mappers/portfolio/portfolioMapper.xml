@@ -76,14 +76,8 @@
 
     <select id="selAllPortfolioList">
 
-        SELECT f.businessId, f.portfolioId, f.title, t.pic AS isThumbnail
+        SELECT f.businessId, f.portfolioId, f.title, f.thumbnail
         FROM portfolio f
-        LEFT JOIN (
-        SELECT c.portfolioId, c.pic
-        FROM portfolio_pic c
-        WHERE c.state = 2
-        ) t
-        ON f.portfolioId = t.portfolioId
         LEFT JOIN business b
         ON b.businessId = f.businessId
         LEFT JOIN detail_type d
@@ -98,7 +92,8 @@
     </select>
     <select id="selOnePortfolio">
         SELECT p.businessId, p.portfolioId, p.title, p.price, p.takingTime, p.contents
-        ,d.detailTypeName as detailType, c.categoryName as category
+        ,d.detailTypeName as detailType, c.categoryName as category, p.youtubeId, p.youtubeUrl
+        ,p.thumbnail
         FROM portfolio p
         JOIN business b
         ON p.businessId = b.businessId

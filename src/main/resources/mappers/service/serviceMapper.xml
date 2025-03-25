@@ -28,6 +28,7 @@
         <id property="serviceId" column="serviceId"/>
         <result property="userName" column="userName"/>
         <result property="userId" column="userId"/>
+        <result property="busiUserId" column="busiUserId"/>
         <result property="userPhone" column="userPhone"/>
         <result property="businessName" column="businessName"/>
         <result property="detailTypeName" column="detailTypeName"/>
@@ -86,7 +87,7 @@
         k.startDate, k.endDate, k.mStartTime, k.mEndTime, d.businessNum, l.categoryName, d.tel as businessPhone,
         g.optionId, n.name as optionName, i.name as optionDetailName, i.contents, i.optionDetailId,
         a.pyeong, d.address as businessAddress, a.updatedAt, a.userId, a.paidAt, a.doneAt, a.totalPrice,
-        IFNULL(o.optionDetailPrice, i.price) AS optionDetailPrice, o.serviceOptionId, o.comment AS optionComment
+        o.optionDetailPrice , o.serviceOptionId, o.comment AS optionComment, d.userId as busiUserId
         FROM service a
         LEFT JOIN user b ON a.userId = b.userId
         LEFT JOIN product c ON a.productId = c.productId
@@ -137,7 +138,7 @@
             and completed in (0, 1, 3, 5)
         </if>
         <if test="status == 1">
-            and completed in (0, 2)
+            and completed in (0, 1, 2)
         </if>
         <if test="status == 2">
             and completed in (2, 6)
@@ -148,6 +149,7 @@
         <if test="searchName!=null">
             and b.name like '%${searchName}%'
         </if>
+        group by a.serviceId
         order by a.serviceId desc
     </select>
 
@@ -176,6 +178,7 @@
         </set>
         where serviceId = #{serviceId}
     </update>
+
     <update id="updServiceDetail">
         update service_detail
         <set>
@@ -255,7 +258,7 @@
 
 
     <select id="serviceInfo">
-        select a.userId, a.price, c.detailTypeName as productName, ifnull(a.tid,0) as tid
+        select a.userId, coalesce(nullif(a.totalPrice, 0), a.price) as price, c.detailTypeName as productName, ifnull(a.tid,0) as tid
         from service a
         join product b on a.productId = b.productId
         join detail_type c on b.detailTypeId = c.detailTypeId
@@ -273,4 +276,10 @@
         </if>
         where serviceId = #{serviceId}
     </update>
+
+    <select id="findEtcId">
+        select etdId
+        from etc
+        where serviceId = #{serviceId}
+    </select>
 </mapper>

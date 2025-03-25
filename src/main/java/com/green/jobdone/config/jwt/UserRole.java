@@ -2,11 +2,13 @@ package com.green.jobdone.config.jwt;
 
 public enum UserRole {
     ADMIN(101),
+    SUPER_ADMIN(102),
     USER(100),
     EMPLOYEE(110),
     MANAGER(120),
     PRESIDENT(130),
-    FREELANCER(140);
+    FREELANCER(140),
+    EXA(999);
 
     private final int code;
 

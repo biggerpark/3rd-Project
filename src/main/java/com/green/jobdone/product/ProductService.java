@@ -1,13 +1,24 @@
 package com.green.jobdone.product;
 
+import com.green.jobdone.business.BusinessRepository;
+import com.green.jobdone.category.DetailTypeRepository;
+import com.green.jobdone.common.exception.CommonErrorCode;
+import com.green.jobdone.common.exception.CustomException;
+import com.green.jobdone.common.exception.ServiceErrorCode;
 import com.green.jobdone.config.security.AuthenticationFacade;
+import com.green.jobdone.entity.*;
 import com.green.jobdone.product.model.*;
+import com.green.jobdone.product.model.dto.OptionDto;
+import com.green.jobdone.product.model.dto.ProductOptionDetailDto;
+import com.green.jobdone.product.model.dto.ProductOptionPostDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -16,23 +27,39 @@ import java.util.List;
 public class ProductService {
     private final ProductMapper mapper;
     private final AuthenticationFacade authenticationFacade;
+    private final ProductRepository productRepository;
+    private final OptionRepository optionRepository;
+    private final OptionDetailRepository optionDetailRepository;
+    private final BusinessRepository businessRepository;
+    private final DetailTypeRepository detailTypeRepository;
+    private final ProductMapper productMapper;
 
     public int postProduct(ProductPostReq p) {
 
         long userId=authenticationFacade.getSignedUserId();
 
-        Long checkUserId=mapper.checkUserBusiness(p.getBusinessId());
+//        Long checkUserId=mapper.checkUserBusiness(p.getBusinessId());
+        Long checkUserId=businessRepository.findUserIdByBusinessId(p.getBusinessId());
 
         if(userId!=checkUserId){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 업체에 대한 권한이 없습니다");
         }
 
 
-        Long businessId = mapper.checkBusinessProduct(p.getBusinessId());
-
+//        Long businessId = mapper.checkBusinessProduct(p.getBusinessId());
+        Long businessId = productRepository.findProductIdByBusinessId(p.getBusinessId());
+        // 명칭 productId가 맞음
+        Product product = new Product();
+        Business business = businessRepository.findById(p.getBusinessId()).orElse(null);
+        DetailType detailType = detailTypeRepository.findById(p.getDetailTypeId()).orElse(null);
         if (businessId == null || businessId == 0L) {
-            int result = mapper.postProduct(p);
-            return result;
+//            int result = mapper.postProduct(p);
+//            return result;
+            product.setBusiness(business);
+            product.setDetailType(detailType);
+            product.setPrice(p.getProductPrice());
+            productRepository.save(product);
+            return 1;
         } else {
 
             return 0;
@@ -42,7 +69,7 @@ public class ProductService {
     }
 
 
-    //관리자가함.
+    //관리자가함. >> 업체가 하기로 변경
     public int postOption(ProductOptionPostReq p) {
 
 
@@ -183,5 +210,72 @@ public class ProductService {
         return result;
     }
 
+    @Transactional
+    public void postAll(ProductPostAllReq p){
+        Long userId = authenticationFacade.getSignedUserId();
+        if (p.getProductId() == null) {
+            throw new CustomException(CommonErrorCode.NOT_EXIST_BUSINESS);
+        }
+        if(!businessRepository.findUserIdByProductId(p.getProductId()).equals(userId)){
+            throw new CustomException(ServiceErrorCode.BUSINESS_OWNER_MISMATCH);
+        };
+        Product product = productRepository.findById(p.getProductId()).orElse(null);
+        if(product!=null && (p.getPrice() != null) && !p.getPrice().equals(0)){
+            product.setPrice(p.getPrice());
+            productRepository.save(product);
+        }
+//        List<Option> optionList = new ArrayList<>(p.getOptions().size());
+        // 업체id로 옵션 조회 >> 옵션 조회후 새로 받은 옵션중 중복 이름이 있으면 에러 던짐 contains()
+//        List<String> optionName = optionRepository.findOptionNameByBusinessId(businessRepository.findBusinessIdByUserId(userId));
+        if(p.getOptions()!=null && !p.getOptions().isEmpty()) {
+            for (OptionDto ol : p.getOptions()) {
+//                if(optionName.contains(ol.getOptionName())){
+//                    throw new CustomException(ServiceErrorCode.FAIL_UPDATE_SERVICE);
+//                }
+                Option option = new Option();
+                if (ol.getOptionId() != null && ol.getOptionId() != 0) {
+                    option = optionRepository.findById(ol.getOptionId()).orElseGet(Option::new);
+                }
+                option.setProduct(product);
+                option.setName(ol.getOptionName());
+//                optionList.add(option);
+                List<OptionDetail> optionDetailList = new ArrayList<>(ol.getOptionDetails().size());
 
+                if (ol.getOptionDetails() != null && !ol.getOptionDetails().isEmpty()) {
+                    for (ProductOptionDetailDto od : ol.getOptionDetails()) {
+                        OptionDetail optionDetail = new OptionDetail();
+
+                        if (od.getOptionDetailId() != null) {
+                            optionDetail = optionDetailRepository.findById(od.getOptionDetailId())
+                                    .orElseGet(OptionDetail::new);
+                        }
+                        optionDetail.setOption(option);
+                        optionDetail.setName(od.getOptionDetailName());
+                        optionDetail.setPrice(od.getOptionDetailPrice());
+                        optionDetailList.add(optionDetail);
+                    }
+                }
+                optionRepository.save(option);
+                optionDetailRepository.saveAll(optionDetailList);
+            }
+        }
+//        optionRepository.saveAll(optionList);
+    }
+    @Transactional
+    public void delOption(ProductOptionDelReq p){
+        if(authenticationFacade.getSignedUserId()!=businessRepository.findUserIdByBusinessId(p.getBusinessId())){
+            throw new CustomException(ServiceErrorCode.BUSINESS_OWNER_MISMATCH);
+        }
+        Option option = optionRepository.findById(p.getOptionId()).orElseThrow(() -> new CustomException(ServiceErrorCode.OPTION_NOT_FOUND));
+        optionRepository.delete(option);
+    }
+
+    @Transactional
+    public void delOptionDetail(ProductOptionDetailDelReq p){
+        if(authenticationFacade.getSignedUserId()!=businessRepository.findUserIdByBusinessId(p.getBusinessId())){
+            throw new CustomException(ServiceErrorCode.BUSINESS_OWNER_MISMATCH);
+        }
+        OptionDetail optionDetail = optionDetailRepository.findById(p.getOptionDetailId()).orElseThrow(() -> new CustomException((ServiceErrorCode.OPTION_DETAIL_NOT_FOUND)));
+        optionDetailRepository.delete(optionDetail);
+    }
 }

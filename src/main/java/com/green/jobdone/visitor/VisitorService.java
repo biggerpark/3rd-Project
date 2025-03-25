@@ -26,6 +26,7 @@ class VisitorService {
         this.visitorLogRepository = visitorLogRepository;
     }
 
+    // 클라이언트가 접속한 아이피 따는데 도커로 하면 도커자체 아이피로 고정됨
     private String getClientIp(HttpServletRequest request) {
         log.info("getClientIp - getRemoteAddr: {}", request.getRemoteAddr());
         String ip = request.getHeader("X-Forwarded-For");
@@ -96,7 +97,7 @@ class VisitorService {
         return visitorCountRepository.findById(1L).map(VisitorCount::getCount).orElse(0);
     }
 
-    @Scheduled(cron = "0 30 * * * *")
+    @Scheduled(cron = "0 1 0 * * *")
     public void resetVisitorCount() {
         VisitorCount visitorCount = visitorCountRepository.findById(1L).orElse(new VisitorCount());
         int yesterdayCount = visitorCount.getCount();

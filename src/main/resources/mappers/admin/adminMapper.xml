@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.green.jobdone.admin.AdminMapper">
+
+    <select id="getBusinessApplication">
+        SELECT a.businessId,a.createdAt as applicationCreatedAt,a.paper,b.detailTypeName,c.name as userName,a.businessName,a.state
+        FROM business a
+        LEFT JOIN detail_type b
+        on a.detailTypeId=b.detailTypeId
+        LEFT JOIN user c
+        on a.userId=c.userId
+        ORDER BY a.businessId DESC
+        LIMIT 10 OFFSET #{offset}
+    </select>
+
+    <select id="getBusinessCategory">
+        SELECT a.businessId
+        , a.createdAt as applicationCreatedAt
+        , a.businessName
+        , a.tel
+        , c.name as userName
+        , b.detailTypeName
+        , ROUND(AVG(r.score),2) AS reviewScore
+        , COUNT(r.reviewId) AS reviewNumbers
+        FROM business a
+        LEFT JOIN detail_type b
+        ON a.detailTypeId = b.detailTypeId
+        LEFT JOIN user c
+        ON a.userId = c.userId
+        LEFT JOIN product d
+        ON a.businessId = d.businessId
+        LEFT JOIN service s
+        ON d.productId = s.productId
+        LEFT JOIN review r
+        ON s.serviceId = r.serviceId
+        WHERE
+        b.categoryId=#{categoryId}
+        GROUP BY
+        a.businessId, a.businessName, a.tel, c.name, b.detailTypeName
+        ORDER BY a.businessId DESC
+    </select>
+
+    <select id="getAdminUserInfo">
+        WITH latest_service AS (
+        SELECT b.userId, d.detailTypeName
+        FROM service b
+        LEFT JOIN product c ON b.productId = c.productId
+        LEFT JOIN detail_type d ON c.detailTypeId = d.detailTypeId
+        WHERE b.createdAt = (
+        SELECT MAX(b2.createdAt)
+        FROM service b2
+        WHERE b2.userId = b.userId
+        )
+        )
+        SELECT a.name AS userName,
+        a.phone,
+        ls.detailTypeName,
+        COUNT(b.serviceId) AS serviceNumber,
+        a.type as typeName,
+        a.userId
+        FROM user a
+        LEFT JOIN service b ON a.userId = b.userId
+        LEFT JOIN latest_service ls ON a.userId = ls.userId
+        GROUP BY a.userId, a.name, a.phone, ls.detailTypeName, a.type
+        ORDER BY a.userId DESC
+        LIMIT 10 OFFSET #{offset}
+
+    </select>
+
+    <select id="getSalesInfo">
+        SELECT c.categoryName,
+        COALESCE(SUM(s.price), 0) AS totalPrice
+        FROM category c
+        LEFT JOIN detail_type d ON c.categoryId = d.categoryId
+        LEFT JOIN product p ON d.detailTypeId = p.detailTypeId
+        LEFT JOIN service s ON p.productId = s.productId
+        AND s.paidAt BETWEEN '${month}-01 00:00:00' AND '${month}-${lastDay} 23:59:59'
+        GROUP BY c.categoryName
+        ORDER BY c.categoryId
+    </select>
+
+
+
+    <select id="getCategoryInfo" resultMap="categoryResultMap">
+        SELECT
+        c.categoryId,
+        c.categoryName,
+        JSON_ARRAYAGG(
+        JSON_OBJECT(
+        'detailTypeId', d.detailTypeId,
+        'detailTypeName', d.detailTypeName,
+        'count', IFNULL(dtCounts.count, 0)
+        )
+        ) AS detailTypeCounts
+        FROM category c
+        JOIN detail_type d ON c.categoryId = d.categoryId
+        LEFT JOIN (
+        SELECT
+        b.detailTypeId,
+        COUNT(b.businessId) AS count
+        FROM business b
+        GROUP BY b.detailTypeId
+        ) dtCounts ON d.detailTypeId = dtCounts.detailTypeId
+        GROUP BY c.categoryId, c.categoryName
+    </select>
+
+    <resultMap id="categoryResultMap" type="com.green.jobdone.admin.model.AdminCategoryInfoDto">
+        <id property="categoryId" column="categoryId"/>
+        <result property="categoryName" column="categoryName"/>
+        <result property="detailTypeCounts" column="detailTypeCounts" typeHandler="com.green.jobdone.admin.mapper.JsonTypeHandler"/>
+    </resultMap>
+
+    <select id="getPaidCount">
+        SELECT
+        COUNT(CASE WHEN s.paidAt BETWEEN '${beforeMonth}-01 00:00:00' AND '${beforeMonth}-${lastDay} 23:59:59' THEN s.paidAt END) / ${lastDay} AS pastPaidCount,
+        COUNT(CASE WHEN s.paidAt BETWEEN '${targetMonth}-01 00:00:00' AND '${today} 23:59:59' THEN s.paidAt END) / ${dayOfMonth} AS nowPaidCount
+        FROM service s
+    </select>
+    
+    <select id="getRatingAverage">
+        SELECT
+        c.categoryName,
+        AVG(r.score) AS avgScore,
+        (SELECT AVG(score) FROM review) AS totalAvgScore
+        FROM review r
+        JOIN service s ON r.serviceId = s.serviceId
+        JOIN product p ON p.productId = s.productId
+        JOIN detail_type d ON d.detailTypeId = p.detailTypeId
+        JOIN category c ON c.categoryId = d.categoryId
+        GROUP BY c.categoryId, c.categoryName
+    </select>
+
+    <select id="getUserIncrease">
+        SELECT COUNT(u.userId)
+        FROM user u
+        WHERE u.createdAt BETWEEN '${targetMonth}-01 00:00:00' AND '${today} 23:59:59'
+    </select>
+
+    <select id="getNewBusiness">
+        SELECT b.businessName, b.createdAt
+        FROM business b
+        WHERE b.state = 100
+        ORDER BY b.createdAt DESC
+        LIMIT 3
+    </select>
+
+    <select id="getNewServiceCount">
+        SELECT
+        COUNT(CASE WHEN s.paidAt BETWEEN '${yesterday} 00:00:00' AND '${yesterday} 23:59:59' THEN s.serviceId END) AS yesterdayServiceCount,
+        COUNT(CASE WHEN s.paidAt BETWEEN '${today} 00:00:00' AND '${today} 23:59:59' THEN s.serviceId END) AS todayServiceCount
+        FROM Service s WHERE s.completed >= 6;
+    </select>
+
+    <select id="getNewUserCount">
+        SELECT COUNT(CASE WHEN u.createdAt BETWEEN '${yesterday} 00:00:00' AND '${yesterday} 23:59:59' THEN u.userId END) AS yesterdayNewUserCount,
+        COUNT(CASE WHEN u.createdAt BETWEEN '${today} 00:00:00' AND '${today} 23:59:59' THEN u.userId END) AS todayNewUserCount
+        FROM User u
+    </select>
+
+    <select id="getNewBusinessCount">
+        SELECT COUNT(CASE WHEN b.approveAt BETWEEN '${yesterday} 00:00:00' AND '${yesterday} 23:59:59' THEN b.businessId END) AS yesterdayNewBusinessCount,
+        COUNT(CASE WHEN b.approveAt BETWEEN '${today} 00:00:00' AND '${today} 23:59:59' THEN b.businessId END) AS todayNewBusinessCount
+        FROM Business b
+    </select>
+
+    <select id="getUnprocessedInquiries">
+        SELECT COUNT(q.qaId) AS totalUnprocessedInquiries,
+        COUNT(CASE WHEN q.createdAt BETWEEN '${today} 00:00:00' AND '${today} 23:59:59' THEN q.qaId END) AS todayUnprocessedInquiries
+        FROM qa q
+        WHERE q.qaState = '00101'
+    </select>
+
+    <resultMap id="getAdmin" type="com.green.jobdone.admin.model.AdminDto">
+        <id property="adminId" column="adminId"/>
+        <result property="aPw" column="aPw"/>
+        <result property="name" column="name"/>
+        <result property="roles" column="type"
+        typeHandler="com.green.jobdone.config.handler.UserRoleTypeHandler"/>
+    </resultMap>
+
+    <select id="getAdminInfo" resultMap="getAdmin">
+        select aPw, type, name, adminId
+        from admin
+        where aId = #{aId}
+    </select>
+
+</mapper>

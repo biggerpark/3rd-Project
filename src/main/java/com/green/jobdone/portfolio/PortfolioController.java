@@ -1,7 +1,6 @@
 package com.green.jobdone.portfolio;
 
-import com.green.jobdone.business.model.BusinessPicReq;
-import com.green.jobdone.business.model.get.BusinessGetOneReq;
+import com.green.jobdone.business.model.BusinessLogoPatchReq;
 import com.green.jobdone.common.model.ResultResponse;
 import com.green.jobdone.portfolio.model.*;
 import com.green.jobdone.portfolio.model.get.*;
@@ -24,34 +23,29 @@ import java.util.List;
 public class PortfolioController {
     private final PortfolioService portfolioService;
 
-    @PostMapping("post")
-    public ResultResponse<Long> insPortfolio(PortfolioPostReq p) {
-        long res = portfolioService.insPortfolio(p);
-        return ResultResponse.<Long>builder()
-                .resultData(p.getPortfolioId())
-                .resultMessage("포트폴리오 등록 완료")
-                .build();
-    }
-
-    @PostMapping("portfolioPic")
-    @Operation(summary = "포폴사진등록")
-    public ResultResponse<PortfolioPicPostRes> postPortfolioPic(@RequestPart List<MultipartFile> pics,
-                                                                @RequestPart PortfolioPicPostReq p) {
-        PortfolioPicPostRes res = portfolioService.insPortfolioPic(pics,p.getBusinessId(),p.getPortfolioId());
-        return ResultResponse.<PortfolioPicPostRes>builder()
-                .resultMessage(res != null? "포트폴리오 사진 등록":"빠꾸먹음")
+    @PostMapping
+    public ResultResponse<PortfolioPostRes> insPortfolio(@RequestPart List<MultipartFile> pics
+                                                         ,@RequestPart(required = false) MultipartFile thumb
+            ,@Valid @RequestPart PortfolioPostReq p) {
+        PortfolioPostRes res = portfolioService.insPortfolio(pics,thumb,p);
+        return ResultResponse.<PortfolioPostRes>builder()
                 .resultData(res)
-                .build();
+                .resultMessage("옛다").build();
     }
 
-    @PutMapping("pic")
-    @Operation(summary = "포폴 사진 유형 수정")
-    public ResultResponse<Integer> putPortfolioPic(@Valid @ParameterObject @ModelAttribute PortfolioGetOneReq p) {
-        int res =portfolioService.udtPortfolioPics(p);
+
+
+    @PatchMapping("thumbnail")
+    @Operation(summary = "포폴 썸네일 변경")
+    public ResultResponse<Integer> patchPortfolioThumbPic(@Valid @RequestPart PortfolioPatchThumbnailReq p, @RequestPart MultipartFile thumbnail) {
+        log.info("UserController > patchPortfolioThumbnailPic > p: {}", p);
+
+        int result = portfolioService.patchPortfolioThumbnail(p,thumbnail);
 
         return ResultResponse.<Integer>builder()
-                .resultMessage(res == 0? "포폴 사진 수정 실패":"포폴 사진 수정 완료")
-                .resultData(res)
+
+                .resultMessage("썸네일 사진 수정 완료")
+                .resultData(result)
                 .build();
     }
 
@@ -72,15 +66,22 @@ public class PortfolioController {
     @DeleteMapping("{portfolioId}")
     @Operation(summary = "포폴 삭제")
     public ResultResponse<Integer> delPortfolio(@Valid @ParameterObject @ModelAttribute PortfolioDelReq p) {
-        int res = portfolioService.delPortfolio(p);
-        return ResultResponse.<Integer>builder().resultData(res).resultMessage("포폴 삭제 완").build();
+        portfolioService.delPortfolio(p);
+        return ResultResponse.<Integer>builder().resultMessage("포폴 삭제 완").build();
+    }
+
+    @PutMapping("state")
+    @Operation(summary = "포폴 사진 상태값 업데이트")
+    public void putPortfolioPicState(@RequestBody PortfolioPicStatePutReq p) {
+        portfolioService.updPortfolioPicState(p);
     }
 
     @PutMapping
     @Operation(summary = "포폴 수정")
-    public ResultResponse<Integer> udtPortfolioPut(@Valid @ParameterObject @ModelAttribute PortfolioPutReq p) {
-        int res = portfolioService.udtPortfolio(p);
-        return ResultResponse.<Integer>builder().resultData(res).resultMessage(res > 0? "포폴 수정 완료": "포폴 수정 빠꾸").build();
+    public ResultResponse<PortfolioPutRes> udtPortfolioPut(@RequestPart(required = false) List<MultipartFile> pics,MultipartFile thumbnail, @Valid @RequestPart PortfolioPutReq p) {
+        PortfolioPutRes res = portfolioService.udtPortfolio(pics, thumbnail,p);
+        log.info("res: {}",res);
+        return ResultResponse.<PortfolioPutRes>builder().resultData(res).resultMessage(res != null? "포폴 수정 완료": "나가라").build();
     }
 
     @GetMapping
@@ -107,5 +108,18 @@ public class PortfolioController {
 
         return ResultResponse.<List<PortfolioPicGetRes>>builder().resultData(res).resultMessage(res != null? "포폴 사진 조회 완" : "포폴 사진 조회 싯빠이").build();
     }
+
+//    @PatchMapping("thumbnail")
+//    @Operation(summary = "썸네일수정")
+//    public ResultResponse<Integer> patchPortfolioThumbnail(@Valid @RequestPart PortfolioPatchThumbnailReq p, @RequestPart MultipartFile thumbnail ) {
+//        int result = portfolioService.patchPortfolioThumbnail(p, thumbnail);
+//
+//        return ResultResponse.<Integer>builder()
+//
+//                .resultMessage("포폴 썸네일 사진 수정 완료")
+//                .resultData(result)
+//                .build();
+//    }
+
 
 }

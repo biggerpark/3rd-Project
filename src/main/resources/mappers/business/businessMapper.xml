@@ -16,8 +16,8 @@
         busiCreatedAt = #{busiCreatedAt},
         tel = #{tel},
         safeTel = #{safeTel},
-        latitude = #{latitude},
-        longitude = #{longitude}
+        lat = #{lat},
+        lng = #{lng}
     </insert>
 
     <select id="existBusinessNum" parameterType="String" resultType="int">
@@ -35,12 +35,7 @@
     <update id="udtBusiness">
         UPDATE business
         <set>
-            <if test=" title != null and title != ''">
-                title = #{title}
-            </if>
-            <if test=" title != null and title != ''">
-                ,contents = #{contents}
-            </if>
+
             <if test="closingTime != null and closingTime != ''">
                 ,closingTime = #{closingTime}
             </if>
@@ -58,7 +53,7 @@
         insert into business_pic
         (businessId, pic)
         values
-        <foreach collection="pics" item="pic"  separator=",">
+        <foreach collection="pics" item="pic" separator=",">
             (#{businessId}, #{pic})
         </foreach>
     </insert>
@@ -74,11 +69,6 @@
         phone = #{phone}
     </insert>
 
-    <update id="putBusinessPic">
-        update business_pic
-        set state = 1
-        where businessId = #{businessId}
-    </update>
 
     <update id="udtBusinessState">
         update business
@@ -101,53 +91,69 @@
     <update id="udtBusinessLogo">
         update business
 
-       set  logo = #{logo}
+        set logo = #{logo}
 
         where businessId = #{businessId}
     </update>
+
     <update id="udtBusinessPaper">
         update business
 
-       set paper = #{paper}
+        set paper = #{paper}
 
         where businessId = #{businessId}
     </update>
 
     <select id="selAllBusiness">
 
-    SELECT
-    b.businessId, b.businessName, b.title
-    , k.categoryId, k.categoryName
-    , d.detailTypeId, d.detailTypeName
-    , p.price
-    , COUNT(distinct s.serviceId) AS serviceCount
-    , COUNT(DISTINCT r.reviewId) AS reviewCount
-    , ROUND(COALESCE(AVG(r.score), 0), 2) AS scoreAvg
-    , IFNULL(l.userId, 0) AS `like`
-    , g.regionId, g.region
-    , c.pic
-    , b.lat, b.lng
-    , ROUND(6371000  * ACOS(COS(RADIANS(#{userLat})) * COS(RADIANS(b.lat)) * COS(RADIANS(b.lng) - RADIANS(#{userLng})) + SIN(RADIANS(#{userLat})) * SIN(RADIANS(b.lat)))) AS distance
+        SELECT
+        b.businessId, b.businessName, b.title, b.logo
+        , k.categoryId, k.categoryName
+        , d.detailTypeId, d.detailTypeName
+        , p.price
+        , COUNT(distinct s.serviceId) AS serviceCount
+        , COUNT(DISTINCT r.reviewId) AS reviewCount
+        , ROUND(COALESCE(AVG(r.score), 0), 2) AS scoreAvg
+<!--        ,   CASE-->
+<!--            WHEN l.userId IS NULL THEN 0-->
+<!--            ELSE 1-->
+<!--            as like-->
+        , IFNULL(l.userId,0) as 'like'
+        , g.regionId, g.region
+        , c.pic
+        , b.lat, b.lng
+        , ROUND(6371000 * ACOS(COS(RADIANS(#{userLat})) * COS(RADIANS(b.lat)) * COS(RADIANS(b.lng) -
+        RADIANS(#{userLng})) + SIN(RADIANS(#{userLat})) * SIN(RADIANS(b.lat)))) AS distance
 
-    FROM business b
-    LEFT JOIN detail_type d
-    ON d.detailTypeId= b.detailTypeId
-    LEFT JOIN category k
-    ON k.categoryId = d.categoryId
-    left JOIN product p
-    ON b.businessId = p.businessId
-    left JOIN service s
-    ON s.productId = p.productId
-    left JOIN review r
-    ON s.serviceId = r.serviceId
-    LEFT JOIN `like` l
-    ON l.businessId = b.businessId AND l.userId = #{signedUserId}
-    LEFT JOIN business_region br
-    ON br.businessId = b.businessId
-    LEFT JOIN region g
-    ON g.regionId = br.regionId
-    LEFT JOIN business_pic c
-    ON c.businessId = b.businessId AND c.state = 2
+        FROM business b
+        LEFT JOIN detail_type d
+        ON d.detailTypeId= b.detailTypeId
+        LEFT JOIN category k
+        ON k.categoryId = d.categoryId
+        left JOIN product p
+        ON b.businessId = p.businessId
+        left JOIN service s
+        ON s.productId = p.productId
+        left JOIN review r
+        ON s.serviceId = r.serviceId
+        LEFT JOIN `like` l
+        ON l.businessId = b.businessId AND l.userId = #{signedUserId}
+        LEFT JOIN business_region br
+        ON br.businessId = b.businessId
+        LEFT JOIN region g
+        ON g.regionId = br.regionId
+        LEFT JOIN business_pic c
+        ON c.businessId = b.businessId AND c.state = 2
+<!--        <if test="signedUserId != null">-->
+<!--            LEFT JOIN `like` l-->
+<!--            ON l.businessId = b.businessId-->
+<!--            AND l.userId = #{signedUserId}-->
+<!--        </if>-->
+<!--        <if test="signedUserId==null">-->
+<!--            LEFT JOIN `like` l-->
+<!--            ON l.businessId = b.businessId-->
+<!--        </if>-->
+
 
         WHERE 1=1
         <if test="regionId != null">
@@ -162,6 +168,7 @@
         <if test="searchTerm != null">
             AND b.title like '%${searchTerm}%'
         </if>
+        AND P.PRICE !=0
         GROUP BY b.businessId
 
         <choose>
@@ -174,7 +181,7 @@
             <when test="sortType == '주문순'">
                 ORDER BY serviceCount DESC
             </when>
-            <when test="sortType == '가격순'">
+            <when test="sortType == '저가순'">
                 ORDER BY p.price
             </when>
             <when test="sortType == '거리순'">
@@ -188,12 +195,10 @@
     </select>
 
 
-
-
-
-
     <select id="selOneBusiness">
         SELECT
+        p.productId,
+        d.categoryId,
         b.detailTypeId,
         d.detailTypeName,
         b.logo,
@@ -205,7 +210,6 @@
         IF(l.userId IS NULL, 0, 1) AS `like`,
         b.address,
         COUNT(distinct s.serviceId) AS serviceCount,
-        -- openingTime과 closingTime에서 초를 00으로 설정하여 시:분 형태로 출력
         DATE_FORMAT(b.openingTime, '%H:%i') AS openingTime,
         DATE_FORMAT(b.closingTime, '%H:%i') AS closingTime,
         b.busiCreatedAt,
@@ -228,9 +232,9 @@
     </select>
 
     <select id="getBusinessPicList">
-        select  p.businessId, p.businessPicId, p.pic
+        select p.businessId, p.businessPicId, p.pic
         from business_pic p
-        where p.businessId = #{businessId} and p.state in(1,2)
+        where p.businessId = #{businessId}
     </select>
 
     <delete id="delBusinessPic">
@@ -256,12 +260,78 @@
         ON s.productId = p.productId
         JOIN business b
         ON p.businessId = b.businessId
-        WHERE  b.businessId = #{businessId}
+        WHERE b.businessId = #{businessId}
         GROUP BY s.productId, YEAR(s.paidAt), MONTH(s.paidAt)
         ORDER BY s.productId ,year DESC, month DESC;
     </select>
 
+    <select id="getBusinessRevenueList">
 
+        SELECT
+        b.businessName,
+        d.detailTypeName,
+        SUM(s.price) AS totalRevenue,
+        SUM(CASE
+        WHEN YEAR(s.paidAt) = YEAR(NOW()) AND MONTH(s.paidAt) = MONTH(NOW())
+        THEN s.price
+        ELSE 0
+        END) AS thisMonthRevenue
+        FROM service s
+        JOIN product p ON s.productId = p.productId
+        JOIN business b ON p.businessId = b.businessId
+        JOIN detail_type d ON b.detailTypeId = d.detailTypeId
+      GROUP BY b.businessId
+
+    </select>
+
+    <select id="countBusinessServicesList">
+        SELECT
+        b.businessName,
+        d.detailTypeName,
+        COUNT(s.serviceId) AS totalServiceCount,
+        SUM(
+        s.completed >= 7
+        AND s.createdAt >= DATE_FORMAT(NOW(), '%Y-%m-01')
+        ) AS thisMonthServiceCount
+        FROM business b
+        JOIN detail_type d ON b.detailTypeId = d.detailTypeId
+        JOIN product p ON b.businessId = p.businessId
+        LEFT JOIN service s ON s.productId = p.productId
+        AND s.completed >= 7
+        GROUP BY b.businessName, d.detailTypeName;
+    </select>
+    <select id="countBusinessServices">
+
+        WITH month_series AS (
+        SELECT YEAR(CURDATE()) AS year, MONTH(CURDATE()) AS month
+        UNION ALL
+        SELECT YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)), MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))
+        UNION ALL
+        SELECT YEAR(DATE_SUB(CURDATE(), INTERVAL 2 MONTH)), MONTH(DATE_SUB(CURDATE(), INTERVAL 2 MONTH))
+        UNION ALL
+        SELECT YEAR(DATE_SUB(CURDATE(), INTERVAL 3 MONTH)), MONTH(DATE_SUB(CURDATE(), INTERVAL 3 MONTH))
+        UNION ALL
+        SELECT YEAR(DATE_SUB(CURDATE(), INTERVAL 4 MONTH)), MONTH(DATE_SUB(CURDATE(), INTERVAL 4 MONTH))
+        UNION ALL
+        SELECT YEAR(DATE_SUB(CURDATE(), INTERVAL 5 MONTH)), MONTH(DATE_SUB(CURDATE(), INTERVAL 5 MONTH))
+        )
+        SELECT
+        b.businessName,
+        ms.year,
+        ms.month,
+        IFNULL(COUNT(s.serviceId), 0) AS serviceCount
+        FROM month_series ms
+        CROSS JOIN business b
+        LEFT JOIN product p ON b.businessId = p.businessId
+        LEFT JOIN service s
+        ON s.productId = p.productId
+        AND YEAR(s.createdAt) = ms.year
+        AND MONTH(s.createdAt) = ms.month
+        AND s.completed >= 7
+        WHERE b.businessId = #{businessId}
+        GROUP BY ms.year, ms.month
+        ORDER BY ms.year DESC, ms.month DESC;
+    </select>
 
 
 </mapper>

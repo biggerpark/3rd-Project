@@ -7,6 +7,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 import java.util.UUID;
 
 @Slf4j
@@ -25,6 +30,11 @@ public class MyFileUtils {
     public MyFileUtils(@Value("${file.directory}") String uploadPath) {
         log.info("MyFileUtils - 생성자: {}", uploadPath);
         this.uploadPath = uploadPath;
+    }
+
+    public boolean folderExists(String folderPath) {
+        File folder = new File(uploadPath,folderPath);
+        return folder.exists() && folder.isDirectory();  // 폴더가 존재하고, 디렉토리일 경우 true 반환
     }
 
     // path = "ddd/aaa"
@@ -105,6 +115,43 @@ public class MyFileUtils {
         } else {
             log.error("File does not exist or is not a file: {}", file.getAbsolutePath());
             return false;  // 파일이 존재하지 않거나 파일이 아니면 false 반환
+        }
+    }
+
+    public boolean moveFolder(String oldFolderPath, String newFolderPath) {
+        Path sourcePath = Paths.get(uploadPath,oldFolderPath);
+        Path targetPath = Paths.get(uploadPath,newFolderPath);
+
+        try {
+            // 대상 폴더가 없으면 생성
+            Files.createDirectories(targetPath);
+
+            // 깊이 우선 탐색으로 디렉터리와 파일 모두 처리
+            Files.walk(sourcePath)
+                    .sorted(Comparator.reverseOrder()) // 하위 폴더부터 먼저 처리 (DFS)
+                    .forEach(source -> {
+                        try {
+                            Path destination = targetPath.resolve(sourcePath.relativize(source));
+
+                            if (Files.isDirectory(source)) {
+                                // 디렉터리 생성
+                                Files.createDirectories(destination);
+                            } else {
+                                // 파일 이동 (이미 존재하면 덮어쓰기)
+                                Files.move(source, destination, StandardCopyOption.REPLACE_EXISTING);
+                            }
+                        } catch (IOException e) {
+                            System.err.println("이동 실패: " + source + " -> " + e.getMessage());
+                        }
+                    });
+
+            // 원본 폴더 삭제
+           // Files.deleteIfExists(sourcePath);
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }

@@ -4,12 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.green.jobdone.common.exception.CustomException;
-import com.green.jobdone.common.exception.ReviewErrorCode;
 import com.green.jobdone.common.exception.UserErrorCode;
 import com.green.jobdone.config.security.AuthenticationFacade;
 import com.green.jobdone.ocrwebclient.model.OCRWebClientDto;
 import com.green.jobdone.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Value;
 import reactor.core.publisher.Mono;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/ocr")
@@ -40,6 +40,7 @@ public class OCRWebClientController {
 
     @PostMapping("/upload")
     public Mono<OCRWebClientDto> uploadOCR(@RequestPart("paper") MultipartFile file) {
+        long signedUserId = authenticationFacade.getSignedUserId();
         return Mono.fromCallable(() -> {
                     MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
                     bodyBuilder.part("document", file.getResource());
@@ -54,10 +55,10 @@ public class OCRWebClientController {
                             .bodyToMono(String.class);
                 })
                 .flatMap(responseMono -> responseMono) // Mono<Mono<String>> -> Mono<String>
-                .map(response -> (OCRWebClientDto) processResponse(response)); // JSON 데이터 가공
+                .map(response -> (OCRWebClientDto) processResponse(signedUserId, response)); // JSON 데이터 가공
     }
 
-    private OCRWebClientDto processResponse(String response) {
+    private OCRWebClientDto processResponse(Long signedUserId, String response) {
         try {
             JsonNode jsonNode = objectMapper.readTree(response);
             // 특정 필드 추출 예제 (OCR 결과에서 "text" 필드만 반환)
@@ -69,7 +70,9 @@ public class OCRWebClientController {
             if (userName.length() > 10) {
                 userName = result.substring(startIdxUserName + ("성명:").length(), result.indexOf("개업", startIdxUserName));
             }
-//            if(!userName.equals(userRepository.getUserNameByUserId(authenticationFacade.getSignedUserId()))) {
+            long userId = signedUserId;
+            log.info("userId: {}", userId);
+//            if(!userName.equals(userRepository.getUserNameByUserId(userId))) {
 //                throw new CustomException(UserErrorCode.INCORRECT_NAME);
 //            }
             int startIdxNum = result.indexOf("등록번호:");
@@ -87,7 +90,7 @@ public class OCRWebClientController {
                         result.indexOf("생년월일", startIdxBusiCreatedAt)
                 );
                 SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy년MM월dd일");
-                SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy/MM/dd");
+                SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date date = inputFormat.parse(busiCreatedAt);
                 ocrWebClientDto.setBusiCreatedAt(outputFormat.format(date));
             } catch (Exception e1) {
@@ -97,7 +100,7 @@ public class OCRWebClientController {
                             result.indexOf("사업장", startIdxBusiCreatedAt)
                     );
                     SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy년MM월dd일");
-                    SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy/MM/dd");
+                    SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
                     Date date = inputFormat.parse(busiCreatedAt);
                     ocrWebClientDto.setBusiCreatedAt(outputFormat.format(date));
                 } catch (Exception e2) {

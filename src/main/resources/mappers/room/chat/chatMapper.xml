@@ -27,27 +27,32 @@
     </insert>
     <resultMap id="selChat" type="com.green.jobdone.room.chat.model.ChatGetRes">
         <id property="chatId" column="chatId"/>
-        <result property="contents" column="contents"/>
+        <result property="message" column="message"/>
         <result property="flag" column="flag"/>
         <result property="createdAt" column="createdAt"/>
         <result property="userName" column="userName"/>
         <result property="logo" column="logo"/>
+        <result property="logo2" column="logo2"/>
         <result property="businessName" column="businessName"/>
-        <collection property="pics" resultMap="chatPic"/>
-    </resultMap>
-    <resultMap id="chatPic" type="com.green.jobdone.room.chat.model.GetPicDto">
-        <id property="chatPicId" column="chatPicId"/>
+        <result property="businessId" column="businessId"/>
+        <result property="userId" column="userId"/>
         <result property="pic" column="pic"/>
+        <result property="chatPicId" column="chatPicId"/>
+<!--        <collection property="pics" resultMap="chatPic"/>-->
     </resultMap>
+<!--    <resultMap id="chatPic" type="com.green.jobdone.room.chat.model.GetPicDto">-->
+<!--        <id property="chatPicId" column="chatPicId"/>-->
+<!--        <result property="pic" column="pic"/>-->
+<!--    </resultMap>-->
     <select id="selRoomChat" resultMap="selChat">
-        select distinct a.chatId, a.contents, a.flag, a.createdAt, c.name as userName, d.logo, d.businessName
-        , e.pic, e.chatPicId
+        select distinct a.chatId, a.contents as message, a.flag, a.createdAt, c.name as userName, d.logo, d.businessName
+        , e.pic, e.chatPicId, d.businessId, c.pic as logo2, c.userId
         from chat a
         left join room b on a.roomId = b.roomId
         left join user c on b.userId = c.userId
         left join business d on b.businessId = d.businessId
         left join chat_pic e on a.chatId = e.chatId
         where a.roomId = #{roomId}
-        order by a.chatId desc, e.chatPicId
+        order by a.chatId, e.chatPicId
     </select>
 </mapper>

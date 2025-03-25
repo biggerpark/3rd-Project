@@ -19,14 +19,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -42,13 +43,20 @@ public class UserService {
     private final AuthenticationFacade authenticationFacade;
     private final JwtConst jwtConst;
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
 
     public int postUserSignUp(UserSignUpReq p, MultipartFile pic) {
-        String existsEmail = mapper.checkEmailExists(p.getEmail());
+//        String existsEmail = mapper.checkEmailExists(p.getEmail());
 
-        if (existsEmail != null) {
-            throw new IllegalArgumentException("이미 등록된 이메일입니다.");
+        User user = new User();
+        UserDto existsEmail = userRepository.checkPostUser(p.getEmail());
+        if(existsEmail!=null) {
+            if(existsEmail.getRole().getCode()==999){
+                user = userRepository.findById(existsEmail.getUserId()).orElseGet(User::new);
+            } else {
+                throw new IllegalArgumentException("이미 등록된 이메일입니다.");
+            }
         }
         String img = String.format("img%d.jpg", (int)(Math.random()*4)+1);
         String savedPicName = (pic != null ? myFileUtils.makeRandomFileName(pic) : img);
@@ -57,13 +65,15 @@ public class UserService {
         String hashedPassword = passwordEncoder.encode(p.getUpw());
         log.info("hashedPassword: {}", hashedPassword);
 
-        User user = new User();
         user.setProviderType(SignInProviderType.LOCAL);
         user.setEmail(p.getEmail());
         user.setUpw(hashedPassword);
         user.setName(p.getName());
         user.setPic(savedPicName);
+//        user.setUuid( UUID.randomUUID().toString().replace("-", "")); // UUID 설정
         user.setPhone(p.getPhone());
+
+        user.setRole(UserRole.USER);
 
         //int result = mapper.insUser(p);
         userRepository.save(user);
@@ -80,7 +90,8 @@ public class UserService {
         // 저장 위치 만든다.
         // middlePath = user/${userId}
         // filePath = user/${userId}/${savedPicName}
-        long userId = p.getUserId(); //userId를 insert 후에 얻을 수 있다.
+        long userId = user.getUserId(); //userId를 insert 후에 얻을 수 있다.
+//        String uuid=user.getUuid();
         String middlePath = String.format("user/%d", userId);
         myFileUtils.makeFolders(middlePath);
         log.info("middlePath: {}", middlePath);
@@ -99,7 +110,14 @@ public class UserService {
 
     public UserSignInRes postUserSignIn(UserSignInReq p, HttpServletResponse response) {
 
+
+
         UserSignInResDto res = mapper.postUserSignIn(p.getEmail()); // email 에 해당하는 유저 res 가져오기
+
+        if(res==null){
+            throw new CustomException(UserErrorCode.INCORRECT_ID_PW);
+        }
+
 
         if (res.getPic() != null) {
             res.setPic(PicUrlMaker.makePicUserUrl(res.getUserId(), res.getPic()));
@@ -127,10 +145,14 @@ public class UserService {
 
         cookieUtils.setCookie(response, "refreshToken", refreshToken, jwtConst.getRefreshTokenCookieExpiry(), "/api/user/access-token");
 
+        if(res.getState()==120){
+            res.setBusinessId(0);
+        }
+
         return UserSignInRes
                 .builder()
                 .email(res.getEmail())
-                .type(res.getType())
+                .type(res.getRoles().get(0).getCode())
                 .userId(res.getUserId())
                 .pic(res.getPic())
                 .accessToken(accessToken)
@@ -142,9 +164,8 @@ public class UserService {
     }
 
     public int postUserEmailCheck(String email) {
-        UserSignUpEmailCheckRes res = mapper.postUserEmailCheck(email);
-
-        if (res == null) {
+        UserDto res = userRepository.checkPostUser(email);
+        if (res==null|| res.getRole().getCode()==999) {
             return 1;
         }
 
@@ -164,12 +185,19 @@ public class UserService {
 
         String profile = res.getPic().substring(0,3);
         String profile2 = "img";
+        String profile3 = "htt";
 
         if(profile.equals(profile2)) {
             res.setPic(String.format("/pic/user/defaultImg/%s", res.getPic()));
+        } else if(profile.equals(profile3)){
+            res.setPic(res.getPic());
         } else {
-            res.setPic(PicUrlMaker.makePicUserUrl(userId, res.getPic()));
+                res.setPic(PicUrlMaker.makePicUserUrl(userId, res.getPic()));
+//            res.setPic(PicUrlMaker.makePicUserUuidUrl(res.getUuid(),res.getPic()));
         }
+
+
+
 
         return res;
 
@@ -202,26 +230,40 @@ public class UserService {
 
         long userId = authenticationFacade.getSignedUserId();
 
-        p.setUserId(userId);
+//        p.setUserId(userId);
+
+        User user=new User();
+        user.setUserId(userId);
+        user.setPhone(p.getPhone());
+        user.setName(p.getName());
+
+
 
 
         if (pic == null) {
-            int result = mapper.updateUserInfo(p);
+//            int result = mapper.updateUserInfo(p);
+
+            int result=userRepository.updateUserInfo(user);
+
             return result;
+
         }
 
 
         String savedPicName = myFileUtils.makeRandomFileName(pic);
 
-        p.setPic(savedPicName);
+        user.setPic(savedPicName);
 
 
-        int result = mapper.updateUserInfo(p);
+//        int result = mapper.updateUserInfo(p);
 
-        String middlePath = String.format("user/%d", p.getUserId());
+        int result=userRepository.updateUserInfo(user);
+
+        String middlePath = String.format("user/%d", userId);
+//        String middlePath = String.format("%s/%s",UUID.randomUUID().toString().replace("-", ""),savedPicName);
 
 
-        myFileUtils.deleteFile(middlePath);
+        myFileUtils.deleteFolder(middlePath,true);
 
         myFileUtils.makeFolders(middlePath);
 
@@ -243,17 +285,20 @@ public class UserService {
         long userId=authenticationFacade.getSignedUserId();
         p.setUserId(userId);
 
-
         String pw = mapper.selectInfoPwUser(p.getUserId());
 
         if (pw == null || !passwordEncoder.matches(p.getUpw(), pw)) {
             return 0;
         }
 
-        int result = mapper.deleteUser(p);
 
 
-        String deletePath = String.format("%s/user/%d", myFileUtils.getUploadPath(), p.getUserId());
+//        int result = mapper.deleteUser(p);
+
+        int result=userRepository.deleteUser(userId);
+
+
+        String deletePath = String.format("user/%d", p.getUserId());
         myFileUtils.deleteFolder(deletePath, true);
 
 
@@ -323,4 +368,27 @@ public class UserService {
         }
     }
 
+//    @Transactional
+//    public int getUuidCheck(){
+//        List<UserUuidDto> list=userMapper.getUuidCheck();
+//
+//        for(UserUuidDto str:list){
+//            if(str.getUuid()==null){
+//                Optional<User> optionalUser=userRepository.findById(str.getUserId());
+//                User user=optionalUser.get();
+//                user.setUuid(UUID.randomUUID().toString().replace("-", ""));
+//                userRepository.save(user);ㅇ
+//            }
+//        }
+//        return 1;
+//    }
+
+    public void saveFcmToken(String token){
+        User user = userRepository.findById(authenticationFacade.getSignedUserId()).orElse(null);
+        if(token==null || user==null){
+            return;
+        }
+        user.setFCMToken(token);
+        userRepository.save(user);
+    }
 }

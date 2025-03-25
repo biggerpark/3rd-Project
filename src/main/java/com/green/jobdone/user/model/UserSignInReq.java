@@ -12,12 +12,13 @@ import lombok.Setter;
 public class UserSignInReq {
 
     @NotNull(message = "아이디를 입력하셔야 합니다.")
-    @Schema(description = "유저 이메일", example = "1234park@naver.com", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "유저 이메일", example = "sss@naver.com", requiredMode = Schema.RequiredMode.REQUIRED)
     private String email;
 
 
     @NotNull(message = "비밀번호를 입력하셔야 합니다.")
     @Size(min=4, max=50, message = "비밀번호는 4~50자 사이만 가능합니다.")
-    @Schema(description = "유저 비밀번호", example = "1111", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "유저 비밀번호", example = "1111aaaa", requiredMode = Schema.RequiredMode.REQUIRED)
+
     private String upw;
 }

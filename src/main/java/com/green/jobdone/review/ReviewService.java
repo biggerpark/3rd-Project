@@ -5,10 +5,11 @@ import com.green.jobdone.common.PicUrlMaker;
 import com.green.jobdone.common.exception.CustomException;
 import com.green.jobdone.common.exception.ReviewErrorCode;
 import com.green.jobdone.config.security.AuthenticationFacade;
+import com.green.jobdone.entity.*;
 import com.green.jobdone.review.comment.ReviewCommentMapper;
-import com.green.jobdone.review.comment.model.ReviewCommentDto;
 import com.green.jobdone.review.comment.model.ReviewCommentGetRes;
 import com.green.jobdone.review.model.*;
+import com.green.jobdone.service.ServiceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -29,6 +28,9 @@ public class ReviewService {
     private final ReviewPicMapper reviewPicMapper;
     private final ReviewCommentMapper reviewCommentMapper;
     private final AuthenticationFacade authenticationFacade;
+    private final ReviewRepository reviewRepository;
+    private final ReviewPicRepository reviewPicRepository;
+    private final ServiceRepository serviceRepository;
     private final MyFileUtils myFileUtils;
 
     public void postImg (MultipartFile pic, int num) {
@@ -43,12 +45,19 @@ public class ReviewService {
 
     @Transactional
     public ReviewPostRes postReview (List<MultipartFile> pics, ReviewPostReq p) {
-        if(reviewMapper.selUserIdByServiceId(p.getServiceId()) != authenticationFacade.getSignedUserId()) {
+        if(reviewRepository.findUserIdByServiceId(p.getServiceId()) != authenticationFacade.getSignedUserId()) {
             throw new CustomException(ReviewErrorCode.FAIL_TO_REG);
         }
-        int result = reviewMapper.insReview(p);
+        com.green.jobdone.entity.Service service = new com.green.jobdone.entity.Service();
+        service.setServiceId(p.getServiceId());
+        Review review = new Review();
+        review.setContents(p.getContents());
+        review.setScore(p.getScore());
+        review.setService(service);
+        Review savedReview = reviewRepository.save(review);
+       // int result = reviewMapper.insReview(p);
 
-        long reviewId = p.getReviewId();
+        Long reviewId = savedReview.getReviewId();
 
         String middlePath = String.format("review/%d", reviewId);
         myFileUtils.makeFolders(middlePath);
@@ -68,10 +77,18 @@ public class ReviewService {
                 throw new RuntimeException(e);
             }
         }
-        ReviewPicDto reviewPicDto = new ReviewPicDto();
-        reviewPicDto.setReviewId(reviewId);
-        reviewPicDto.setPics(picNameList);
-        int resultPics = reviewPicMapper.insReviewPic(reviewPicDto);
+        List<ReviewPic> reviewPicList = new ArrayList<>(picNameList.size());
+        for(String item : picNameList) {
+            ReviewPic reviewPic = new ReviewPic();
+            reviewPic.setReview(review);
+            reviewPic.setPic(item);
+            reviewPicList.add(reviewPic);
+        }
+        reviewPicRepository.saveAll(reviewPicList);
+//        ReviewPicDto reviewPicDto = new ReviewPicDto();
+//        reviewPicDto.setReviewId(reviewId);
+//        reviewPicDto.setPics(picNameList);
+//        int resultPics = reviewPicMapper.insReviewPic(reviewPicDto);
 
         return ReviewPostRes.builder()
                 .reviewId(reviewId)
@@ -79,7 +96,7 @@ public class ReviewService {
                 .build();
     }
 
-    public List<ReviewGetRes> getFeedList(ReviewGetReq p) {
+    public List<ReviewGetRes> getReviewList(ReviewGetReq p) {
         List<ReviewGetRes> list = new ArrayList<>(p.getSize());
 
         //SELECT (1): review + review_pic
@@ -129,22 +146,49 @@ public class ReviewService {
         return list;
     }
 
+    public List<ReviewGetMainRes> getReviewMainList() {
+        List<ReviewGetMainRes> res = reviewRepository.selReviewForMain();
+        for(ReviewGetMainRes item : res) {
+            String profile = item.getPic().substring(0,3);
+            String profile2 = "img";
+            String profile3 = "htt";
+
+            if(profile.equals(profile2)) {
+                item.setPic(String.format("/pic/user/defaultImg/%s", item.getPic()));
+            } else if(profile.equals(profile3)){
+                item.setPic(item.getPic());
+            } else {
+                item.setPic(PicUrlMaker.makePicUserUrl(item.getUserId(), item.getPic()));
+            }
+            item.setUserId(null);
+        }
+        return res;
+    }
+
     public ReviewPutRes updReview(List<MultipartFile> pics, ReviewPutReq p) {
-        if(reviewMapper.selUserIdByReviewId(p.getReviewId()) != authenticationFacade.getSignedUserId()) {
+        if(reviewRepository.findUserIdByReviewId(p.getReviewId()) != authenticationFacade.getSignedUserId()) {
             throw new CustomException(ReviewErrorCode.FAIL_TO_UPD);
         }
-        int result = reviewMapper.updReview(p);
+        Review review = reviewRepository.findById(p.getReviewId()).orElse(null);
+        com.green.jobdone.entity.Service service = new com.green.jobdone.entity.Service();
+        service.setServiceId(p.getServiceId());
+        review.setReviewId(p.getReviewId());
+        review.setService(service);
+        review.setContents(p.getContents());
+        review.setScore(p.getScore());
+        reviewRepository.save(review);
+//        int result = reviewMapper.updReview(p);
         List<String> picNameList = new ArrayList<>();
 //        String check = pics.get(0).getOriginalFilename();
 
         long reviewId = p.getReviewId();
-        List<String> delPicNameList = reviewPicMapper.selReviewPicIdWithState1(reviewId);
+        List<String> delPicNameList = reviewPicRepository.getReviewPicByReviewIdAndState(reviewId);
         for(String pic : delPicNameList) {
             String middlePath = String.format("review/%d/%s", reviewId, pic);
             myFileUtils.deleteFile(middlePath);
         }
 
-        int delPics = reviewPicMapper.delReviewPic(reviewId);
+        int delPics = reviewPicRepository.deleteReviewPicByReviewId(reviewId);
 
         if(pics == null || pics.isEmpty()){
             return ReviewPutRes.builder()
@@ -171,10 +215,19 @@ public class ReviewService {
                 throw new RuntimeException(e);
             }
         }
-        ReviewPicDto reviewPicDto = new ReviewPicDto();
-        reviewPicDto.setReviewId(reviewId);
-        reviewPicDto.setPics(picNameList);
-        int resultPics = reviewPicMapper.insReviewPic(reviewPicDto);
+        List<ReviewPic> reviewPicList = new ArrayList<>(picNameList.size());
+        for(String item : picNameList) {
+            ReviewPic reviewPic = new ReviewPic();
+            reviewPic.setReview(review);
+            reviewPic.setPic(item);
+            reviewPicList.add(reviewPic);
+        }
+        reviewPicRepository.saveAll(reviewPicList);
+
+//        ReviewPicDto reviewPicDto = new ReviewPicDto();
+//        reviewPicDto.setReviewId(reviewId);
+//        reviewPicDto.setPics(picNameList);
+//        int resultPics = reviewPicMapper.insReviewPic(reviewPicDto);
 
         return ReviewPutRes.builder()
                 .reviewId(reviewId)
@@ -183,20 +236,25 @@ public class ReviewService {
     }
 
     public void updReviewPicState(ReviewPicStatePutReq p) {
-        reviewPicMapper.updReviewPicState(p);
+        if(p.getReviewId() == null && p.getReviewPicId() != null) {
+            reviewPicRepository.updateStateByReviewPicId(p.getReviewPicId());
+        } else {
+            reviewPicRepository.updateStateByReviewId(p.getReviewId());
+        }
     }
 
-    public int delReview(ReviewDelReq p) {
-        if(reviewMapper.selUserIdByReviewId(p.getReviewId()) != authenticationFacade.getSignedUserId()) {
+    public void delReview(ReviewDelReq p) {
+        if(reviewRepository.findUserIdByReviewId(p.getReviewId()) != authenticationFacade.getSignedUserId()) {
             throw new CustomException(ReviewErrorCode.FAIL_TO_DEL);
         }
-        int affectedRows = reviewMapper.delReview(p);
-
+        Review review = reviewRepository.findById(p.getReviewId()).orElse(null);
+        if(review == null) {
+            throw new CustomException(ReviewErrorCode.FAIL_TO_DEL);
+        }
+        reviewRepository.delete(review);
         //리뷰 사진 삭제
         String deletePath = String.format("review/%d", p.getReviewId());
         myFileUtils.deleteFolder(deletePath, true);
-
-        return affectedRows;
     }
 
 
